@@ -54,30 +54,21 @@ export function MobileNav({
 
     const mediaQuery = window.matchMedia("(min-width: 1024px)");
 
-    const handleMediaChange = (event: MediaQueryListEvent | MediaQueryList) => {
+    const handleMediaChange = (event: MediaQueryListEvent) => {
       if (event.matches) {
         setIsOpen(false);
       }
     };
 
-    // Check immediately in case it was opened at or near the breakpoint
     if (mediaQuery.matches) {
-      setIsOpen(false);
+      queueMicrotask(() => setIsOpen(false));
       return;
     }
 
-    if (typeof mediaQuery.addEventListener === "function") {
-      mediaQuery.addEventListener("change", handleMediaChange);
-    } else if (typeof (mediaQuery as any).addListener === "function") {
-      (mediaQuery as any).addListener(handleMediaChange);
-    }
+    mediaQuery.addEventListener("change", handleMediaChange);
 
     return () => {
-      if (typeof mediaQuery.removeEventListener === "function") {
-        mediaQuery.removeEventListener("change", handleMediaChange);
-      } else if (typeof (mediaQuery as any).removeListener === "function") {
-        (mediaQuery as any).removeListener(handleMediaChange);
-      }
+      mediaQuery.removeEventListener("change", handleMediaChange);
     };
   }, [isOpen]);
 
