@@ -1,0 +1,40 @@
+{
+  "Brand": {
+    "name": "Musnad Tech",
+    "tagline": "Empowering Next-Generation Digital Experiences"
+  },
+  "Navbar": {
+    "brandName": "Musnad Tech",
+    "contactCta": "Contact",
+    "signIn": "Sign In",
+    "openMenu": "Open navigation menu",
+    "closeMenu": "Close menu",
+    "dismissAnnouncement": "Dismiss announcement",
+    "learnMore": "Learn more",
+    "nav": {
+      "about": "About",
+      "services": "Services",
+      "projects": "Projects",
+      "blog": "Blog",
+      "careers": "Careers",
+      "team": "Team"
+    }
+  },
+  "HomePage": {
+    "badge": "Design System & Component Library",
+    "title": "Musnad UI Components",
+    "description": "A comprehensive suite of accessible, token-driven UI components engineered with Tailwind CSS v4, supporting brand crimson accents, full internationalization (next-intl), and responsive dark/light modes."
+  },
+  "Common": {
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System",
+    "language": "Language",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "deploy": "Confirm & Deploy",
+    "processing": "Processing...",
+    "search": "Search..."
+  }
+}
+
