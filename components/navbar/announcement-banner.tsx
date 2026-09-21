@@ -7,16 +7,7 @@ import type { AnnouncementBannerProps } from "./nav-types";
 import { DEFAULT_NAV_LABELS } from "./nav-config";
 import { cn } from "@/lib/utils";
 
-/**
- * AnnouncementBanner displayed above the main navbar.
- *
- * Implements:
- * - Badge tag integration
- * - Localized Link routing
- * - Client dismissal state
- * - Direction-aware arrow
- * - Accessible announcement region semantics
- */
+
 export function AnnouncementBanner({
   text,
   tag,
