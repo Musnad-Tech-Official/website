@@ -1,18 +1,21 @@
-import Link from "next/link";
+import Image from "next/image";
+import { Link } from "@/i18n/routing";
 import type { NavLogoProps } from "./nav-types";
 import { DEFAULT_NAV_CONFIG, DEFAULT_NAV_LABELS } from "./nav-config";
+import { cn } from "@/lib/utils";
 
 /**
- * NavLogo renders the brand logo mark and the "Musnad Tech" wordmark.
+ * NavLogo renders the brand logo with theme-aware images:
+ * - Light Mode: /brand/logo-light.png
+ * - Dark Mode: /brand/logo-dark.png
  *
- * Server-compatible component.
- *
- * Future replacement: Replace the inline `<span data-slot="logo-mark">`
- * with `<Image src="/brand/logo.svg" ... />` once the transparent logo asset is provided.
+ * Uses CSS classes `dark:hidden` and `hidden dark:block` for instant,
+ * flicker-free theme adaptation matching Next.js & next-themes best practices.
  */
 export function NavLogo({
   homeHref = DEFAULT_NAV_CONFIG.homeHref,
   wordmark = DEFAULT_NAV_LABELS.brandName,
+  showWordmark = true,
   onClick,
   className = "",
 }: NavLogoProps) {
@@ -21,24 +24,43 @@ export function NavLogo({
       href={homeHref}
       aria-label={`${wordmark} - Home`}
       onClick={onClick}
-      className={`group inline-flex items-center gap-2.5 rounded-md text-foreground transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-2 ${className}`}
+      className={cn(
+        "group inline-flex items-center gap-3 rounded-lg text-foreground transition-opacity hover:opacity-95",
+        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 shrink-0 select-none",
+        className
+      )}
     >
-      {/* Logo mark area - isolated for easy replacement with final SVG asset */}
-      <span
-        data-slot="logo-mark"
-        className="flex h-8 w-8 items-center justify-center rounded-lg bg-foreground text-background font-bold text-base select-none transition-transform group-hover:scale-105"
-        aria-hidden="true"
-      >
-        M
-      </span>
+      {/* Light Mode Logo */}
+      <Image
+        src="/brand/logo-light.png"
+        alt={`${wordmark} Logo`}
+        width={447}
+        height={559}
+        priority
+        className="h-10 w-auto object-contain dark:hidden transition-transform duration-200 group-hover:scale-105"
+      />
+
+      {/* Dark Mode Logo */}
+      <Image
+        src="/brand/logo-dark.png"
+        alt={`${wordmark} Logo`}
+        width={800}
+        height={800}
+        priority
+        className="h-10 w-auto object-contain hidden dark:block transition-transform duration-200 group-hover:scale-105"
+      />
 
       {/* Wordmark */}
-      <span
-        data-slot="logo-wordmark"
-        className="font-semibold text-lg tracking-tight text-foreground select-none"
-      >
-        {wordmark}
-      </span>
+      {showWordmark && wordmark && (
+        <span
+          data-slot="logo-wordmark"
+          className="font-bold text-lg sm:text-xl tracking-tight text-foreground select-none"
+        >
+          {wordmark}
+        </span>
+      )}
     </Link>
   );
 }
+
+

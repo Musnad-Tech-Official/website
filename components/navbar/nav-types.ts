@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import type { BadgeVariant } from "@/components/ui/badge";
 
 export interface NavItem {
   id: string;
@@ -6,6 +7,8 @@ export interface NavItem {
   href: string;
   requiresFeatureFlag?: "blog" | "careers";
   external?: boolean;
+  badge?: string;
+  badgeVariant?: BadgeVariant;
 }
 
 export interface NavLabels {
@@ -20,6 +23,7 @@ export interface NavLabels {
 
 export interface AnnouncementBannerProps {
   text: string;
+  tag?: string;
   href?: string;
   linkText?: string;
   direction?: "ltr" | "rtl";
@@ -32,9 +36,11 @@ export interface AnnouncementBannerProps {
 export interface NavLogoProps {
   homeHref?: string;
   wordmark?: string;
+  showWordmark?: boolean;
   onClick?: () => void;
   className?: string;
 }
+
 
 export interface NavLinksProps {
   items: NavItem[];
@@ -59,6 +65,7 @@ export interface MobileNavProps {
   direction?: "ltr" | "rtl";
   labels?: NavLabels;
   utilities?: ReactNode;
+  showUtilities?: boolean;
   className?: string;
 }
 
@@ -76,5 +83,7 @@ export interface NavbarProps {
   customItems?: NavItem[];
   labels?: NavLabels;
   utilities?: ReactNode;
+  showUtilities?: boolean;
   className?: string;
 }
+

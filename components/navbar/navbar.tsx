@@ -1,19 +1,27 @@
-import Link from "next/link";
+import { Link } from "@/i18n/routing";
+import { Button } from "@/components/ui/button";
+import { NavbarUtilities } from "@/components/navbar-utilities";
 import type { NavbarProps } from "./nav-types";
-import { DEFAULT_NAV_ITEMS, DEFAULT_NAV_CONFIG, DEFAULT_NAV_LABELS } from "./nav-config";
+import {
+  DEFAULT_NAV_CONFIG,
+  DEFAULT_NAV_LABELS,
+  ARABIC_NAV_LABELS,
+  getLocalizedNavItems,
+} from "./nav-config";
 import { NavLogo } from "./nav-logo";
 import { NavLinks } from "./nav-links";
 import { MobileNav } from "./mobile-nav";
 import { AnnouncementBanner } from "./announcement-banner";
+import { cn } from "@/lib/utils";
 
 /**
  * Public website navbar for Musnad Tech.
  *
- * Server Component architecture:
- * - Pure structural shell with no direct DOM event handlers
- * - Interactive leaves (NavLinks, MobileNav, AnnouncementBanner) manage their own client interactivity
- * - Reusable utilities slot for future ThemeToggle and LocaleSwitcher
- * - Fully locale/direction-ready
+ * Architecture:
+ * - Pure structural shell with clean design system tokens
+ * - Localized routing support across all links
+ * - Integrated Button, Badge, and NavbarUtilities
+ * - Fully locale/direction-aware with automatic defaults
  */
 export function Navbar({
   currentPath,
@@ -29,18 +37,28 @@ export function Navbar({
   customItems,
   labels: customLabels,
   utilities,
+  showUtilities = true,
   className = "",
 }: NavbarProps) {
-  const navItems = customItems || DEFAULT_NAV_ITEMS;
-  const labels = { ...DEFAULT_NAV_LABELS, ...customLabels };
+  // Locale-aware default items and labels
+  const navItems = customItems || getLocalizedNavItems(locale);
+  const defaultLabels = locale === "ar" ? ARABIC_NAV_LABELS : DEFAULT_NAV_LABELS;
+  const labels = { ...defaultLabels, ...customLabels };
   const stickyClass = isSticky ? "sticky top-0 z-40" : "relative";
+
+  // Default utilities if not explicitly passed
+  const renderedUtilities = utilities ?? (showUtilities ? <NavbarUtilities /> : null);
 
   return (
     <header
       role="banner"
       dir={direction}
       lang={locale}
-      className={`w-full max-w-full overflow-x-clip ${stickyClass} bg-background/95 backdrop-blur-md border-b border-black/10 dark:border-white/10 transition-colors ${className}`}
+      className={cn(
+        "w-full max-w-full overflow-x-clip bg-background/95 backdrop-blur-md border-b border-border transition-colors",
+        stickyClass,
+        className
+      )}
     >
       {/* Optional Announcement Banner */}
       {announcement && (
@@ -66,24 +84,30 @@ export function Navbar({
         </div>
 
         {/* Desktop Utility Actions Area */}
-        <div className="hidden lg:flex lg:items-center lg:gap-4">
+        <div className="hidden lg:flex lg:items-center lg:gap-3">
           {/* Integration slot for LocaleSwitcher / ThemeToggle */}
-          {utilities}
+          {renderedUtilities}
 
-          {/* Sign In link */}
-          <Link
-            href={signInHref}
-            className="text-sm font-medium text-foreground/80 hover:text-foreground transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground rounded px-2 py-1"
-          >
-            {labels.signIn}
+          {/* Sign In link button */}
+          <Link href={signInHref}>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-foreground/80 hover:text-foreground font-medium rounded-lg"
+            >
+              {labels.signIn}
+            </Button>
           </Link>
 
           {/* Primary Contact CTA */}
-          <Link
-            href={contactHref}
-            className="inline-flex items-center justify-center rounded-md bg-foreground px-4 py-2 text-sm font-medium text-background transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-2"
-          >
-            {labels.contactCta}
+          <Link href={contactHref}>
+            <Button
+              variant="primary"
+              size="sm"
+              className="font-semibold shadow-xs rounded-lg px-4"
+            >
+              {labels.contactCta}
+            </Button>
           </Link>
         </div>
 
@@ -100,9 +124,11 @@ export function Navbar({
             direction={direction}
             labels={labels}
             utilities={utilities}
+            showUtilities={showUtilities}
           />
         </div>
       </div>
     </header>
   );
 }
+
