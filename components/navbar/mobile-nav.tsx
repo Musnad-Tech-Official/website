@@ -1,23 +1,28 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
-import Link from "next/link";
+import { Link } from "@/i18n/routing";
+import { Button } from "@/components/ui/button";
+import { ThemeSwitcher } from "@/components/theme-switcher";
+import { LanguageSwitcher } from "@/components/language-switcher";
 import type { MobileNavProps } from "./nav-types";
 import { DEFAULT_NAV_CONFIG, DEFAULT_NAV_LABELS } from "./nav-config";
 import { NavLogo } from "./nav-logo";
 import { NavLinks } from "./nav-links";
 import { getFocusableElements } from "./nav-utils";
+import { cn } from "@/lib/utils";
 
 /**
- * Accessible mobile navigation drawer.
+ * Accessible, animated mobile navigation drawer.
  *
  * Implements:
+ * - Enter and exit slide/fade animations
+ * - Animated morphing hamburger / close icon
+ * - Touch-optimized segmented utilities for Theme and Language
  * - Keyboard focus trap while open
- * - Auto-close and scroll restoration on desktop viewport resize (>= 1024px)
- * - Escape key dismiss
- * - Focus restoration to hamburger trigger on close
- * - Reusable NavLinks integration
- * - Mobile utilities integration slot
+ * - Auto-close on desktop viewport resize (>= 1024px)
+ * - Escape key dismiss and focus restoration
+ * - Safe area & dynamic 100dvh viewport support
  */
 export function MobileNav({
   items,
@@ -30,38 +35,60 @@ export function MobileNav({
   direction = "ltr",
   labels: customLabels,
   utilities,
+  showUtilities = true,
   className = "",
 }: MobileNavProps) {
-  const [isOpen, setIsOpen] = useState(false);
+  // Mounting and animation states
+  const [isMounted, setIsMounted] = useState(false);
+  const [isAnimating, setIsAnimating] = useState(false);
+
   const triggerRef = useRef<HTMLButtonElement>(null);
   const drawerRef = useRef<HTMLDivElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
 
   const labels = { ...DEFAULT_NAV_LABELS, ...customLabels };
+  const isRtl = direction === "rtl";
 
+  // Open drawer with smooth enter animation
   const handleOpen = useCallback(() => {
-    setIsOpen(true);
+    setIsMounted(true);
+    // Double requestAnimationFrame ensures DOM is painted before transition starts
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        setIsAnimating(true);
+      });
+    });
   }, []);
 
+  // Close drawer with smooth exit animation
   const handleClose = useCallback(() => {
-    setIsOpen(false);
-    triggerRef.current?.focus();
+    setIsAnimating(false);
+    const timer = setTimeout(() => {
+      setIsMounted(false);
+      triggerRef.current?.focus();
+    }, 280); // matches CSS transition duration
+
+    return () => clearTimeout(timer);
   }, []);
 
   // 1. Viewport resize & orientation listener: auto-close if viewport becomes >= 1024px (desktop)
   useEffect(() => {
-    if (!isOpen) return;
+    if (!isMounted) return;
 
     const mediaQuery = window.matchMedia("(min-width: 1024px)");
 
     const handleMediaChange = (event: MediaQueryListEvent) => {
       if (event.matches) {
-        setIsOpen(false);
+        setIsAnimating(false);
+        setIsMounted(false);
       }
     };
 
     if (mediaQuery.matches) {
-      queueMicrotask(() => setIsOpen(false));
+      queueMicrotask(() => {
+        setIsAnimating(false);
+        setIsMounted(false);
+      });
       return;
     }
 
@@ -70,28 +97,35 @@ export function MobileNav({
     return () => {
       mediaQuery.removeEventListener("change", handleMediaChange);
     };
-  }, [isOpen]);
+  }, [isMounted]);
 
-  // 2. Body scroll locking: guaranteed restoration on close or unmount
+  // 2. Body scroll locking with scrollbar width compensation
   useEffect(() => {
-    if (!isOpen) return;
+    if (!isMounted) return;
 
     const originalOverflow = document.body.style.overflow;
+    const originalPaddingRight = document.body.style.paddingRight;
+    const scrollbarWidth =
+      window.innerWidth - document.documentElement.clientWidth;
+
     document.body.style.overflow = "hidden";
+    if (scrollbarWidth > 0) {
+      document.body.style.paddingRight = `${scrollbarWidth}px`;
+    }
 
     return () => {
       document.body.style.overflow = originalOverflow;
+      document.body.style.paddingRight = originalPaddingRight;
     };
-  }, [isOpen]);
+  }, [isMounted]);
 
   // 3. Focus trap and keyboard navigation (Tab cycling & Escape)
   useEffect(() => {
-    if (!isOpen) return;
+    if (!isMounted || !isAnimating) return;
 
-    // Focus the close button on open
     const focusTimer = setTimeout(() => {
       closeButtonRef.current?.focus();
-    }, 0);
+    }, 50);
 
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
@@ -140,50 +174,74 @@ export function MobileNav({
       clearTimeout(focusTimer);
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [isOpen, handleClose]);
+  }, [isMounted, isAnimating, handleClose]);
 
-  const drawerPositionClass =
-    direction === "rtl" ? "left-0 border-r" : "right-0 border-l";
+  // Position and transition transforms
+  const drawerPositionClass = isRtl ? "left-0 border-r" : "right-0 border-l";
+  const drawerTranslateClass = isAnimating
+    ? "translate-x-0"
+    : isRtl
+      ? "-translate-x-full"
+      : "translate-x-full";
 
   return (
-    <div className={`lg:hidden ${className}`}>
-      {/* Hamburger Trigger Button */}
+    <div className={cn("lg:hidden", className)}>
+      {/* Animated Hamburger Trigger Button */}
       <button
         ref={triggerRef}
         type="button"
-        onClick={handleOpen}
-        aria-expanded={isOpen}
+        onClick={isMounted ? handleClose : handleOpen}
+        aria-expanded={isMounted}
         aria-controls="mobile-nav-dialog"
-        aria-label={isOpen ? labels.closeMenu : labels.openMenu}
-        className="inline-flex h-10 w-10 items-center justify-center rounded-md p-2 text-foreground/80 hover:bg-black/5 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-2 dark:hover:bg-white/10"
+        aria-label={isMounted ? labels.closeMenu : labels.openMenu}
+        className={cn(
+          "relative inline-flex h-10 w-10 items-center justify-center rounded-lg border border-border/60 bg-background/80 text-foreground transition-all duration-150 select-none cursor-pointer",
+          "hover:bg-accent hover:text-accent-foreground hover:border-primary/40 active:scale-95",
+          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1"
+        )}
       >
-        <svg
-          className="h-5 w-5"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-          aria-hidden="true"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M4 6h16M4 12h16M4 18h16"
+        <span className="sr-only">
+          {isMounted ? labels.closeMenu : labels.openMenu}
+        </span>
+        <div className="relative flex h-4 w-5 flex-col justify-between">
+          <span
+            className={cn(
+              "h-0.5 w-full rounded-full bg-current transition-all duration-250 ease-out origin-center",
+              isMounted && "translate-y-[7px] rotate-45"
+            )}
           />
-        </svg>
+          <span
+            className={cn(
+              "h-0.5 w-full rounded-full bg-current transition-all duration-200 ease-out",
+              isMounted && "opacity-0 scale-x-0"
+            )}
+          />
+          <span
+            className={cn(
+              "h-0.5 w-full rounded-full bg-current transition-all duration-250 ease-out origin-center",
+              isMounted && "-translate-y-[7px] -rotate-45"
+            )}
+          />
+        </div>
       </button>
 
-      {/* Accessible Drawer Modal */}
-      {isOpen && (
-        <div className="fixed inset-0 z-50 flex" role="presentation">
-          {/* Backdrop overlay */}
+      {/* Accessible Drawer Modal & Backdrop */}
+      {isMounted && (
+        <div
+          className="fixed inset-0 z-50 flex overflow-hidden"
+          role="presentation"
+        >
+          {/* Backdrop overlay with fade transition */}
           <div
-            className="fixed inset-0 bg-black/50 backdrop-blur-xs transition-opacity"
+            className={cn(
+              "fixed inset-0 bg-black/60 backdrop-blur-xs transition-opacity duration-300 ease-out",
+              isAnimating ? "opacity-100" : "opacity-0"
+            )}
             aria-hidden="true"
             onClick={handleClose}
           />
 
-          {/* Drawer container with focus trap */}
+          {/* Drawer container with slide transition */}
           <div
             ref={drawerRef}
             id="mobile-nav-dialog"
@@ -191,41 +249,47 @@ export function MobileNav({
             aria-modal="true"
             aria-label={labels.openMenu}
             dir={direction}
-            className={`fixed inset-y-0 ${drawerPositionClass} z-50 flex w-full max-w-xs flex-col bg-background p-6 shadow-2xl transition-transform duration-200 ease-in-out dark:bg-zinc-950 border-black/10 dark:border-white/10`}
+            className={cn(
+              "fixed inset-y-0 z-50 flex h-[100dvh] w-[88vw] max-w-sm sm:max-w-xs flex-col bg-card text-card-foreground p-5 shadow-2xl transition-transform duration-300 ease-out border-border",
+              drawerPositionClass,
+              drawerTranslateClass
+            )}
           >
             {/* Header: Logo and Close Button */}
-            <div className="flex items-center justify-between pb-6 border-b border-black/10 dark:border-white/10">
+            <div className="flex items-center justify-between pb-4 border-b border-border/80">
               <NavLogo
                 homeHref={homeHref}
                 wordmark={labels.brandName}
                 onClick={handleClose}
               />
-              <button
+              <Button
                 ref={closeButtonRef}
                 type="button"
+                variant="ghost"
+                size="icon-sm"
                 onClick={handleClose}
                 aria-label={labels.closeMenu}
-                className="inline-flex h-9 w-9 items-center justify-center rounded-md text-foreground/70 hover:bg-black/5 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground dark:hover:bg-white/10"
+                className="rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted"
               >
                 <svg
                   className="h-5 w-5"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
+                  strokeWidth="2"
                   aria-hidden="true"
                 >
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
-                    strokeWidth={2}
                     d="M6 18L18 6M6 6l12 12"
                   />
                 </svg>
-              </button>
+              </Button>
             </div>
 
-            {/* Navigation links (reusing NavLinks with mobile presentation variant) */}
-            <div className="flex-1 overflow-y-auto py-6">
+            {/* Navigation links (reusing NavLinks with mobile variant) */}
+            <div className="flex-1 overflow-y-auto overscroll-contain py-4 space-y-4">
               <NavLinks
                 items={items}
                 currentPath={currentPath}
@@ -234,33 +298,69 @@ export function MobileNav({
                 onItemClick={handleClose}
                 variant="mobile"
               />
-            </div>
 
-            {/* Utility action area */}
-            <div className="flex flex-col gap-3 pt-6 border-t border-black/10 dark:border-white/10">
-              {/* Slot for future additions: ThemeToggle, LocaleSwitcher */}
-              {utilities && (
-                <div className="flex items-center justify-between pb-1">
-                  {utilities}
+              {/* Dedicated Touch-Optimized Mobile Utilities Section */}
+              {showUtilities && (
+                <div className="pt-4 border-t border-border/60 space-y-3">
+                  {utilities ? (
+                    <div className="flex items-center justify-between">
+                      {utilities}
+                    </div>
+                  ) : (
+                    <div className="space-y-3 p-3 rounded-xl bg-muted/40 border border-border/40">
+                      {/* Language Switcher */}
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-semibold text-muted-foreground">
+                          {isRtl ? "اللغة" : "Language"}
+                        </span>
+                        <LanguageSwitcher variant="segmented" size="sm" />
+                      </div>
+
+                      {/* Theme Switcher */}
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-semibold text-muted-foreground">
+                          {isRtl ? "المظهر" : "Theme"}
+                        </span>
+                        <ThemeSwitcher variant="segmented" size="sm" />
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
+            </div>
 
-              {/* Sign in entry */}
+            {/* Footer Action CTAs */}
+            <div className="flex flex-col gap-2.5 pt-4 border-t border-border/80">
+              {/* Sign in button */}
               <Link
                 href={signInHref}
                 onClick={handleClose}
-                className="w-full text-center py-2.5 text-sm font-medium text-foreground/80 hover:text-foreground transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground rounded-md"
+                className="w-full block"
               >
-                {labels.signIn}
+                <Button
+                  variant="outline"
+                  size="md"
+                  fullWidth
+                  className="rounded-xl font-medium"
+                >
+                  {labels.signIn}
+                </Button>
               </Link>
 
               {/* Primary Contact CTA */}
               <Link
                 href={contactHref}
                 onClick={handleClose}
-                className="w-full flex items-center justify-center rounded-md bg-foreground px-4 py-2.5 text-sm font-medium text-background transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-2"
+                className="w-full block"
               >
-                {labels.contactCta}
+                <Button
+                  variant="primary"
+                  size="md"
+                  fullWidth
+                  className="rounded-xl font-semibold shadow-sm"
+                >
+                  {labels.contactCta}
+                </Button>
               </Link>
             </div>
           </div>
@@ -269,3 +369,4 @@ export function MobileNav({
     </div>
   );
 }
+
