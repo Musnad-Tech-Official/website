@@ -83,6 +83,7 @@ export function getFooterSections(t: (key: string) => string): FooterSection[] {
         { id: "services", label: t("nav.services"), href: "/services" },
         { id: "blog", label: t("nav.blog"), href: "/blog" },
         { id: "team", label: t("nav.team"), href: "/team" },
+        { id: "careers", label: t("nav.careers"), href: "/careers" },
       ],
     },
     {
