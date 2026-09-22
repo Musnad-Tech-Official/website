@@ -12,11 +12,11 @@
     "dismissAnnouncement": "إخفاء الإعلان",
     "learnMore": "معرفة المزيد",
     "nav": {
+      "home": "الرئيسية",
       "about": "من نحن",
       "services": "خدماتنا",
       "projects": "مشاريعنا",
       "blog": "المدونة",
-      "careers": "الوظائف",
       "team": "فريق العمل"
     }
   },

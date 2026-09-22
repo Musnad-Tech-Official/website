@@ -3,8 +3,6 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { Link } from "@/i18n/routing";
 import { Button } from "@/components/ui/button";
-import { ThemeSwitcher } from "@/components/theme-switcher";
-import { LanguageSwitcher } from "@/components/language-switcher";
 import type { MobileNavProps } from "./nav-types";
 import { DEFAULT_NAV_CONFIG, DEFAULT_NAV_LABELS } from "./nav-config";
 import { NavLogo } from "./nav-logo";
@@ -34,8 +32,6 @@ export function MobileNav({
   signInHref = DEFAULT_NAV_CONFIG.signInHref,
   direction = "ltr",
   labels: customLabels,
-  utilities,
-  showUtilities = true,
   className = "",
 }: MobileNavProps) {
   // Mounting and animation states
@@ -195,7 +191,7 @@ export function MobileNav({
         aria-controls="mobile-nav-dialog"
         aria-label={isMounted ? labels.closeMenu : labels.openMenu}
         className={cn(
-          "relative inline-flex h-10 w-10 items-center justify-center rounded-lg border border-border/60 bg-background/80 text-foreground transition-all duration-150 select-none cursor-pointer",
+          "relative inline-flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-lg border border-border/60 bg-background text-foreground transition-all duration-150 select-none cursor-pointer shrink-0",
           "hover:bg-accent hover:text-accent-foreground hover:border-primary/40 active:scale-95",
           "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1"
         )}
@@ -203,11 +199,11 @@ export function MobileNav({
         <span className="sr-only">
           {isMounted ? labels.closeMenu : labels.openMenu}
         </span>
-        <div className="relative flex h-4 w-5 flex-col justify-between">
+        <div className="relative flex h-3.5 w-4 flex-col justify-between">
           <span
             className={cn(
               "h-0.5 w-full rounded-full bg-current transition-all duration-250 ease-out origin-center",
-              isMounted && "translate-y-[7px] rotate-45"
+              isMounted && "translate-y-[6px] rotate-45"
             )}
           />
           <span
@@ -219,7 +215,7 @@ export function MobileNav({
           <span
             className={cn(
               "h-0.5 w-full rounded-full bg-current transition-all duration-250 ease-out origin-center",
-              isMounted && "-translate-y-[7px] -rotate-45"
+              isMounted && "-translate-y-[6px] -rotate-45"
             )}
           />
         </div>
@@ -289,7 +285,7 @@ export function MobileNav({
             </div>
 
             {/* Navigation links (reusing NavLinks with mobile variant) */}
-            <div className="flex-1 overflow-y-auto overscroll-contain py-4 space-y-4">
+            <div className="flex-1 overflow-y-auto overscroll-contain py-4">
               <NavLinks
                 items={items}
                 currentPath={currentPath}
@@ -298,35 +294,6 @@ export function MobileNav({
                 onItemClick={handleClose}
                 variant="mobile"
               />
-
-              {/* Dedicated Touch-Optimized Mobile Utilities Section */}
-              {showUtilities && (
-                <div className="pt-4 border-t border-border/60 space-y-3">
-                  {utilities ? (
-                    <div className="flex items-center justify-between">
-                      {utilities}
-                    </div>
-                  ) : (
-                    <div className="space-y-3 p-3 rounded-xl bg-muted/40 border border-border/40">
-                      {/* Language Switcher */}
-                      <div className="flex items-center justify-between">
-                        <span className="text-xs font-semibold text-muted-foreground">
-                          {isRtl ? "اللغة" : "Language"}
-                        </span>
-                        <LanguageSwitcher variant="segmented" size="sm" />
-                      </div>
-
-                      {/* Theme Switcher */}
-                      <div className="flex items-center justify-between">
-                        <span className="text-xs font-semibold text-muted-foreground">
-                          {isRtl ? "المظهر" : "Theme"}
-                        </span>
-                        <ThemeSwitcher variant="segmented" size="sm" />
-                      </div>
-                    </div>
-                  )}
-                </div>
-              )}
             </div>
 
             {/* Footer Action CTAs */}

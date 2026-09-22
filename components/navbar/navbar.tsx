@@ -111,8 +111,16 @@ export function Navbar({
           </Link>
         </div>
 
-        {/* Mobile Navigation Trigger & Drawer */}
-        <div className="flex items-center gap-2 lg:hidden">
+        {/* Mobile & Tablet Navigation Area: [LanguageSwitcher] [ThemeSwitcher] [Menu Button] */}
+        <div className="flex items-center gap-1.5 sm:gap-2 lg:hidden">
+          {showUtilities && (
+            utilities ? (
+              utilities
+            ) : (
+              <NavbarUtilities size="sm" />
+            )
+          )}
+
           <MobileNav
             items={navItems}
             currentPath={currentPath}
@@ -123,8 +131,6 @@ export function Navbar({
             signInHref={signInHref}
             direction={direction}
             labels={labels}
-            utilities={utilities}
-            showUtilities={showUtilities}
           />
         </div>
       </div>

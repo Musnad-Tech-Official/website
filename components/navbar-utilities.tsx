@@ -19,7 +19,7 @@ export function NavbarUtilities({
   size = "sm",
 }: NavbarUtilitiesProps) {
   return (
-    <div className={cn("flex items-center gap-2", className)}>
+    <div className={cn("flex items-center gap-1.5 sm:gap-2 shrink-0", className)}>
       <LanguageSwitcher variant={languageVariant} size={size} />
       <ThemeSwitcher variant={themeVariant} size={size} />
     </div>

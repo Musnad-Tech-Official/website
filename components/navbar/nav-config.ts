@@ -5,6 +5,11 @@ export type SupportedLocale = (typeof SUPPORTED_LOCALES)[number];
 
 export const DEFAULT_NAV_ITEMS: NavItem[] = [
   {
+    id: "home",
+    label: "Home",
+    href: "/",
+  },
+  {
     id: "about",
     label: "About",
     href: "/about",
@@ -26,14 +31,6 @@ export const DEFAULT_NAV_ITEMS: NavItem[] = [
     requiresFeatureFlag: "blog",
     badge: "New",
     badgeVariant: "accent",
-  },
-  {
-    id: "careers",
-    label: "Careers",
-    href: "/careers",
-    requiresFeatureFlag: "careers",
-    badge: "Hiring",
-    badgeVariant: "default",
   },
   {
     id: "team",
@@ -74,6 +71,7 @@ export const DEFAULT_NAV_CONFIG = {
 export function getLocalizedNavItems(locale?: string): NavItem[] {
   if (locale === "ar") {
     return [
+      { id: "home", label: "الرئيسية", href: "/" },
       { id: "about", label: "من نحن", href: "/about" },
       { id: "services", label: "خدماتنا", href: "/services" },
       { id: "projects", label: "مشاريعنا", href: "/projects" },
@@ -84,14 +82,6 @@ export function getLocalizedNavItems(locale?: string): NavItem[] {
         requiresFeatureFlag: "blog",
         badge: "جديد",
         badgeVariant: "accent",
-      },
-      {
-        id: "careers",
-        label: "الوظائف",
-        href: "/careers",
-        requiresFeatureFlag: "careers",
-        badge: "توظيف",
-        badgeVariant: "default",
       },
       { id: "team", label: "فريق العمل", href: "/team" },
     ];
