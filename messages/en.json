@@ -35,6 +35,19 @@
     "deploy": "Confirm & Deploy",
     "processing": "Processing...",
     "search": "Search..."
+  },
+  "NotFoundPage": {
+    "title": "404",
+    "subtitle": "Page Not Found",
+    "description": "The page you are looking for does not exist or has been moved.",
+    "returnHome": "Return Home"
+  },
+  "Hero": {
+    "titlePrefix": "Musnad Tech",
+    "titleSuffix": "for Thoughtful Web, Mobile & Enterprise Systems",
+    "description": "We architect and engineer high-performance web platforms, mobile apps, desktop solutions, and robust accounting & enterprise systems built for scale and reliability.",
+    "discussProject": "Discuss Your Project",
+    "github": "GitHub"
   }
 }
 
