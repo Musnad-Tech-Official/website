@@ -60,10 +60,7 @@ export function NavLinks({
                         "inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium rounded-lg transition-all duration-150",
                         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 select-none",
                         isActive
-                          ? cn(
-                              "text-primary font-semibold bg-accent border border-primary/20",
-                              activeItemClassName
-                            )
+                          ? cn("text-primary", activeItemClassName)
                           : cn(
                               "text-foreground/75 hover:text-foreground hover:bg-muted/70",
                               itemClassName
@@ -73,10 +70,7 @@ export function NavLinks({
                         "group flex w-full items-center justify-between min-h-[48px] rounded-xl px-3.5 py-2.5 text-base font-medium transition-all duration-150",
                         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring select-none",
                         isActive
-                          ? cn(
-                              "bg-accent text-primary font-semibold border-s-4 border-primary shadow-xs",
-                              activeItemClassName
-                            )
+                          ? cn("text-primary", activeItemClassName)
                           : cn(
                               "text-foreground/80 hover:bg-muted/80 hover:text-foreground active:bg-muted",
                               itemClassName
