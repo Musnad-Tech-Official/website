@@ -15,7 +15,6 @@ import { cn } from "@/lib/utils";
 export function NavLogo({
   homeHref = DEFAULT_NAV_CONFIG.homeHref,
   wordmark = DEFAULT_NAV_LABELS.brandName,
-  showWordmark = true,
   onClick,
   className = "",
 }: NavLogoProps) {
@@ -25,40 +24,30 @@ export function NavLogo({
       aria-label={`${wordmark} - Home`}
       onClick={onClick}
       className={cn(
-        "group inline-flex items-center gap-3 rounded-lg text-foreground transition-opacity hover:opacity-95",
+        "group inline-flex items-center rounded-lg text-foreground transition-opacity hover:opacity-95",
         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 shrink-0 select-none",
         className
       )}
     >
-      {/* Light Mode Logo */}
+      {/* Light Mode Logo (black + red) */}
       <Image
         src="/brand/logo-light.png"
         alt={`${wordmark} Logo`}
-        width={447}
-        height={559}
+        width={1024}
+        height={341}
         priority
-        className="h-10 w-auto object-contain dark:hidden transition-transform duration-200 group-hover:scale-105"
+        className="h-8 sm:h-9 w-auto object-contain dark:hidden transition-transform duration-200 group-hover:scale-105"
       />
 
-      {/* Dark Mode Logo */}
+      {/* Dark Mode Logo (white + red) */}
       <Image
         src="/brand/logo-dark.png"
         alt={`${wordmark} Logo`}
-        width={800}
-        height={800}
+        width={1024}
+        height={341}
         priority
-        className="h-10 w-auto object-contain hidden dark:block transition-transform duration-200 group-hover:scale-105"
+        className="h-8 sm:h-9 w-auto object-contain hidden dark:block transition-transform duration-200 group-hover:scale-105"
       />
-
-      {/* Wordmark */}
-      {showWordmark && wordmark && (
-        <span
-          data-slot="logo-wordmark"
-          className="font-bold text-lg sm:text-xl tracking-tight text-foreground select-none"
-        >
-          {wordmark}
-        </span>
-      )}
     </Link>
   );
 }

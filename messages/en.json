@@ -12,11 +12,11 @@
     "dismissAnnouncement": "Dismiss announcement",
     "learnMore": "Learn more",
     "nav": {
+      "home": "Home",
       "about": "About",
       "services": "Services",
       "projects": "Projects",
       "blog": "Blog",
-      "careers": "Careers",
       "team": "Team"
     }
   },
