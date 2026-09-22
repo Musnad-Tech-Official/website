@@ -48,6 +48,26 @@
     "description": "We architect and engineer high-performance web platforms, mobile apps, desktop solutions, and robust accounting & enterprise systems built for scale and reliability.",
     "discussProject": "Discuss Your Project",
     "github": "GitHub"
+  },
+  "Footer": {
+    "brandDescription": "Empowering Next-Generation Digital Experiences with high-performance web platforms, mobile applications, and enterprise systems.",
+    "exploreTitle": "Explore",
+    "companyTitle": "Company",
+    "legalTitle": "Legal",
+    "nav": {
+      "home": "Home",
+      "projects": "Projects",
+      "services": "Services",
+      "blog": "Blog",
+      "team": "Team",
+      "about": "About",
+      "contact": "Contact",
+      "faq": "FAQ",
+      "privacy": "Privacy Policy",
+      "terms": "Terms of Service",
+      "cookies": "Cookie Policy"
+    },
+    "allRightsReserved": "All rights reserved."
   }
 }
 

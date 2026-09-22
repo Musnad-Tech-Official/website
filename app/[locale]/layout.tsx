@@ -3,6 +3,7 @@ import { Poppins, Tajawal } from "next/font/google";
 import "../globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Navbar } from "@/components/navbar/navbar";
+import { Footer } from "@/components/footer";
 import { NavbarUtilities } from "@/components/navbar-utilities";
 import { getAnnouncement } from "@/data/announcement";
 import { NextIntlClientProvider, hasLocale } from "next-intl";
@@ -79,6 +80,7 @@ export default async function LocaleLayout({
               utilities={<NavbarUtilities />}
             />
             <main className="flex-1 flex flex-col">{children}</main>
+            <Footer locale={locale} direction={isRtl ? "rtl" : "ltr"} />
           </ThemeProvider>
         </NextIntlClientProvider>
       </body>
