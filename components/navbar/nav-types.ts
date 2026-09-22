@@ -15,6 +15,7 @@ export interface NavLabels {
   brandName?: string;
   contactCta?: string;
   signIn?: string;
+  signUp?: string;
   openMenu?: string;
   closeMenu?: string;
   dismissAnnouncement?: string;

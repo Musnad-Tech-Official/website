@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { Link } from "@/i18n/routing";
 import { Button } from "@/components/ui/button";
+import { SignInButton, SignUpButton, Show, UserButton } from "@clerk/nextjs";
 import type { MobileNavProps } from "./nav-types";
 import { DEFAULT_NAV_CONFIG, DEFAULT_NAV_LABELS } from "./nav-config";
 import { NavLogo } from "./nav-logo";
@@ -298,21 +299,40 @@ export function MobileNav({
 
             {/* Footer Action CTAs */}
             <div className="flex flex-col gap-2.5 pt-4 border-t border-border/80">
-              {/* Sign in button */}
-              <Link
-                href={signInHref}
-                onClick={handleClose}
-                className="w-full block"
-              >
-                <Button
-                  variant="outline"
-                  size="md"
-                  fullWidth
-                  className="rounded-xl font-medium"
-                >
-                  {labels.signIn}
-                </Button>
-              </Link>
+              {/* Authentication Controls */}
+              <Show when="signed-out">
+                <SignInButton>
+                  <Button
+                    variant="outline"
+                    size="md"
+                    fullWidth
+                    className="rounded-xl font-medium"
+                    onClick={handleClose}
+                  >
+                    {labels.signIn}
+                  </Button>
+                </SignInButton>
+                <SignUpButton>
+                  <Button
+                    variant="outline"
+                    size="md"
+                    fullWidth
+                    className="rounded-xl font-medium"
+                    onClick={handleClose}
+                  >
+                    {labels.signUp}
+                  </Button>
+                </SignUpButton>
+              </Show>
+
+              <Show when="signed-in">
+                <div className="flex items-center justify-between p-3 rounded-xl bg-muted/40 border border-border/40">
+                  <span className="text-sm font-medium text-foreground">
+                    {direction === "rtl" ? "الحساب الشخصي" : "My Account"}
+                  </span>
+                  <UserButton />
+                </div>
+              </Show>
 
               {/* Primary Contact CTA */}
               <Link
