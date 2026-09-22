@@ -24,7 +24,7 @@ export function NavLogo({
       aria-label={`${wordmark} - Home`}
       onClick={onClick}
       className={cn(
-        "group inline-flex items-center rounded-lg text-foreground transition-opacity hover:opacity-95",
+        "inline-flex items-center rounded-lg text-foreground",
         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 shrink-0 select-none",
         className
       )}
@@ -36,7 +36,7 @@ export function NavLogo({
         width={1024}
         height={341}
         priority
-        className="h-8 sm:h-9 w-auto object-contain dark:hidden transition-transform duration-200 group-hover:scale-105"
+        className="h-8 sm:h-9 w-auto object-contain dark:hidden"
       />
 
       {/* Dark Mode Logo (white + red) */}
@@ -46,7 +46,7 @@ export function NavLogo({
         width={1024}
         height={341}
         priority
-        className="h-8 sm:h-9 w-auto object-contain hidden dark:block transition-transform duration-200 group-hover:scale-105"
+        className="h-8 sm:h-9 w-auto object-contain hidden dark:block"
       />
     </Link>
   );
