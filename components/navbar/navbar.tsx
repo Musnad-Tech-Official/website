@@ -1,6 +1,7 @@
 import { Link } from "@/i18n/routing";
 import { Button } from "@/components/ui/button";
 import { NavbarUtilities } from "@/components/navbar-utilities";
+import { SignInButton, SignUpButton, Show, UserButton } from "@clerk/nextjs";
 import type { NavbarProps } from "./nav-types";
 import {
   DEFAULT_NAV_CONFIG,
@@ -88,16 +89,30 @@ export function Navbar({
           {/* Integration slot for LocaleSwitcher / ThemeToggle */}
           {renderedUtilities}
 
-          {/* Sign In link button */}
-          <Link href={signInHref}>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="text-foreground/80 hover:text-foreground font-medium rounded-lg"
-            >
-              {labels.signIn}
-            </Button>
-          </Link>
+          {/* Authentication Controls */}
+          <Show when="signed-out">
+            <SignInButton>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="text-foreground/80 hover:text-foreground font-medium rounded-lg cursor-pointer"
+              >
+                {labels.signIn}
+              </Button>
+            </SignInButton>
+            <SignUpButton>
+              <Button
+                variant="outline"
+                size="sm"
+                className="font-medium rounded-lg cursor-pointer"
+              >
+                {labels.signUp}
+              </Button>
+            </SignUpButton>
+          </Show>
+          <Show when="signed-in">
+            <UserButton />
+          </Show>
 
           {/* Primary Contact CTA */}
           <Link href={contactHref}>

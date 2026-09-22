@@ -10,6 +10,7 @@ import { NextIntlClientProvider, hasLocale } from "next-intl";
 import { getMessages } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { routing } from "@/i18n/routing";
+import { ClerkProvider } from "@clerk/nextjs";
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -65,24 +66,26 @@ export default async function LocaleLayout({
       className={`${poppins.variable} ${tajawal.variable} ${activeFont.className} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
-        <NextIntlClientProvider locale={locale} messages={messages}>
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="system"
-            enableSystem
-            disableTransitionOnChange
-            scriptProps={{ async: true }}
-          >
-            <Navbar
-              locale={locale}
-              direction={isRtl ? "rtl" : "ltr"}
-              announcement={announcement}
-              utilities={<NavbarUtilities />}
-            />
-            <main className="flex-1 flex flex-col">{children}</main>
-            <Footer locale={locale} direction={isRtl ? "rtl" : "ltr"} />
-          </ThemeProvider>
-        </NextIntlClientProvider>
+        <ClerkProvider>
+          <NextIntlClientProvider locale={locale} messages={messages}>
+            <ThemeProvider
+              attribute="class"
+              defaultTheme="system"
+              enableSystem
+              disableTransitionOnChange
+              scriptProps={{ async: true }}
+            >
+              <Navbar
+                locale={locale}
+                direction={isRtl ? "rtl" : "ltr"}
+                announcement={announcement}
+                utilities={<NavbarUtilities />}
+              />
+              <main className="flex-1 flex flex-col">{children}</main>
+              <Footer locale={locale} direction={isRtl ? "rtl" : "ltr"} />
+            </ThemeProvider>
+          </NextIntlClientProvider>
+        </ClerkProvider>
       </body>
     </html>
   );
