@@ -89,11 +89,10 @@
       "p2": "We are bilingual by default — delivering enterprise systems and modern digital platforms with first-class Arabic and English user experiences. We value continuous learning, code quality, and engineering integrity."
     },
     "cta": {
-      "eyebrow": "Musnad Tech Studio",
       "title": "Have a project in mind?",
       "subtitle": "Tell us what you're building. We respond promptly to discuss architecture, scope, and technical execution.",
-      "careers": "Careers",
-      "startProject": "Start a project inquiry"
+      "discussProject": "Discuss Your Project",
+      "exploreProjects": "Explore Projects"
     }
   }
 }

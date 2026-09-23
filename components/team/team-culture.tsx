@@ -1,13 +1,12 @@
+"use client";
+
 import React from "react";
-import { FaCode, FaGlobe, FaLayerGroup } from "react-icons/fa6";
+import { useLocale } from "next-intl";
+import { HiRocketLaunch, HiLanguage, HiSparkles } from "react-icons/hi2";
+import { DraggableCultureCard } from "./draggable-culture-card";
 import type { TeamCultureProps } from "./team-types";
 import { cn } from "@/lib/utils";
 
-/**
- * TeamCulture renders the engineering ethos and studio highlights section:
- * - Left: Culture narrative on craftsmanship, code quality, and bilingual foundation
- * - Right: 3 structural highlight cards (Capabilities, Bilingual Standards, Architecture)
- */
 export function TeamCulture({
   eyebrow,
   title,
@@ -16,15 +15,19 @@ export function TeamCulture({
   stats,
   className = "",
 }: TeamCultureProps) {
-  const statIcons: Record<string, React.ComponentType<{ className?: string }>> = {
-    capabilities: FaCode,
-    bilingual: FaGlobe,
-    architecture: FaLayerGroup,
+  const locale = useLocale();
+  const isRtl = locale === "ar";
+
+  // Card icons rendered with theme primary brand color
+  const statIcons: Record<string, React.ReactNode> = {
+    capabilities: <HiRocketLaunch className="w-4.5 h-4.5" />,
+    bilingual: <HiLanguage className="w-4.5 h-4.5" />,
+    architecture: <HiSparkles className="w-4.5 h-4.5" />,
   };
 
-  const topStats = stats.slice(0, 2);
-  const bottomStat = stats[2];
-  const BottomIcon = bottomStat ? statIcons[bottomStat.iconType] || FaLayerGroup : FaLayerGroup;
+  // Stack rotation angles for the card deck
+  const rotationsLTR = [-2.5, 1.5, 3];
+  const rotationsRTL = [2.5, -1.5, -3];
 
   return (
     <section
@@ -33,7 +36,7 @@ export function TeamCulture({
         className
       )}
     >
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
         {/* Left Column: Narrative Story */}
         <div className="lg:col-span-7 flex flex-col text-start">
           {eyebrow && (
@@ -59,55 +62,24 @@ export function TeamCulture({
           )}
         </div>
 
-        {/* Right Column: Stat Highlights Cards */}
-        <div className="lg:col-span-5 flex flex-col gap-4 sm:gap-5 w-full">
-          {/* Top 2 Metric Cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
-            {topStats.map((stat) => {
-              const Icon = statIcons[stat.iconType] || FaCode;
-              return (
-                <div
-                  key={stat.id}
-                  className="rounded-2xl border border-border/80 bg-card text-card-foreground p-5 sm:p-6 shadow-xs flex flex-col justify-between text-start"
-                >
-                  <div className="flex items-center justify-between mb-4">
-                    <span
-                      aria-hidden="true"
-                      className="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-muted text-muted-foreground"
-                    >
-                      <Icon className="h-4 w-4" />
-                    </span>
-                    <span className="text-2xl sm:text-3xl font-extrabold tracking-tight text-foreground">
-                      {stat.value}
-                    </span>
-                  </div>
-                  <p className="text-xs sm:text-sm font-medium text-muted-foreground leading-snug">
-                    {stat.label}
-                  </p>
-                </div>
-              );
-            })}
-          </div>
+        {/* Right Column: Interactive Draggable Card Deck */}
+        <div className="lg:col-span-5 flex flex-col items-center lg:items-end w-full py-4">
+          {stats.map((stat, index) => {
+            const icon = statIcons[stat.iconType] || statIcons.capabilities;
+            const initialRotation = isRtl
+              ? (rotationsRTL[index] ?? 0)
+              : (rotationsLTR[index] ?? 0);
 
-          {/* Bottom Architecture & Focus Card */}
-          {bottomStat && (
-            <div className="rounded-2xl border border-border/80 bg-card text-card-foreground p-5 sm:p-6 shadow-xs flex flex-col text-start">
-              <div className="flex items-center justify-between mb-3">
-                <span
-                  aria-hidden="true"
-                  className="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-muted text-muted-foreground"
-                >
-                  <BottomIcon className="h-4 w-4" />
-                </span>
-              </div>
-              <h3 className="text-xl sm:text-2xl font-bold tracking-tight text-foreground">
-                {bottomStat.value}
-              </h3>
-              <p className="text-xs sm:text-sm font-medium text-muted-foreground mt-1 leading-relaxed">
-                {bottomStat.label}
-              </p>
-            </div>
-          )}
+            return (
+              <DraggableCultureCard
+                key={stat.id}
+                stat={stat}
+                index={index}
+                initialRotation={initialRotation}
+                icon={icon}
+              />
+            );
+          })}
         </div>
       </div>
     </section>

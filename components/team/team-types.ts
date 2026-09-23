@@ -32,12 +32,16 @@ export interface TeamCultureProps {
 }
 
 export interface TeamCtaProps {
-  eyebrow: string;
+  eyebrow?: string;
   title: string;
   subtitle: string;
-  careersLabel: string;
-  startProjectLabel: string;
-  careersHref?: string;
+  discussProjectLabel?: string;
+  exploreProjectsLabel?: string;
+  careersLabel?: string;
+  startProjectLabel?: string;
   contactHref?: string;
+  projectsHref?: string;
+  careersHref?: string;
   className?: string;
 }
+
