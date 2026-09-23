@@ -61,7 +61,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
 
         <div className="relative flex items-center">
           {hasLeftIcon && (
-            <div className="pointer-events-none absolute left-3 flex items-center justify-center text-muted-foreground">
+            <div className="pointer-events-none absolute inset-s-3 flex items-center justify-center text-muted-foreground">
               {leftIcon}
             </div>
           )}
@@ -83,15 +83,15 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
               "disabled:cursor-not-allowed disabled:opacity-50 disabled:bg-muted/30",
               error && "border-destructive focus:ring-destructive text-destructive",
               inputSizes[inputSize],
-              hasLeftIcon && (inputSize === "sm" ? "pl-8" : inputSize === "lg" ? "pl-11" : "pl-10"),
-              hasRightIcon && (inputSize === "sm" ? "pr-8" : inputSize === "lg" ? "pr-11" : "pr-10"),
+              hasLeftIcon && (inputSize === "sm" ? "ps-8" : inputSize === "lg" ? "ps-11" : "ps-10"),
+              hasRightIcon && (inputSize === "sm" ? "pe-8" : inputSize === "lg" ? "pe-11" : "pe-10"),
               className
             )}
             {...props}
           />
 
           {hasRightIcon && (
-            <div className="absolute right-3 flex items-center justify-center text-muted-foreground">
+            <div className="absolute inset-e-3 flex items-center justify-center text-muted-foreground">
               {rightIcon}
             </div>
           )}

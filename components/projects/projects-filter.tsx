@@ -9,12 +9,7 @@ import { LuSearch, LuX } from "react-icons/lu";
 import type { ProjectsFilterProps } from "./projects-types";
 import { cn } from "@/lib/utils";
 
-/**
- * ProjectsFilter renders the search and sorting controls:
- * - Search text input matching approved project titles/descriptions
- * - Truthful sort order selector (Default, Alphabetical)
- * - Live project count display & clear button
- */
+
 export function ProjectsFilter({
   filterState,
   onFilterChange,

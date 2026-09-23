@@ -4,8 +4,8 @@ import { getProjects } from "@/data/projects";
 import {
   ProjectsHeader,
   ProjectsExplorer,
-  ProjectsCta,
 } from "@/components/projects";
+import { CTA } from "@/components/ui";
 
 interface ProjectsPageProps {
   params: Promise<{ locale: string }>;
@@ -23,13 +23,7 @@ export async function generateMetadata({
   };
 }
 
-/**
- * ProjectsPage renders Page 11 — Projects for Musnad Tech:
- * - Breadcrumb & commanding page title and subtitle
- * - Filter and search controls with dynamic project count
- * - 3-column responsive grid of all 6 approved project case studies
- * - Bottom inquiry banner linking to /contact
- */
+
 export default async function ProjectsPage({ params }: ProjectsPageProps) {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "Projects" });
@@ -51,8 +45,9 @@ export default async function ProjectsPage({ params }: ProjectsPageProps) {
       {/* 2. Interactive Search, Filter & Projects Grid */}
       <ProjectsExplorer projects={projects} locale={locale} />
 
-      {/* 3. Project Inquiry Callout Banner */}
-      <ProjectsCta
+      {/* 3. Project Inquiry Callout Banner (Reusable CTA component) */}
+      <CTA
+        variant="projects"
         title={t("cta.title")}
         subtitle={t("cta.subtitle")}
         buttonLabel={t("cta.button")}

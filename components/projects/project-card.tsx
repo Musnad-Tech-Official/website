@@ -6,14 +6,7 @@ import { LuArrowUpRight } from "react-icons/lu";
 import type { ProjectCardProps } from "./projects-types";
 import { cn } from "@/lib/utils";
 
-/**
- * ProjectCard renders an interactive preview card for a single project:
- * - Decorative visual canvas using theme-aware design system tokens
- * - Project title and navigation arrow indicator
- * - Approved neutral description
- * - Bottom action link to view the case study
- * - Fully accessible and locale-aware link
- */
+
 export function ProjectCard({ project, className = "" }: ProjectCardProps) {
   const t = useTranslations("Projects.card");
 
@@ -31,7 +24,7 @@ export function ProjectCard({ project, className = "" }: ProjectCardProps) {
         )}
       >
         {/* Decorative thumbnail canvas */}
-        <div className="relative h-44 sm:h-48 w-full overflow-hidden bg-gradient-to-br from-muted/90 via-muted/40 to-background border-b border-border/60 flex items-center justify-center">
+        <div className="relative h-44 sm:h-48 w-full overflow-hidden bg-linear-to-br from-muted/90 via-muted/40 to-background border-b border-border/60 flex items-center justify-center">
           {/* Subtle architectural background texture */}
           <div
             aria-hidden="true"
@@ -54,7 +47,7 @@ export function ProjectCard({ project, className = "" }: ProjectCardProps) {
             aria-hidden="true"
             className="h-12 w-12 rounded-xl border border-border/60 bg-background/50 backdrop-blur-xs flex items-center justify-center text-muted-foreground/60 shadow-xs"
           >
-            <LuArrowUpRight className="h-5 w-5 rtl:rotate-[-90deg]" />
+            <LuArrowUpRight className="h-5 w-5 rtl:-rotate-90" />
           </div>
         </div>
 
@@ -70,7 +63,7 @@ export function ProjectCard({ project, className = "" }: ProjectCardProps) {
               aria-hidden="true"
               className="h-8 w-8 rounded-full border border-border/70 bg-muted/30 flex items-center justify-center text-muted-foreground group-hover:text-primary group-hover:border-primary/40 group-hover:bg-primary/5 transition-all shrink-0"
             >
-              <LuArrowUpRight className="h-4 w-4 rtl:rotate-[-90deg] transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+              <LuArrowUpRight className="h-4 w-4 rtl:-rotate-90 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
             </div>
           </div>
 
@@ -83,7 +76,7 @@ export function ProjectCard({ project, className = "" }: ProjectCardProps) {
           <div className="mt-auto pt-6 border-t border-border/60 flex items-center justify-between text-xs font-medium text-muted-foreground group-hover:text-primary transition-colors">
             <span>{t("viewProjectAction")}</span>
             <LuArrowUpRight
-              className="h-3.5 w-3.5 rtl:rotate-[-90deg] transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+              className="h-3.5 w-3.5 rtl:-rotate-90 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
               aria-hidden="true"
             />
           </div>
