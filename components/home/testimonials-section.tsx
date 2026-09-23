@@ -14,7 +14,7 @@ export function TestimonialsSection({ className = "" }: TestimonialsSectionProps
   const locale = useLocale();
   const isRtl = locale === "ar";
 
-  // Prepare full-width duplicated card sets for each track
+  // Prepare full-width duplicated card sets for seamless infinite tracks
   // Row 1 starts with Ahmed, Reem, Faisal, Tariq, Mona, Khalid
   const row1Base = [...TESTIMONIALS, ...TESTIMONIALS];
   // Row 2 starts with Tariq, Mona, Khalid, Ahmed, Reem, Faisal for visual variety
@@ -48,38 +48,39 @@ export function TestimonialsSection({ className = "" }: TestimonialsSectionProps
         dir={isRtl ? "rtl" : "ltr"}
         variant="default"
         className={cn(
-          "w-77.5 sm:w-95 lg:w-105 shrink-0",
+          "w-80 sm:w-96 lg:w-105 shrink-0",
           "relative flex flex-col justify-between",
           "p-6 sm:p-7 rounded-2xl",
-          "border border-border/80 bg-card",
-          "hover:border-primary/40 hover:shadow-lg dark:hover:shadow-primary/5 hover:-translate-y-1",
+          "border border-border/80 bg-card/95 dark:bg-card/85 backdrop-blur-xs",
+          "shadow-xs hover:border-primary/40 hover:shadow-lg dark:hover:shadow-primary/5 hover:-translate-y-1",
           "transition-all duration-300 select-none cursor-default"
         )}
       >
         <div>
-          {/* Prominent Brand Quote Icon */}
-          <div className="flex items-center justify-between mb-4 sm:mb-5">
+          {/* Freestanding large quote icon without square/box shape, subtle brand opacity */}
+          <div className="flex items-center justify-start mb-3 sm:mb-4">
             <LuQuote
-              className="h-8 w-8 sm:h-9 sm:w-9 text-primary fill-primary/15 rtl:-scale-x-100 shrink-0"
+              className="h-10 w-10 sm:h-11 sm:w-11 text-primary/30 dark:text-primary/35 rtl:-scale-x-100 shrink-0 select-none"
               aria-hidden="true"
             />
           </div>
 
           {/* Testimonial Quote Statement */}
-          <blockquote className="m-0 text-sm sm:text-base text-foreground/90 leading-relaxed font-normal">
+          <blockquote className="m-0 text-sm sm:text-base text-foreground/90 dark:text-foreground/90 leading-relaxed font-normal">
             {isRtl ? `«${quote}»` : `“${quote}”`}
           </blockquote>
         </div>
 
-        {/* Author Metadata with Design System Avatar */}
+        {/* Author Metadata with fully rounded Design System Avatar */}
         <div className="mt-6 pt-5 border-t border-border/60 flex items-center gap-3.5">
           <Avatar
             fallback={item.initial}
             size="md"
-            className="border border-border/80 bg-muted/60 text-foreground font-bold shrink-0"
+            shape="circle"
+            className="rounded-full border border-primary/20 bg-primary/10 text-primary font-bold shrink-0"
           />
           <div className="flex flex-col text-start min-w-0">
-            <span className="text-sm font-semibold text-foreground tracking-tight truncate">
+            <span className="text-sm font-bold text-foreground tracking-tight truncate">
               {author}
             </span>
             <span className="text-xs text-muted-foreground mt-0.5 truncate">
@@ -127,37 +128,37 @@ export function TestimonialsSection({ className = "" }: TestimonialsSectionProps
           aria-hidden="true"
         />
 
-        {/* Row 1: Continuous horizontal marquee from right to left */}
+        {/* Row 1: Continuous horizontal marquee from right to left (no pause on hover) */}
         <div
           dir="ltr"
-          className="group/row flex overflow-hidden w-full select-none gap-(--marquee-gap,1.5rem) [--marquee-gap:1.5rem]"
+          className="flex overflow-hidden w-full select-none"
         >
           {/* Track 1 */}
-          <div className="flex shrink-0 items-stretch gap-(--marquee-gap,1.5rem) animate-marquee-left group-hover/row:[animation-play-state:paused]">
+          <div className="flex shrink-0 items-stretch gap-6 pr-6 animate-marquee-left">
             {row1Base.map((item, idx) => renderCard(item, "r1-t1", idx))}
           </div>
           {/* Track 2 (Clone for infinite seamless loop) */}
           <div
             aria-hidden="true"
-            className="flex shrink-0 items-stretch gap-(--marquee-gap,1.5rem) animate-marquee-left group-hover/row:[animation-play-state:paused]"
+            className="flex shrink-0 items-stretch gap-6 pr-6 animate-marquee-left"
           >
             {row1Base.map((item, idx) => renderCard(item, "r1-t2", idx))}
           </div>
         </div>
 
-        {/* Row 2: Continuous horizontal marquee from left to right */}
+        {/* Row 2: Continuous horizontal marquee from left to right (no pause on hover) */}
         <div
           dir="ltr"
-          className="group/row flex overflow-hidden w-full select-none gap-(--marquee-gap,1.5rem) [--marquee-gap:1.5rem]"
+          className="flex overflow-hidden w-full select-none"
         >
           {/* Track 1 */}
-          <div className="flex shrink-0 items-stretch gap-(--marquee-gap,1.5rem) animate-marquee-right group-hover/row:[animation-play-state:paused]">
+          <div className="flex shrink-0 items-stretch gap-6 pr-6 animate-marquee-right">
             {row2Base.map((item, idx) => renderCard(item, "r2-t1", idx))}
           </div>
           {/* Track 2 (Clone for infinite seamless loop) */}
           <div
             aria-hidden="true"
-            className="flex shrink-0 items-stretch gap-(--marquee-gap,1.5rem) animate-marquee-right group-hover/row:[animation-play-state:paused]"
+            className="flex shrink-0 items-stretch gap-6 pr-6 animate-marquee-right"
           >
             {row2Base.map((item, idx) => renderCard(item, "r2-t2", idx))}
           </div>
@@ -166,3 +167,4 @@ export function TestimonialsSection({ className = "" }: TestimonialsSectionProps
     </section>
   );
 }
+

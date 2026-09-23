@@ -158,13 +158,13 @@ body {
     transform: translateX(0%);
   }
   to {
-    transform: translateX(-50%);
+    transform: translateX(-100%);
   }
 }
 
 @keyframes marquee-right {
   from {
-    transform: translateX(-50%);
+    transform: translateX(-100%);
   }
   to {
     transform: translateX(0%);
@@ -172,14 +172,12 @@ body {
 }
 
 .animate-marquee-left {
-  animation: marquee-left 38s linear infinite;
+  animation: marquee-left 50s linear infinite;
+  will-change: transform;
 }
 
 .animate-marquee-right {
-  animation: marquee-right 38s linear infinite;
-}
-
-.pause-marquee:hover {
-  animation-play-state: paused;
+  animation: marquee-right 50s linear infinite;
+  will-change: transform;
 }
 

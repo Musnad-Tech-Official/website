@@ -206,6 +206,7 @@
       "heading": "Latest insights",
       "description": "Technical writing and field notes from the team.",
       "viewAll": "View all",
+      "readArticle": "Read article",
       "trending": "Trending",
       "minRead": "{count} min read",
       "timeAgo": "1y ago",

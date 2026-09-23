@@ -28,6 +28,8 @@ export interface InsightArticleData {
   isTrending: boolean;
   tags: string[];
   timeAgo?: string;
+  date?: string;
+  authorInitials?: string;
   previewGradient: string;
   href: string;
 }
