@@ -424,5 +424,91 @@
       "subtitle": "Tell us what you're building. We respond within two business days — no sales theatre.",
       "button": "Start a project inquiry"
     }
+  },
+  "ServiceDetail": {
+    "common": {
+      "breadcrumb": {
+        "home": "Home",
+        "services": "Services",
+        "label": "Breadcrumbs"
+      },
+      "onThisPage": "ON THIS PAGE",
+      "anchors": {
+        "overview": "Overview",
+        "capabilities": "Capabilities",
+        "relatedProjects": "Related projects"
+      },
+      "relatedTechnologies": "RELATED TECHNOLOGIES",
+      "relatedByTechnology": {
+        "eyebrow": "RELATED BY TECHNOLOGY",
+        "heading": "Built with similar tools",
+        "projectsEyebrow": "PROJECTS",
+        "servicesEyebrow": "SERVICES"
+      },
+      "relatedProjects": {
+        "eyebrow": "RELATED PROJECTS",
+        "heading": "Related projects",
+        "featured": "Featured",
+        "liveDemo": "Live demo available",
+        "completed": "Completed"
+      },
+      "capabilities": {
+        "eyebrow": "CAPABILITIES",
+        "heading": "Capabilities"
+      },
+      "cta": {
+        "badge": "Responses within two business days",
+        "title": "Have a project in mind?",
+        "subtitle": "Tell us what you're building. We respond within two business days — no sales theatre.",
+        "backToServices": "Back to Services"
+      }
+    },
+    "productEngineering": {
+      "metaTitle": "Product Engineering — Musnad Tech",
+      "metaDescription": "From discovery to launch — we build products end to end with engineering accountability.",
+      "intro": {
+        "eyebrow": "SERVICES",
+        "title": "Product Engineering",
+        "subtitle": "From discovery to launch — we build products end to end with engineering accountability."
+      },
+      "overview": {
+        "statement": "We partner with founders and product teams to turn ideas into reliable, maintainable software. We own architecture, implementation, and the hard decisions in between."
+      },
+      "capabilities": {
+        "architecture": "Architecture & system design",
+        "fullstack": "Full-stack implementation",
+        "discovery": "Technical discovery & RFCs",
+        "review": "Code review & quality gates",
+        "observability": "Observability & incident response"
+      },
+      "sidebar": {
+        "ctaButton": "Start a Product Engineering project"
+      },
+      "cta": {
+        "primaryButton": "Start a Product Engineering project"
+      }
+    },
+    "projects": {
+      "sahim": {
+        "title": "Sahim Analytics",
+        "category": "Fintech Platform",
+        "description": "A streaming analytics platform that aggregates market signals and turns them into actionable insight with sub-second latency."
+      },
+      "rakeen": {
+        "title": "Rakeen Portal",
+        "category": "Client Portal",
+        "description": "A secure, bilingual client portal for document exchange, case tracking, and confidential communication."
+      },
+      "naft": {
+        "title": "Naft Deploy",
+        "category": "Developer Tool",
+        "description": "An open-source deployment tool that gives small teams push-to-deploy without operating a full Kubernetes cluster."
+      },
+      "musnadCli": {
+        "title": "Musnad CLI",
+        "category": "Developer Tool",
+        "description": "An internal CLI and developer platform that standardizes project scaffolding and deployment."
+      }
+    }
   }
 }
