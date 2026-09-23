@@ -68,6 +68,33 @@
       "cookies": "Cookie Policy"
     },
     "allRightsReserved": "All rights reserved."
+  },
+  "Team": {
+    "metaTitle": "Team — Musnad Tech",
+    "metaDescription": "Meet the Musnad Tech team. A focused team working across product leadership, technical leadership, and software engineering.",
+    "breadcrumb": {
+      "home": "Home",
+      "team": "Team",
+      "label": "Breadcrumbs"
+    },
+    "header": {
+      "eyebrow": "The Team",
+      "title": "Meet the team",
+      "subtitle": "A focused team working across product leadership, technical leadership, and software engineering."
+    },
+    "culture": {
+      "eyebrow": "Culture",
+      "title": "Thoughtful, curious, accountable.",
+      "p1": "We focus on high-impact software engineering with an emphasis on craftsmanship and scalable architecture. Every project is approached with thorough design documentation, clean code standards, and transparent collaboration.",
+      "p2": "We are bilingual by default — delivering enterprise systems and modern digital platforms with first-class Arabic and English user experiences. We value continuous learning, code quality, and engineering integrity."
+    },
+    "cta": {
+      "eyebrow": "Musnad Tech Studio",
+      "title": "Have a project in mind?",
+      "subtitle": "Tell us what you're building. We respond promptly to discuss architecture, scope, and technical execution.",
+      "careers": "Careers",
+      "startProject": "Start a project inquiry"
+    }
   }
 }
 
