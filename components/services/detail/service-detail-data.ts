@@ -11,6 +11,9 @@ import {
   LuLayers,
   LuTrendingDown,
   LuTerminal,
+  LuDatabase,
+  LuLayoutDashboard,
+  LuSparkles,
 } from "react-icons/lu";
 import type { ServiceDetailData } from "./service-detail-types";
 
@@ -241,3 +244,103 @@ export const PLATFORM_INFRASTRUCTURE_DETAIL: ServiceDetailData = {
     ],
   },
 };
+
+/**
+ * Data Engineering Service Detail Configuration & Frontend Fixture Data.
+ * Matches 07-service-data-engineering.png specification.
+ */
+export const DATA_ENGINEERING_DETAIL: ServiceDetailData = {
+  slug: "data-engineering",
+  translationKey: "dataEngineering",
+  icon: LuDatabase,
+  technologies: ["Python", "PostgreSQL", "Redis"],
+  capabilities: [
+    {
+      id: "pipelines",
+      translationKey: "pipelines",
+      icon: LuWorkflow,
+    },
+    {
+      id: "modeling",
+      translationKey: "modeling",
+      icon: LuLayers,
+    },
+    {
+      id: "streaming",
+      translationKey: "streaming",
+      icon: LuActivity,
+    },
+    {
+      id: "dashboards",
+      translationKey: "dashboards",
+      icon: LuLayoutDashboard,
+    },
+    {
+      id: "quality",
+      translationKey: "quality",
+      icon: LuShieldCheck,
+    },
+  ],
+  relatedProjects: [
+    {
+      id: "sahim",
+      slug: "sahim-analytics",
+      itemKey: "sahim",
+      year: "2024",
+      featured: true,
+      liveDemo: true,
+      technologies: ["TypeScript", "Go", "PostgreSQL", "Redis", "+1"],
+      rating: 4.7,
+      reviewCount: 38,
+      gradient: "from-zinc-900 via-neutral-900 to-zinc-950",
+      href: "/projects/sahim-analytics",
+    },
+  ],
+  relatedByTechnology: {
+    projects: [
+      {
+        id: "hudhud",
+        slug: "hudhud-chat",
+        itemKey: "hudhud",
+        year: "2024",
+        technologies: ["Python", "Redis"],
+        href: "/projects/hudhud-chat",
+      },
+      {
+        id: "rakeen",
+        slug: "rakeen-portal",
+        itemKey: "rakeen",
+        year: "2023",
+        technologies: ["PostgreSQL"],
+        href: "/projects/rakeen-portal",
+      },
+      {
+        id: "wathq",
+        slug: "wathq-observability",
+        itemKey: "wathq",
+        year: "2023",
+        technologies: ["Redis"],
+        href: "/projects/wathq-observability",
+      },
+    ],
+    services: [
+      {
+        id: "ai-integration",
+        slug: "ai-integration",
+        serviceKey: "aiIntegration",
+        icon: LuSparkles,
+        technologies: ["Python", "Redis"],
+        href: "/services/ai-integration",
+      },
+      {
+        id: "product-engineering",
+        slug: "product-engineering",
+        serviceKey: "productEngineering",
+        icon: LuCode,
+        technologies: ["PostgreSQL"],
+        href: "/services/product-engineering",
+      },
+    ],
+  },
+};
+

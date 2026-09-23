@@ -513,6 +513,31 @@
         "primaryButton": "Start a Platform & Infrastructure project"
       }
     },
+    "dataEngineering": {
+      "metaTitle": "Data Engineering — Musnad Tech",
+      "metaDescription": "Pipelines, warehouses, and analytics surfaces built for trust and performance.",
+      "intro": {
+        "eyebrow": "SERVICES",
+        "title": "Data Engineering",
+        "subtitle": "Pipelines, warehouses, and analytics surfaces built for trust and performance."
+      },
+      "overview": {
+        "statement": "We help teams move from scattered data to reliable, queryable systems. ETL/ELT pipelines, warehouse modeling, and the dashboards people actually trust."
+      },
+      "capabilities": {
+        "pipelines": "ETL / ELT pipelines",
+        "modeling": "Warehouse modeling (dbt)",
+        "streaming": "Real-time streaming",
+        "dashboards": "Analytics dashboards",
+        "quality": "Data quality & contracts"
+      },
+      "sidebar": {
+        "ctaButton": "Start a Data Engineering project"
+      },
+      "cta": {
+        "primaryButton": "Start a Data Engineering project"
+      }
+    },
     "projects": {
       "sahim": {
         "title": "Sahim Analytics",
@@ -538,6 +563,11 @@
         "title": "Wathq Observability",
         "category": "Platform Engineering",
         "description": "An observability stack — metrics, traces, and dashboards — that cut incident response time."
+      },
+      "hudhud": {
+        "title": "Hudhud Chat",
+        "category": "R&D",
+        "description": "An AI-powered conversational platform for enterprise knowledge retrieval and research."
       }
     }
   }
