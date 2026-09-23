@@ -5,3 +5,4 @@ export * from "./projects-grid";
 export * from "./projects-filter";
 export * from "./projects-explorer";
 export * from "./projects-cta";
+export * from "./detail";

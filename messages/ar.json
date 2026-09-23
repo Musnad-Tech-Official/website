@@ -329,5 +329,38 @@
       "subtitle": "شاركنا ما ترغب في بنائه.",
       "button": "ابدأ استفساراً عن مشروع"
     }
+  },
+  "ProjectDetail": {
+    "breadcrumb": {
+      "home": "الرئيسية",
+      "projects": "مشاريعنا",
+      "label": "مسار التنقل"
+    },
+    "meta": {
+      "titleTemplate": "{title} — مسند للتقنية",
+      "defaultDescription": "استعرض دراسات المشاريع التقنية من مسند للتقنية."
+    },
+    "relatedProjects": "مشاريع ذات صلة",
+    "gallery": {
+      "previewPrefix": "معاينة"
+    },
+    "rating": {
+      "submit": "إرسال التقييم",
+      "ratingsCount": "تقييم",
+      "integrationNotice": "سيصبح تقييم المشاريع متاحاً عند ربط تفاعلات الحساب.",
+      "previewNotice": "معاينة للتقييم فقط — لا يتم حفظ التقييمات حالياً."
+    },
+    "comments": {
+      "submit": "نشر التعليق",
+      "reply": "رد",
+      "empty": "لا توجد تعليقات حتى الآن.",
+      "integrationNotice": "ستصبح التعليقات متاحة عند ربط تفاعلات الحساب."
+    },
+    "eligibility": {
+      "signedOut": "سجّل الدخول لتقييم هذا المشروع أو التعليق عليه.",
+      "signIn": "تسجيل الدخول",
+      "experienceRequired": "جرّب هذا المشروع أولاً قبل التقييم أو التعليق.",
+      "experienceRequiredSecondary": "التقييمات والتعليقات متاحة للمستخدمين الذين تم التحقق من تجربتهم للمشروع."
+    }
   }
 }

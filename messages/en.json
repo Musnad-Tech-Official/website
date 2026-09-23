@@ -329,5 +329,38 @@
       "subtitle": "Tell us about what you want to build.",
       "button": "Start a project inquiry"
     }
+  },
+  "ProjectDetail": {
+    "breadcrumb": {
+      "home": "Home",
+      "projects": "Projects",
+      "label": "Breadcrumbs"
+    },
+    "meta": {
+      "titleTemplate": "{title} — Musnad Tech",
+      "defaultDescription": "Explore project case studies from Musnad Tech."
+    },
+    "relatedProjects": "Related projects",
+    "gallery": {
+      "previewPrefix": "Preview"
+    },
+    "rating": {
+      "submit": "Submit Rating",
+      "ratingsCount": "ratings",
+      "integrationNotice": "Project ratings will be available when account interactions are connected.",
+      "previewNotice": "Rating preview only — ratings are not persisted."
+    },
+    "comments": {
+      "submit": "Post comment",
+      "reply": "Reply",
+      "empty": "No comments yet.",
+      "integrationNotice": "Comments will be available when account interactions are connected."
+    },
+    "eligibility": {
+      "signedOut": "Sign in to rate or comment on this project.",
+      "signIn": "Sign In",
+      "experienceRequired": "Try this project before rating or commenting.",
+      "experienceRequiredSecondary": "Ratings and comments are available to verified project users."
+    }
   }
 }
