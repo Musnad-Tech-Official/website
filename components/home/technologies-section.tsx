@@ -1,5 +1,6 @@
 import { useTranslations } from "next-intl";
-import { TECHNOLOGIES_LIST } from "./home-data";
+import { ALL_TECH_ITEMS } from "@/components/hero/tech-data";
+import { TechIcon } from "@/components/hero/tech-icon";
 import { cn } from "@/lib/utils";
 
 export interface TechnologiesSectionProps {
@@ -32,32 +33,28 @@ export function TechnologiesSection({ className = "" }: TechnologiesSectionProps
           </p>
         </div>
 
-        {/* Technology Pills Wrapping Container */}
+        {/* Technology Badges Container matching Hero visual style */}
         <div
-          className="mt-8 sm:mt-10 flex flex-wrap items-center gap-2.5 sm:gap-3"
+          className="mt-10 sm:mt-12 flex flex-wrap items-center gap-3 sm:gap-3.5"
           aria-label="Technologies list"
         >
-          {TECHNOLOGIES_LIST.map((tech) => {
-            const categoryLabel = t(`categories.${tech.category}`);
-
-            return (
-              <div
-                key={tech.id}
-                className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-border/80 bg-card text-xs sm:text-sm font-medium text-foreground hover:border-primary/50 hover:bg-muted/40 transition-colors shadow-2xs select-none cursor-default group"
-              >
-                <span
-                  className={cn("h-2 w-2 rounded-full shrink-0", tech.dotColor)}
-                  aria-hidden="true"
-                />
-                <span className="font-semibold text-foreground group-hover:text-primary transition-colors">
-                  {tech.name}
-                </span>
-                <span className="text-muted-foreground/75 font-normal text-xs">
-                  · {categoryLabel}
-                </span>
-              </div>
-            );
-          })}
+          {ALL_TECH_ITEMS.map((tech) => (
+            <div
+              key={tech.id}
+              dir="ltr"
+              className={cn(
+                "relative inline-flex items-center gap-3 pl-2.5 pr-4.5 py-2 sm:pl-3 sm:pr-5 sm:py-2.5 rounded-full select-none cursor-default",
+                "bg-card text-card-foreground dark:bg-[#131418] dark:text-neutral-100 border border-border/75 dark:border-white/10",
+                "shadow-xs dark:shadow-[0_4px_16px_rgba(0,0,0,0.5)] hover:shadow-md dark:hover:shadow-[0_6px_20px_rgba(0,0,0,0.7)]",
+                "hover:border-primary/40 dark:hover:border-primary/40 hover:-translate-y-0.5 transition-all duration-200 group"
+              )}
+            >
+              <TechIcon id={tech.id} className="w-4 h-4" />
+              <span className="text-sm sm:text-[15px] font-semibold tracking-tight whitespace-nowrap text-foreground group-hover:text-primary transition-colors">
+                {tech.name}
+              </span>
+            </div>
+          ))}
         </div>
       </div>
     </section>

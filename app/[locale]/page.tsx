@@ -6,7 +6,6 @@ import {
   TeamPreview,
   TechnologiesSection,
   TestimonialsSection,
-  TrustMetrics,
   LatestInsights,
   FinalCta,
 } from "@/components/home";
@@ -35,13 +34,10 @@ export default function Page() {
       {/* 6. Testimonials */}
       <TestimonialsSection />
 
-      {/* 7. Trust Metrics Row */}
-      <TrustMetrics />
-
-      {/* 8. Latest Insights */}
+      {/* 7. Latest Insights */}
       <LatestInsights />
 
-      {/* 9. Final CTA */}
+      {/* 8. Final CTA */}
       <FinalCta />
     </div>
   );

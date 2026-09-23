@@ -4,7 +4,7 @@ import { Card } from "@/components/ui/card";
 import type { TeamMemberCardProps } from "./team-types";
 import { cn } from "@/lib/utils";
 
-export default function TeamMemberCard({ member, className = "" }: TeamMemberCardProps) {
+export function TeamMemberCard({ member, className = "" }: TeamMemberCardProps) {
   return (
     <Card
       variant="interactive"
@@ -54,3 +54,5 @@ export default function TeamMemberCard({ member, className = "" }: TeamMemberCar
     </Card>
   );
 }
+
+export default TeamMemberCard;

@@ -6,6 +6,5 @@ export * from "./selected-projects";
 export * from "./team-preview";
 export * from "./technologies-section";
 export * from "./testimonials-section";
-export * from "./trust-metrics";
 export * from "./latest-insights";
 export * from "./final-cta";

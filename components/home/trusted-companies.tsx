@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { TRUSTED_COMPANIES } from "./home-data";
 import { cn } from "@/lib/utils";
@@ -13,25 +14,33 @@ export function TrustedCompanies({ className = "" }: TrustedCompaniesProps) {
     <section
       aria-label={t("eyebrow")}
       className={cn(
-        "w-full border-y border-border/40 bg-muted/20 py-8 sm:py-10 transition-colors",
+        "w-full border-y border-border/50 bg-muted/20 py-10 sm:py-12 lg:py-14 transition-colors relative overflow-hidden",
         className
       )}
     >
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <p className="text-center text-[11px] sm:text-xs font-semibold uppercase tracking-widest text-muted-foreground/80 mb-6">
+        <p className="text-center text-xs sm:text-sm font-semibold uppercase tracking-widest text-muted-foreground/90 mb-8 sm:mb-10">
           {t("eyebrow")}
         </p>
 
-        <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-4 sm:gap-x-12 sm:gap-y-6">
+        {/* Logos container with responsive layout */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 items-center justify-center gap-6 sm:gap-8 lg:gap-10">
           {TRUSTED_COMPANIES.map((company) => (
             <div
               key={company.id}
-              className="inline-flex items-center gap-2.5 text-muted-foreground transition-all duration-150 hover:text-foreground group cursor-default select-none"
+              className="group flex flex-col items-center justify-center p-3 rounded-xl border border-border/40 bg-card/60 dark:bg-card/30 backdrop-blur-xs transition-all duration-300 hover:border-primary/40 hover:bg-card hover:shadow-xs hover:-translate-y-0.5"
+              title={company.name}
             >
-              <span className="flex h-7 w-7 items-center justify-center rounded-md border border-border/70 bg-card text-xs font-bold text-foreground/80 shadow-2xs group-hover:border-primary/40 group-hover:text-primary transition-colors">
-                {company.letter}
-              </span>
-              <span className="text-xs sm:text-sm font-semibold tracking-tight">
+              <div className="relative h-10 sm:h-12 w-full flex items-center justify-center px-2">
+                <Image
+                  src={company.logo}
+                  alt={company.name}
+                  width={120}
+                  height={40}
+                  className="max-h-8 sm:max-h-10 max-w-32.5 w-auto h-auto object-contain filter grayscale opacity-75 dark:opacity-85 dark:brightness-200 transition-all duration-300 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-105"
+                />
+              </div>
+              <span className="mt-2 text-[11px] font-medium text-muted-foreground/80 group-hover:text-foreground transition-colors truncate max-w-full text-center">
                 {company.name}
               </span>
             </div>
