@@ -94,6 +94,39 @@
       "discussProject": "ناقش مشروعك معنا",
       "exploreProjects": "استكشف مشاريعنا"
     }
+  },
+  "Projects": {
+    "metaTitle": "مشاريعنا — مسند للتقنية",
+    "metaDescription": "دراسات حالة متعمقة لأعمالنا الحقيقية — المشكلة، المنهجية، والنتائج الموثقة.",
+    "breadcrumb": {
+      "home": "الرئيسية",
+      "projects": "مشاريعنا",
+      "label": "مسار التنقل"
+    },
+    "header": {
+      "eyebrow": "مشاريعنا",
+      "title": "دراسات حالة، وليست مجرد معرض أعمال",
+      "subtitle": "دراسات حالة متعمقة لأعمالنا الحقيقية — المشكلة، المنهجية، والنتائج الموثقة."
+    },
+    "filters": {
+      "searchPlaceholder": "البحث في المشاريع...",
+      "sortBy": "الترتيب حسب",
+      "sortDefault": "الافتراضي",
+      "sortAlphabetical": "أبجدياً (أ–ي)",
+      "projectsCount": "{count} {count, plural, zero {مشروع} one {مشروع} two {مشروعان} few {مشاريع} many {مشروعاً} other {مشروع}}",
+      "noResultsTitle": "لم يتم العثور على أي مشاريع",
+      "noResultsDescription": "جرّب تغيير كلمات البحث لعرض المشاريع المتاحة.",
+      "clearFilters": "إعادة تعيين التصفية"
+    },
+    "card": {
+      "viewProject": "عرض تفاصيل مشروع {title}",
+      "viewProjectAction": "استعرض دراسة المشروع"
+    },
+    "cta": {
+      "title": "هل لديك مشروع في بالك؟",
+      "subtitle": "شاركنا ما ترغب في بنائه.",
+      "button": "ابدأ استفساراً عن مشروع"
+    }
   }
 }
 
