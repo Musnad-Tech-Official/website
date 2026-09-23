@@ -5,8 +5,8 @@ import {
   TeamHeader,
   TeamGrid,
   TeamCulture,
-  TeamCta,
 } from "@/components/team";
+import { CtaSection } from "@/components/ui/cta-section";
 
 interface TeamPageProps {
   params: Promise<{ locale: string }>;
@@ -24,13 +24,6 @@ export async function generateMetadata({
   };
 }
 
-/**
- * TeamPage renders Page 03 — Team:
- * - Breadcrumb & Header
- * - 3-column Team Members Grid
- * - Culture narrative & Stat highlight cards
- * - Project inquiry & Hiring CTA
- */
 export default async function TeamPage({ params }: TeamPageProps) {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "Team" });
@@ -50,7 +43,7 @@ export default async function TeamPage({ params }: TeamPageProps) {
         breadcrumbLabel={t("breadcrumb.label")}
       />
 
-      {/* 2. Team Members Grid */}
+      {/* 2. Team Members Horizontal Slider */}
       <TeamGrid members={members} />
 
       {/* 3. Culture Narrative & Stats */}
@@ -62,15 +55,21 @@ export default async function TeamPage({ params }: TeamPageProps) {
         stats={stats}
       />
 
-      {/* 4. Hiring & Project Inquiry Callout */}
-      <TeamCta
-        eyebrow={t("cta.eyebrow")}
+      {/* 4. Project Inquiry Callout (Reusable CTA) */}
+      <CtaSection
         title={t("cta.title")}
         subtitle={t("cta.subtitle")}
-        careersLabel={t("cta.careers")}
-        startProjectLabel={t("cta.startProject")}
-        careersHref="/careers"
-        contactHref="/contact"
+        primaryAction={{
+          label: t("cta.discussProject"),
+          href: "/contact",
+          variant: "primary",
+          showArrow: true,
+        }}
+        secondaryAction={{
+          label: t("cta.exploreProjects"),
+          href: "/projects",
+          variant: "outline",
+        }}
       />
     </div>
   );

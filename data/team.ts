@@ -15,6 +15,7 @@ export interface TeamMember {
 
 export interface TeamStat {
   id: string;
+  eyebrow: string;
   value: string;
   label: string;
   iconType: "capabilities" | "bilingual" | "architecture";
@@ -77,20 +78,23 @@ export const TEAM_MEMBERS_AR: TeamMember[] = [
 export const TEAM_STATS_EN: TeamStat[] = [
   {
     id: "capabilities",
-    value: "Full-Stack",
-    label: "Modern web, mobile & cloud systems",
+    eyebrow: "Thoughtful Engineering",
+    value: "Built to Scale",
+    label: "Maintainable architecture designed for high performance, reliability, and continuous evolution.",
     iconType: "capabilities",
   },
   {
     id: "bilingual",
-    value: "Bilingual",
-    label: "First-class Arabic & English experiences",
+    eyebrow: "Native Bilingual",
+    value: "Bilingual by Default",
+    label: "First-class Arabic and English digital experiences with meticulous RTL and LTR ergonomics.",
     iconType: "bilingual",
   },
   {
     id: "architecture",
-    value: "Scalable Architecture",
-    label: "Engineered for high performance, reliability, and scale",
+    eyebrow: "Product Strategy",
+    value: "Clarity at Every Step",
+    label: "Engineering guided by real user needs, clean code standards, and transparent partnership.",
     iconType: "architecture",
   },
 ];
@@ -98,20 +102,23 @@ export const TEAM_STATS_EN: TeamStat[] = [
 export const TEAM_STATS_AR: TeamStat[] = [
   {
     id: "capabilities",
-    value: "تطوير شامل",
-    label: "أنظمة الويب والجوال والمنصات السحابية",
+    eyebrow: "هندسة برمجية متقنة",
+    value: "مبني ليتوسع ويدوم",
+    label: "معمارية برمجية متينة مصممة لأعلى مستويات الأداء والموثوقية والتطور المستمر.",
     iconType: "capabilities",
   },
   {
     id: "bilingual",
-    value: "ثنائي اللغة",
-    label: "تجارب عربية وإنجليزية أصلية ومتقنة",
+    eyebrow: "ثنائي اللغة بأصالة",
+    value: "تجربة عربية وعالمية",
+    label: "تجارب رقمية أصيلة باللغتين العربية والإنجليزية مع إتقان فائق لتفاصيل الاتجاه والتصميم.",
     iconType: "bilingual",
   },
   {
     id: "architecture",
-    value: "معمارية قابلة للتوسع",
-    label: "مصممة بأعلى معايير الأداء والموثوقية والاستقرار",
+    eyebrow: "رؤية واستراتيجية المنتج",
+    value: "وضوح في كل مرحلة",
+    label: "تطوير برمجيات ينطلق من الاحتياج الفعلي مع شفافية كاملة ومعايير شيفرة عالمية.",
     iconType: "architecture",
   },
 ];
