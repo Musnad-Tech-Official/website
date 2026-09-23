@@ -94,6 +94,39 @@
       "discussProject": "Discuss Your Project",
       "exploreProjects": "Explore Projects"
     }
+  },
+  "Projects": {
+    "metaTitle": "Projects — Musnad Tech",
+    "metaDescription": "Structured deep-dives into real work — the problem, the approach, and verified outcomes.",
+    "breadcrumb": {
+      "home": "Home",
+      "projects": "Projects",
+      "label": "Breadcrumbs"
+    },
+    "header": {
+      "eyebrow": "PROJECTS",
+      "title": "Case studies, not portfolios",
+      "subtitle": "Structured deep-dives into real work — the problem, the approach, and verified outcomes."
+    },
+    "filters": {
+      "searchPlaceholder": "Search projects...",
+      "sortBy": "Sort by",
+      "sortDefault": "Default",
+      "sortAlphabetical": "Alphabetical (A–Z)",
+      "projectsCount": "{count} {count, plural, one {project} other {projects}}",
+      "noResultsTitle": "No projects found",
+      "noResultsDescription": "Try adjusting your search query to see matching projects.",
+      "clearFilters": "Clear filters"
+    },
+    "card": {
+      "viewProject": "View project details for {title}",
+      "viewProjectAction": "View case study"
+    },
+    "cta": {
+      "title": "Have a project in mind?",
+      "subtitle": "Tell us about what you want to build.",
+      "button": "Start a project inquiry"
+    }
   }
 }
 
