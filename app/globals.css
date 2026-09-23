@@ -151,3 +151,33 @@ body {
   font-family: inherit;
   transition: background-color 0.2s ease, color 0.2s ease;
 }
+
+/* Horizontal Infinite Marquee Animations */
+@keyframes marquee-left {
+  from {
+    transform: translateX(0%);
+  }
+  to {
+    transform: translateX(-100%);
+  }
+}
+
+@keyframes marquee-right {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0%);
+  }
+}
+
+.animate-marquee-left {
+  animation: marquee-left 50s linear infinite;
+  will-change: transform;
+}
+
+.animate-marquee-right {
+  animation: marquee-right 50s linear infinite;
+  will-change: transform;
+}
+

@@ -1,9 +1,8 @@
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { Link } from "@/i18n/routing";
 import { LuArrowRight } from "react-icons/lu";
-import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { TEAM_MEMBERS } from "./home-data";
+import { TeamMemberCard } from "@/components/team";
+import { getTeamMembers } from "@/data/team";
 import { cn } from "@/lib/utils";
 
 export interface TeamPreviewProps {
@@ -12,6 +11,8 @@ export interface TeamPreviewProps {
 
 export function TeamPreview({ className = "" }: TeamPreviewProps) {
   const t = useTranslations("Home.team");
+  const locale = useLocale();
+  const members = getTeamMembers(locale);
 
   return (
     <section
@@ -51,62 +52,11 @@ export function TeamPreview({ className = "" }: TeamPreviewProps) {
           </div>
         </div>
 
-        {/* 4 Team Member Cards Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {TEAM_MEMBERS.map((member) => {
-            const name = t(`members.${member.memberKey}.name`);
-            const role = t(`members.${member.memberKey}.role`);
-            const bio = t(`members.${member.memberKey}.bio`);
-
-            return (
-              <Card
-                key={member.id}
-                variant="interactive"
-                className="group relative flex flex-col overflow-hidden p-0"
-              >
-                {/* Monogram Banner */}
-                <div
-                  className={cn(
-                    "relative h-44 sm:h-48 w-full flex items-center justify-center select-none bg-gradient-to-br border-b border-border/40",
-                    member.bannerGradient
-                  )}
-                >
-                  <span className="text-3xl sm:text-4xl font-extrabold tracking-widest text-white/95 drop-shadow-sm font-sans">
-                    {member.initials}
-                  </span>
-                </div>
-
-                {/* Info Container */}
-                <div className="p-5 sm:p-6 flex flex-col flex-1 justify-between text-start">
-                  <div>
-                    <h3 className="text-base sm:text-lg font-bold text-foreground group-hover:text-primary transition-colors tracking-tight">
-                      {name}
-                    </h3>
-                    <p className="text-xs sm:text-sm font-semibold text-primary mt-0.5">
-                      {role}
-                    </p>
-                    <p className="mt-2.5 text-xs sm:text-sm text-muted-foreground leading-relaxed line-clamp-3">
-                      {bio}
-                    </p>
-                  </div>
-
-                  {/* Skills / Tech Chips */}
-                  <div className="mt-5 flex flex-wrap gap-1.5 pt-3 border-t border-border/40" aria-label="Key skills">
-                    {member.skills.map((skill, idx) => (
-                      <Badge
-                        key={idx}
-                        variant="secondary"
-                        size="sm"
-                        className="font-normal text-[11px] text-muted-foreground bg-muted/60"
-                      >
-                        {skill}
-                      </Badge>
-                    ))}
-                  </div>
-                </div>
-              </Card>
-            );
-          })}
+        {/* Team Members Grid reusing TeamMemberCard */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+          {members.map((member) => (
+            <TeamMemberCard key={member.id} member={member} />
+          ))}
         </div>
       </div>
     </section>

@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 120" width="100%" height="100%">
+  <g fill="none" fill-rule="evenodd">
+    <!-- Emblem: Interlocking stylized crescents -->
+    <g transform="translate(20, 15)">
+      <circle cx="45" cy="45" r="40" fill="#0D2C54" />
+      <path d="M45 10 A35 35 0 0 1 80 45 A35 35 0 0 1 45 80 A35 35 0 0 1 10 45 A35 35 0 0 1 45 10 Z" fill="#ffffff" />
+      <circle cx="45" cy="45" r="26" fill="#C81D25" />
+      <path d="M45 25 A20 20 0 1 0 65 45 A20 20 0 0 0 45 25 Z" fill="#ffffff" />
+      <circle cx="45" cy="45" r="12" fill="#0D2C54" />
+    </g>
+    <!-- Text Elements -->
+    <g transform="translate(125, 20)">
+      <!-- English acronym -->
+      <text font-family="system-ui, -apple-system, sans-serif" font-size="34" font-weight="900" fill="#0D2C54" letter-spacing="2" x="0" y="36">YKB</text>
+      <!-- Arabic Name -->
+      <text font-family="'Segoe UI', Tahoma, sans-serif" font-size="18" font-weight="700" fill="#0D2C54" x="0" y="66">بنك اليمن والكويت</text>
+      <!-- English Subtitle -->
+      <text font-family="system-ui, -apple-system, sans-serif" font-size="11" font-weight="600" fill="#64748B" letter-spacing="1" x="0" y="82">YEMEN KUWAIT BANK</text>
+    </g>
+  </g>
+</svg>
+
