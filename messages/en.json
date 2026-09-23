@@ -488,6 +488,31 @@
         "primaryButton": "Start a Product Engineering project"
       }
     },
+    "platformInfrastructure": {
+      "metaTitle": "Platform & Infrastructure — Musnad Tech",
+      "metaDescription": "Cloud-native platforms, CI/CD, and developer experience that scales with your team.",
+      "intro": {
+        "eyebrow": "SERVICES",
+        "title": "Platform & Infrastructure",
+        "subtitle": "Cloud-native platforms, CI/CD, and developer experience that scales with your team."
+      },
+      "overview": {
+        "statement": "We design and operate platforms that let product teams move fast without breaking things. Infrastructure as code, automated deployment pipelines, and sensible guardrails."
+      },
+      "capabilities": {
+        "cloudArchitecture": "Cloud architecture (AWS / GCP)",
+        "kubernetes": "Kubernetes & container orchestration",
+        "cicd": "CI/CD pipeline design",
+        "iac": "Infrastructure as code (Terraform)",
+        "finops": "Cost optimization & FinOps"
+      },
+      "sidebar": {
+        "ctaButton": "Start a Platform & Infrastructure project"
+      },
+      "cta": {
+        "primaryButton": "Start a Platform & Infrastructure project"
+      }
+    },
     "projects": {
       "sahim": {
         "title": "Sahim Analytics",
@@ -508,6 +533,11 @@
         "title": "Musnad CLI",
         "category": "Developer Tool",
         "description": "An internal CLI and developer platform that standardizes project scaffolding and deployment."
+      },
+      "wathq": {
+        "title": "Wathq Observability",
+        "category": "Platform Engineering",
+        "description": "An observability stack — metrics, traces, and dashboards — that cut incident response time."
       }
     }
   }
