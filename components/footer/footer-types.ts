@@ -24,6 +24,8 @@ export interface FooterBrandProps {
   homeHref?: string;
   brandName?: string;
   description?: string;
+  email?: string;
+  location?: string;
   socialLinks?: SocialLink[];
   className?: string;
 }
@@ -36,6 +38,8 @@ export interface FooterLinksProps {
 export interface FooterBottomProps {
   brandName?: string;
   allRightsReserved?: string;
+  builtInRiyadh?: string;
+  locale?: string;
   className?: string;
 }
 

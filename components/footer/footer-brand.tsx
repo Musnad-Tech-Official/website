@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { Link } from "@/i18n/routing";
+import { LuMail, LuMapPin } from "react-icons/lu";
 import type { FooterBrandProps } from "./footer-types";
 import { OFFICIAL_SOCIAL_LINKS } from "./footer-config";
 import { cn } from "@/lib/utils";
@@ -8,12 +9,15 @@ import { cn } from "@/lib/utils";
  * FooterBrand renders the brand identity column:
  * - Theme-aware Musnad logo (light and dark mode assets)
  * - Concise company mission / description
- * - Accessible social links (GitHub) with comfortable touch targets and visible focus indicators
+ * - Direct contact email and location info
+ * - Accessible social links with comfortable touch targets and visible focus indicators
  */
 export function FooterBrand({
   homeHref = "/",
   brandName = "Musnad Tech",
   description,
+  email,
+  location,
   socialLinks = OFFICIAL_SOCIAL_LINKS,
   className = "",
 }: FooterBrandProps) {
@@ -54,6 +58,27 @@ export function FooterBrand({
         <p className="text-sm text-muted-foreground leading-relaxed max-w-sm">
           {description}
         </p>
+      )}
+
+      {/* Contact Information & Location */}
+      {(email || location) && (
+        <div className="flex flex-col gap-2 text-xs text-muted-foreground pt-1">
+          {email && (
+            <a
+              href={`mailto:${email}`}
+              className="inline-flex items-center gap-2 hover:text-foreground transition-colors w-fit focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring rounded-xs"
+            >
+              <LuMail className="h-3.5 w-3.5 text-muted-foreground/80 shrink-0" aria-hidden="true" />
+              <span>{email}</span>
+            </a>
+          )}
+          {location && (
+            <div className="inline-flex items-center gap-2 w-fit">
+              <LuMapPin className="h-3.5 w-3.5 text-muted-foreground/80 shrink-0" aria-hidden="true" />
+              <span>{location}</span>
+            </div>
+          )}
+        </div>
       )}
 
       {/* Social Links */}

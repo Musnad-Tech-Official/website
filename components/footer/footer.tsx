@@ -44,6 +44,8 @@ export function Footer({
             <FooterBrand
               brandName={tBrand("name")}
               description={t("brandDescription")}
+              email={t("contactEmail")}
+              location={t("location")}
             />
           </div>
 
@@ -59,6 +61,8 @@ export function Footer({
         <FooterBottom
           brandName={tBrand("name")}
           allRightsReserved={t("allRightsReserved")}
+          builtInRiyadh={t("builtInRiyadh")}
+          locale={locale}
         />
       </div>
     </footer>

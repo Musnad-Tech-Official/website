@@ -17,13 +17,211 @@
       "services": "Services",
       "projects": "Projects",
       "blog": "Blog",
-      "team": "Team"
+      "team": "Team",
+      "careers": "Careers"
     }
   },
   "HomePage": {
     "badge": "Design System & Component Library",
     "title": "Musnad UI Components",
     "description": "A comprehensive suite of accessible, token-driven UI components engineered with Tailwind CSS v4, supporting brand crimson accents, full internationalization (next-intl), and responsive dark/light modes."
+  },
+  "Home": {
+    "trustedCompanies": {
+      "eyebrow": "TRUSTED BY TEAMS WHO SHIP"
+    },
+    "capabilities": {
+      "eyebrow": "WHAT WE DO",
+      "heading": "Capabilities, not a feature list",
+      "description": "We work across the full product lifecycle — from discovery to operations. These are outcomes we deliver, not a stack of tools.",
+      "viewAll": "View all",
+      "learnMore": "Learn more",
+      "services": {
+        "productEngineering": {
+          "title": "Product Engineering",
+          "description": "From discovery to launch — we build products end to end with engineering accountability.",
+          "tag1": "Architecture & system design",
+          "tag2": "Full-stack implementation",
+          "tag3": "Technical discovery & RFCs"
+        },
+        "platformInfrastructure": {
+          "title": "Platform & Infrastructure",
+          "description": "Cloud-native platforms, CI/CD, and developer experience that scales with your team.",
+          "tag1": "Cloud architecture (AWS / GCP)",
+          "tag2": "Kubernetes & container orchestration",
+          "tag3": "CI/CD pipeline design"
+        },
+        "dataEngineering": {
+          "title": "Data Engineering",
+          "description": "Pipelines, warehouses, and analytics surfaces built for trust and performance.",
+          "tag1": "ETL / ELT pipelines",
+          "tag2": "Warehouse modeling (dbt)",
+          "tag3": "Real-time streaming"
+        },
+        "developerTools": {
+          "title": "Developer Tools",
+          "description": "CLIs, SDKs, and internal platforms that make engineers measurably faster.",
+          "tag1": "CLI & SDK design",
+          "tag2": "API design (REST & gRPC)",
+          "tag3": "Developer documentation"
+        },
+        "aiIntegration": {
+          "title": "AI Integration",
+          "description": "Practical, production-ready AI features — grounded, observable, and honest about limits.",
+          "tag1": "RAG pipelines & evaluation",
+          "tag2": "LLM application architecture",
+          "tag3": "Prompt engineering & evals"
+        },
+        "designEngineering": {
+          "title": "Design Engineering",
+          "description": "Where design meets implementation — interfaces that feel considered and perform.",
+          "tag1": "Design systems & tokens",
+          "tag2": "Component libraries",
+          "tag3": "Accessibility (WCAG 2.2 AA)"
+        }
+      }
+    },
+    "projects": {
+      "eyebrow": "SELECTED WORK",
+      "heading": "Projects that prove capability",
+      "description": "Real case studies with measurable outcomes. Browse the full catalog for search, filters, and demos.",
+      "viewAll": "View all",
+      "featured": "Featured",
+      "liveDemo": "Live demo available",
+      "completed": "Completed",
+      "items": {
+        "sahim": {
+          "title": "Sahim Analytics",
+          "category": "Fintech Platform",
+          "description": "A streaming analytics platform that aggregates market signals and turns them into actionable insight with sub-second latency."
+        },
+        "naft": {
+          "title": "Naft Deploy",
+          "category": "Developer Tool",
+          "description": "An open-source deployment tool that gives small teams push-to-deploy without operating a full Kubernetes cluster."
+        },
+        "rakeen": {
+          "title": "Rakeen Portal",
+          "category": "Client Portal",
+          "description": "A secure, bilingual client portal for document exchange, case tracking, and confidential communication."
+        }
+      }
+    },
+    "team": {
+      "eyebrow": "THE STUDIO",
+      "heading": "Engineers who care about the craft",
+      "description": "A small, senior team. Meet the people behind the work.",
+      "viewAll": "View all",
+      "members": {
+        "layla": {
+          "name": "Layla Alharbi",
+          "role": "Founder & Principal Engineer",
+          "bio": "Layla founded Musnad Tech after a decade building distributed systems at scale. She leads architecture and system design across all engagements."
+        },
+        "omar": {
+          "name": "Omar Faris",
+          "role": "Staff Engineer, Platform",
+          "bio": "Omar builds the infrastructure and tooling other engineers rely on. He maintains several of our open-source platforms and leads CI/CD standards."
+        },
+        "sara": {
+          "name": "Sara Alotaibi",
+          "role": "Senior ML Engineer",
+          "bio": "Sara leads our AI integration practice. She cares about evals, guardrails, and being honest about limits, turning LLMs into reliable workflows."
+        },
+        "yousef": {
+          "name": "Yousef Khalil",
+          "role": "Senior Product Engineer",
+          "bio": "Yousef turns ambiguous product problems into shipped software. He's our go-to for frontend architecture, design fidelity, and accessible UX."
+        }
+      }
+    },
+    "technologies": {
+      "eyebrow": "TOOLING",
+      "heading": "Technologies we build with",
+      "description": "We choose tools that fit the problem. These appear across our projects, services, and team skills.",
+      "categories": {
+        "language": "Language",
+        "framework": "Framework",
+        "database": "Database",
+        "infrastructure": "Infrastructure",
+        "tooling": "Tooling"
+      }
+    },
+    "testimonials": {
+      "eyebrow": "IN THEIR WORDS",
+      "heading": "What partners say",
+      "items": {
+        "ahmed": {
+          "quote": "Musnad Tech didn't just build software — they raised our standard for what reliable looks like. The Sahim platform became the tool our analysts actually trust.",
+          "author": "Ahmed Al-Dossari",
+          "role": "Head of Product · Regional Investment Firm"
+        },
+        "reem": {
+          "quote": "The Rakeen portal transformed how our clients interact with us. Bilingual, accessible, and genuinely secure — delivered on time.",
+          "author": "Reem Al-Sayed",
+          "role": "Managing Partner · Legal Services Firm"
+        },
+        "faisal": {
+          "quote": "They replaced a costly vendor SaaS with a self-hosted observability stack and cut our incident response time by more than half. Calm, competent engineering.",
+          "author": "Faisal Al-Nasser",
+          "role": "CTO · Logistics Operator"
+        }
+      }
+    },
+    "trustMetrics": {
+      "m1": {
+        "title": "Proof over claims",
+        "description": "We show our work. Case studies, evals, open source — verify us."
+      },
+      "m2": {
+        "title": "Structured flexibility",
+        "description": "Deliberate structure with room for the right exceptions — not a rigid template."
+      },
+      "m3": {
+        "title": "Security by design",
+        "description": "Threat modeling and least privilege are defaults, not add-ons."
+      },
+      "m4": {
+        "title": "Bilingual first",
+        "description": "Arabic and English are first-class. RTL and LTR, end to end."
+      }
+    },
+    "latestInsights": {
+      "eyebrow": "FROM THE BLOG",
+      "heading": "Latest insights",
+      "description": "Technical writing and field notes from the team.",
+      "viewAll": "View all",
+      "trending": "Trending",
+      "minRead": "{count} min read",
+      "timeAgo": "1y ago",
+      "articles": {
+        "rag": {
+          "title": "Eval first, ship second: building RAG you can trust",
+          "excerpt": "Most RAG demos fail in production because nobody measured them. Here's the eval-first approach we use before writing a single prompt.",
+          "category": "AI Engineering",
+          "author": "Sara Alotaibi"
+        },
+        "bilingual": {
+          "title": "Bilingual RTL done right: lessons from Rakeen Portal",
+          "excerpt": "Arabic/English isn't just translation. It's direction, typography, layout, and state. Here's how we built an enterprise portal without RTL bugs.",
+          "category": "Design Engineering",
+          "author": "Nasser Alqahtani"
+        },
+        "naft": {
+          "title": "Why we built Naft: small teams shouldn't need Kubernetes",
+          "excerpt": "Kubernetes is powerful but operationally heavy. Naft gives small teams push-to-deploy on their own servers with zero cluster overhead.",
+          "category": "Developer Tools",
+          "author": "Omar Faris"
+        }
+      }
+    },
+    "finalCta": {
+      "badge": "We respond within two business days",
+      "heading": "Have a project in mind?",
+      "description": "Tell us what you're building. We respond within two business days — no sales theatre.",
+      "primaryCta": "Start a project inquiry",
+      "secondaryCta": "Careers"
+    }
   },
   "Common": {
     "light": "Light",
@@ -50,16 +248,20 @@
     "github": "GitHub"
   },
   "Footer": {
-    "brandDescription": "Empowering Next-Generation Digital Experiences with high-performance web platforms, mobile applications, and enterprise systems.",
+    "brandDescription": "A software engineering studio building reliable products, platforms, and developer tools.",
     "exploreTitle": "Explore",
     "companyTitle": "Company",
     "legalTitle": "Legal",
+    "contactEmail": "hello@musnad.tech",
+    "location": "Riyadh, Saudi Arabia",
+    "builtInRiyadh": "Built in Riyadh",
     "nav": {
       "home": "Home",
       "projects": "Projects",
       "services": "Services",
       "blog": "Blog",
       "team": "Team",
+      "careers": "Careers",
       "about": "About",
       "contact": "Contact",
       "faq": "FAQ",
@@ -129,4 +331,3 @@
     }
   }
 }
-
