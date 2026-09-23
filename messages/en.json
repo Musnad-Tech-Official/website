@@ -329,5 +329,100 @@
       "subtitle": "Tell us about what you want to build.",
       "button": "Start a project inquiry"
     }
+  },
+  "Services": {
+    "metaTitle": "Services — Musnad Tech",
+    "metaDescription": "Outcome-focused capabilities. Each one links to real projects and the technologies behind them.",
+    "breadcrumb": {
+      "home": "Home",
+      "services": "Services",
+      "label": "Breadcrumbs"
+    },
+    "intro": {
+      "eyebrow": "SERVICES",
+      "title": "What we help with",
+      "subtitle": "Outcome-focused capabilities. Each one links to real projects and the technologies behind them."
+    },
+    "card": {
+      "learnMore": "Learn more",
+      "viewService": "View details for {title}"
+    },
+    "items": {
+      "productEngineering": {
+        "title": "Product Engineering",
+        "description": "From discovery to launch — we build products end to end with engineering accountability.",
+        "tag1": "Architecture & system design",
+        "tag2": "Full-stack implementation",
+        "tag3": "Technical discovery & RFCs"
+      },
+      "platformInfrastructure": {
+        "title": "Platform & Infrastructure",
+        "description": "Cloud-native platforms, CI/CD, and developer experience that scales with your team.",
+        "tag1": "Cloud architecture (AWS / GCP)",
+        "tag2": "Kubernetes & container orchestration",
+        "tag3": "CI/CD pipeline design"
+      },
+      "dataEngineering": {
+        "title": "Data Engineering",
+        "description": "Pipelines, warehouses, and analytics surfaces built for trust and performance.",
+        "tag1": "ETL / ELT pipelines",
+        "tag2": "Warehouse modeling (dbt)",
+        "tag3": "Real-time streaming"
+      },
+      "developerTools": {
+        "title": "Developer Tools",
+        "description": "CLIs, SDKs, and internal platforms that make engineers measurably faster.",
+        "tag1": "CLI & SDK design",
+        "tag2": "API design (REST & gRPC)",
+        "tag3": "Developer documentation"
+      },
+      "aiIntegration": {
+        "title": "AI Integration",
+        "description": "Practical, production-ready AI features — grounded, observable, and honest about limits.",
+        "tag1": "RAG pipelines & evaluation",
+        "tag2": "LLM application architecture",
+        "tag3": "Prompt engineering & evals"
+      },
+      "designEngineering": {
+        "title": "Design Engineering",
+        "description": "Where design meets implementation — interfaces that feel considered and perform.",
+        "tag1": "Design systems & tokens",
+        "tag2": "Component libraries",
+        "tag3": "Accessibility (WCAG 2.2 AA)"
+      }
+    },
+    "process": {
+      "eyebrow": "HOW WE WORK",
+      "heading": "How we work",
+      "subtitle": "A deliberate process that keeps quality and accountability front and center.",
+      "steps": {
+        "step1": {
+          "number": "01",
+          "title": "Discovery",
+          "description": "A paid engagement to align on the problem, constraints, and success metrics before committing to build."
+        },
+        "step2": {
+          "number": "02",
+          "title": "Architecture & RFCs",
+          "description": "We write down the hard decisions — architecture, trade-offs, risks — and review them openly."
+        },
+        "step3": {
+          "number": "03",
+          "title": "Build with cadence",
+          "description": "Weekly demos, continuous review, and honest progress. No black boxes, no surprises at the end."
+        },
+        "step4": {
+          "number": "04",
+          "title": "Ship & operate",
+          "description": "We deploy to production with observability and own the first weeks of operation. Then we hand over, or stay on."
+        }
+      }
+    },
+    "cta": {
+      "badge": "Responses within two business days",
+      "title": "Have a project in mind?",
+      "subtitle": "Tell us what you're building. We respond within two business days — no sales theatre.",
+      "button": "Start a project inquiry"
+    }
   }
 }
