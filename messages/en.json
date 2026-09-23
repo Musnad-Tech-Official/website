@@ -458,6 +458,51 @@
       "experienceRequiredSecondary": "Ratings and comments are available to verified project users."
     }
   },
+  "Blog": {
+    "meta": {
+      "title": "Blog — Musnad Tech",
+      "description": "Technical articles and field notes from Musnad Tech."
+    },
+    "breadcrumb": {
+      "home": "Home",
+      "blog": "Blog",
+      "label": "Breadcrumbs"
+    },
+    "header": {
+      "eyebrow": "INSIGHTS",
+      "title": "Writing from the studio",
+      "subtitle": "Technical articles and field notes. We publish when we have something worth saying."
+    },
+    "filters": {
+      "searchPlaceholder": "Search articles...",
+      "clearSearch": "Clear search",
+      "noResultsTitle": "No articles match your search.",
+      "noResultsDescription": "Try adjusting your search terms or clearing your filters to explore other articles.",
+      "clearFilters": "Clear filters"
+    },
+    "sections": {
+      "featured": "FEATURED",
+      "articles": "ARTICLES"
+    },
+    "card": {
+      "readArticle": "Read article",
+      "featuredBadge": "Featured",
+      "minRead": "{count} min read"
+    },
+    "newsletter": {
+      "eyebrow": "NEWSLETTER",
+      "title": "Subscribe to the Musnad newsletter",
+      "description": "Technical articles and field notes. We send when there's something worth saying — no spam.",
+      "emailPlaceholder": "your@email.com",
+      "subscribeButton": "Subscribe",
+      "privacyNotice": "We respect your privacy. Unsubscribe anytime.",
+      "integrationNotice": "Newsletter signup will be available when email integration is connected."
+    },
+    "emptyState": {
+      "noArticles": "No articles are available yet.",
+      "noArticlesDescription": "Approved articles will appear here when published."
+    }
+  },
   "About": {
     "metaTitle": "About — Musnad Tech",
     "metaDescription": "A software engineering studio built on proof, not promises. Rigorous, honest, and accountable to outcomes.",
