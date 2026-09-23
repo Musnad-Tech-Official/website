@@ -13,6 +13,8 @@ export * from "./alert";
 export * from "./skeleton";
 export * from "./tooltip";
 export * from "./cta-section";
+export * from "./page-header";
+export * from "./empty-state";
 export * from "../theme-switcher";
 export * from "../language-switcher";
 export * from "../navbar-utilities";

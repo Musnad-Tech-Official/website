@@ -1,10 +1,11 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import { useState, useMemo } from "react";
 import { useTranslations } from "next-intl";
 import { ProjectsFilter } from "./projects-filter";
 import { ProjectsGrid } from "./projects-grid";
 import { Button } from "@/components/ui/button";
+import { EmptyState } from "@/components/ui/empty-state";
 import { LuSearch, LuRotateCcw } from "react-icons/lu";
 import type {
   ProjectsExplorerProps,
@@ -16,12 +17,6 @@ const INITIAL_FILTER_STATE: ProjectFilterState = {
   sortBy: "default",
 };
 
-/**
- * ProjectsExplorer is the interactive client coordinator for the Projects page:
- * - Maintains client-side search and alphabetical sorting
- * - Matches query strictly against approved project titles and neutral descriptions
- * - Renders the responsive grid or an accessible empty-state message
- */
 export function ProjectsExplorer({
   projects,
   locale,
@@ -78,30 +73,22 @@ export function ProjectsExplorer({
       {filteredProjects.length > 0 ? (
         <ProjectsGrid projects={filteredProjects} locale={locale} />
       ) : (
-        <div
-          role="status"
-          aria-live="polite"
-          className="rounded-2xl border border-dashed border-border/80 bg-card/40 p-10 sm:p-16 text-center my-6"
-        >
-          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-muted/60 text-muted-foreground mb-4">
-            <LuSearch className="h-6 w-6" aria-hidden="true" />
-          </div>
-          <h3 className="text-lg font-bold text-foreground mb-2">
-            {t("noResultsTitle")}
-          </h3>
-          <p className="text-sm text-muted-foreground max-w-md mx-auto mb-6 leading-relaxed">
-            {t("noResultsDescription")}
-          </p>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleReset}
-            className="gap-2 rounded-lg cursor-pointer"
-          >
-            <LuRotateCcw className="h-3.5 w-3.5" aria-hidden="true" />
-            <span>{t("clearFilters")}</span>
-          </Button>
-        </div>
+        <EmptyState
+          icon={<LuSearch className="h-6 w-6" aria-hidden="true" />}
+          title={t("noResultsTitle")}
+          description={t("noResultsDescription")}
+          action={
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleReset}
+              className="gap-2 rounded-lg cursor-pointer"
+            >
+              <LuRotateCcw className="h-3.5 w-3.5" aria-hidden="true" />
+              <span>{t("clearFilters")}</span>
+            </Button>
+          }
+        />
       )}
     </div>
   );

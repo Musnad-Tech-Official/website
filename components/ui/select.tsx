@@ -13,9 +13,9 @@ export interface SelectProps
 }
 
 const selectSizes: Record<SelectSize, string> = {
-  sm: "h-8 pl-2.5 pr-8 text-xs rounded-md",
-  md: "h-10 pl-3.5 pr-10 text-sm rounded-lg",
-  lg: "h-12 pl-4 pr-12 text-base rounded-lg",
+  sm: "h-8 ps-2.5 pe-8 text-xs rounded-md",
+  md: "h-10 ps-3.5 pe-10 text-sm rounded-lg",
+  lg: "h-12 ps-4 pe-12 text-base rounded-lg",
 };
 
 export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
@@ -74,7 +74,7 @@ export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
           </select>
 
           {/* Custom chevron indicator */}
-          <div className="pointer-events-none absolute right-3 flex items-center text-muted-foreground">
+          <div className="pointer-events-none absolute inset-e-3 flex items-center text-muted-foreground">
             <svg
               className="h-4 w-4"
               viewBox="0 0 20 20"
