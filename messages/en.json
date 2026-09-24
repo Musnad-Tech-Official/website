@@ -793,7 +793,23 @@
       ]
     },
     "designEngineer": {
-      "title": "Design Engineer"
+      "title": "Design Engineer",
+      "subtitle": "Bridge design and engineering. Own our design system, build accessible components, and craft interfaces that feel considered.",
+      "responsibilities": [
+        "Own and evolve our design system",
+        "Build accessible, reusable components",
+        "Prototype and ship production UI",
+        "Champion accessibility (WCAG 2.2 AA)"
+      ],
+      "requirements": [
+        "Strong TypeScript and React",
+        "Fluency in CSS and layout systems",
+        "An eye for detail and motion"
+      ],
+      "niceToHave": [
+        "Bilingual RTL/LTR experience",
+        "Figma plugin or tooling work"
+      ]
     }
   }
 }
