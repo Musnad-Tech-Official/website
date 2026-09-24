@@ -25,26 +25,32 @@ export function TrustedCompanies({ className = "" }: TrustedCompaniesProps) {
 
         {/* Logos container with responsive layout */}
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 items-center justify-center gap-6 sm:gap-8 lg:gap-10">
-          {TRUSTED_COMPANIES.map((company) => (
-            <div
-              key={company.id}
-              className="group flex flex-col items-center justify-center p-3 rounded-xl border border-border/40 bg-card/60 dark:bg-card/30 backdrop-blur-xs transition-all duration-300 hover:border-primary/40 hover:bg-card hover:shadow-xs hover:-translate-y-0.5"
-              title={company.name}
-            >
-              <div className="relative h-10 sm:h-12 w-full flex items-center justify-center px-2">
-                <Image
-                  src={company.logo}
-                  alt={company.name}
-                  width={120}
-                  height={40}
-                  className="max-h-8 sm:max-h-10 max-w-32.5 w-auto h-auto object-contain filter grayscale opacity-75 dark:opacity-85 dark:brightness-200 transition-all duration-300 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-105"
-                />
+          {TRUSTED_COMPANIES.map((company) => {
+            const companyName = t.has(`companies.${company.id}`)
+              ? t(`companies.${company.id}`)
+              : company.name;
+
+            return (
+              <div
+                key={company.id}
+                className="group flex flex-col items-center justify-center p-3 rounded-xl border border-border/40 bg-card/60 dark:bg-card/30 backdrop-blur-xs transition-all duration-300 hover:border-primary/40 hover:bg-card hover:shadow-xs hover:-translate-y-0.5"
+                title={companyName}
+              >
+                <div className="relative h-10 sm:h-12 w-full flex items-center justify-center px-2">
+                  <Image
+                    src={company.logo}
+                    alt={companyName}
+                    width={120}
+                    height={40}
+                    className="max-h-8 sm:max-h-10 max-w-32.5 w-auto h-auto object-contain filter grayscale opacity-75 dark:opacity-85 dark:brightness-200 transition-all duration-300 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-105"
+                  />
+                </div>
+                <span className="mt-2 text-[11px] font-medium text-muted-foreground/80 group-hover:text-foreground transition-colors truncate max-w-full text-center">
+                  {companyName}
+                </span>
               </div>
-              <span className="mt-2 text-[11px] font-medium text-muted-foreground/80 group-hover:text-foreground transition-colors truncate max-w-full text-center">
-                {company.name}
-              </span>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </section>

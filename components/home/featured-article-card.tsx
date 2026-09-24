@@ -21,6 +21,9 @@ export function FeaturedArticleCard({
   const category = t(`articles.${article.articleKey}.category`);
   const author = t(`articles.${article.articleKey}.author`);
   const minRead = t("minRead", { count: article.readTime });
+  const articleDate = t.has(`articles.${article.articleKey}.date`)
+    ? t(`articles.${article.articleKey}.date`)
+    : article.date || "2024";
 
   return (
     <Card
@@ -99,7 +102,7 @@ export function FeaturedArticleCard({
               <div className="flex flex-wrap items-center gap-2 text-xs sm:text-sm text-muted-foreground font-medium">
                 <span className="font-semibold text-foreground">{author}</span>
                 <span aria-hidden="true">·</span>
-                <span>{article.date || "2024"}</span>
+                <span>{articleDate}</span>
                 <span aria-hidden="true">·</span>
                 <span className="inline-flex items-center gap-1">
                   <LuClock className="h-3.5 w-3.5" aria-hidden="true" />

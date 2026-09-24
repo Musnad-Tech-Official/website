@@ -28,7 +28,15 @@
   },
   "Home": {
     "trustedCompanies": {
-      "eyebrow": "TRUSTED BY TEAMS WHO SHIP"
+      "eyebrow": "TRUSTED BY TEAMS WHO SHIP",
+      "companies": {
+        "yemen-mobile": "Yemen Mobile",
+        "kuraimi-bank": "Al Kuraimi Bank",
+        "tadhamon-bank": "Tadhamon Bank",
+        "hsa-group": "HSA Group",
+        "cac-bank": "CAC Bank",
+        "ykb": "Yemen Kuwait Bank"
+      }
     },
     "capabilities": {
       "eyebrow": "WHAT WE DO",
@@ -215,19 +223,22 @@
           "title": "Eval first, ship second: building RAG you can trust",
           "excerpt": "Most RAG demos fail in production because nobody measured them. Here's the eval-first approach we use before writing a single prompt.",
           "category": "AI Engineering",
-          "author": "Sara Alotaibi"
+          "author": "Sara Alotaibi",
+          "date": "Oct 2024"
         },
         "bilingual": {
           "title": "Bilingual RTL done right: lessons from Rakeen Portal",
           "excerpt": "Arabic/English isn't just translation. It's direction, typography, layout, and state. Here's how we built an enterprise portal without RTL bugs.",
           "category": "Design Engineering",
-          "author": "Nasser Alqahtani"
+          "author": "Nasser Alqahtani",
+          "date": "Aug 2024"
         },
         "naft": {
           "title": "Why we built Naft: small teams shouldn't need Kubernetes",
           "excerpt": "Kubernetes is powerful but operationally heavy. Naft gives small teams push-to-deploy on their own servers with zero cluster overhead.",
           "category": "Developer Tools",
-          "author": "Omar Faris"
+          "author": "Omar Faris",
+          "date": "Jun 2024"
         }
       }
     },
@@ -336,37 +347,114 @@
       "exploreProjects": "Explore Projects"
     }
   },
-  "Projects": {
-    "metaTitle": "Projects — Musnad Tech",
-    "metaDescription": "Structured deep-dives into real work — the problem, the approach, and verified outcomes.",
-    "breadcrumb": {
-      "home": "Home",
-      "projects": "Projects",
-      "label": "Breadcrumbs"
+  "About": {
+    "metaTitle": "About — Musnad Tech",
+    "metaDescription": "A software engineering studio built on proof, not promises. Rigorous, honest, and accountable to outcomes.",
+    "intro": {
+      "breadcrumbHome": "Home",
+      "breadcrumbAbout": "About",
+      "breadcrumbLabel": "Breadcrumbs",
+      "eyebrow": "ABOUT MUSNAD TECH",
+      "title": "A studio built on\nproof, not promises.",
+      "subtitle": "We started Musnad Tech to do software engineering the way we believe it should be done — rigorous, honest, and accountable to outcomes."
     },
-    "header": {
-      "eyebrow": "PROJECTS",
-      "title": "Case studies, not portfolios",
-      "subtitle": "Structured deep-dives into real work — the problem, the approach, and verified outcomes."
+    "missionVision": {
+      "missionTitle": "Our mission",
+      "missionDescription": "Help teams ship software that is reliable, maintainable, and worth trusting — and show our work so others can verify it.",
+      "visionTitle": "Our vision",
+      "visionDescription": "A regional engineering culture where quality is the default, not a premium."
     },
-    "filters": {
-      "searchPlaceholder": "Search projects...",
-      "sortBy": "Sort by",
-      "sortDefault": "Default",
-      "sortAlphabetical": "Alphabetical (A–Z)",
-      "projectsCount": "{count} {count, plural, one {project} other {projects}}",
-      "noResultsTitle": "No projects found",
-      "noResultsDescription": "Try adjusting your search query to see matching projects.",
-      "clearFilters": "Clear filters"
+    "values": {
+      "eyebrow": "VALUES",
+      "title": "What we value",
+      "subtitle": "These aren't slogans. They show up in how we work every day.",
+      "items": {
+        "proof": {
+          "title": "Proof over claims",
+          "description": "We show our work. Case studies, evals, open source — verify us."
+        },
+        "flexibility": {
+          "title": "Structured flexibility",
+          "description": "Deliberate structure with room for the right exceptions — not a rigid template."
+        },
+        "security": {
+          "title": "Security by design",
+          "description": "Threat modeling and least privilege are defaults, not add-ons."
+        },
+        "bilingual": {
+          "title": "Bilingual first",
+          "description": "Arabic and English are first-class. RTL and LTR, end to end."
+        }
+      }
     },
-    "card": {
-      "viewProject": "View project details for {title}",
-      "viewProjectAction": "View case study"
+    "approach": {
+      "eyebrow": "APPROACH",
+      "title": "How we work",
+      "subtitle": "A deliberate process that keeps quality and accountability front and center.",
+      "steps": {
+        "discovery": {
+          "step": "01",
+          "title": "Discovery",
+          "description": "A paid engagement to align on the problem, constraints, and success metrics before committing to build."
+        },
+        "architecture": {
+          "step": "02",
+          "title": "Architecture & RFCs",
+          "description": "We write down the hard decisions — architecture, trade-offs, risks — and review them openly."
+        },
+        "cadence": {
+          "step": "03",
+          "title": "Build with cadence",
+          "description": "Weekly demos, continuous review, and honest progress. No black boxes, no surprises at the end."
+        },
+        "operate": {
+          "step": "04",
+          "title": "Ship & operate",
+          "description": "We deploy to production with observability and own the first weeks of operation. Then we hand over, or stay on."
+        }
+      }
+    },
+    "story": {
+      "title": "How we got here",
+      "p1": "Musnad Tech was founded in Riyadh in 2021 by a small group of senior engineers who had spent a decade building software at scale — and who were tired of the gap between what teams promise and what actually ships. We started the studio to do software engineering the way we believed it should be done: rigorous, honest, and accountable to outcomes you can verify.",
+      "p2": "From the first commit, we made a deliberate choice: bilingual-first, by default. Arabic and English are not translations bolted on at the end — they are first-class in our interfaces, our documentation, and our process. That same instinct shapes everything we ship. We publish case studies with real metrics, write RFCs for the hard decisions, open-source the tools we depend on, and stay honest about what worked and what didn't. Proof over claims is not a tagline; it is how we operate."
+    },
+    "milestones": {
+      "title": "Milestones",
+      "items": {
+        "2021": {
+          "year": "2021",
+          "title": "Musnad Tech founded",
+          "description": "Started as a two-person studio in Riyadh."
+        },
+        "2022": {
+          "year": "2022",
+          "title": "First regulated client portal",
+          "description": "Shipped Rakeen — our first bilingual, compliant product."
+        },
+        "2023": {
+          "year": "2023",
+          "title": "Open-source Naft",
+          "description": "Released Naft Deploy, our deployment tool for small teams."
+        },
+        "2024": {
+          "year": "2024",
+          "title": "Streaming analytics at scale",
+          "description": "Delivered Sahim — 48k events/min with sub-200ms queries."
+        },
+        "2025": {
+          "year": "2025",
+          "title": "AI practice & eval-first RAG",
+          "description": "Formalized our AI integration practice around evals and honesty."
+        }
+      }
     },
     "cta": {
+      "badge": "We respond within two business days",
       "title": "Have a project in mind?",
-      "subtitle": "Tell us about what you want to build.",
-      "button": "Start a project inquiry"
+      "subtitle": "Tell us what you're building. We respond within two business days — no sales theatre.",
+      "primaryAction": "Start a project inquiry",
+      "secondaryAction": "Team"
     }
   },
   "Services": {
@@ -686,6 +774,475 @@
       }
     }
   },
+  "Projects": {
+    "metaTitle": "Projects — Musnad Tech",
+    "metaDescription": "Structured deep-dives into real work — the problem, the approach, and verified outcomes.",
+    "breadcrumb": {
+      "home": "Home",
+      "projects": "Projects",
+      "label": "Breadcrumbs"
+    },
+    "header": {
+      "eyebrow": "PROJECTS",
+      "title": "Case studies, not portfolios",
+      "subtitle": "Structured deep-dives into real work — the problem, the approach, and verified outcomes."
+    },
+    "filters": {
+      "searchPlaceholder": "Search projects...",
+      "sortBy": "Sort by",
+      "sortDefault": "Default",
+      "sortAlphabetical": "Alphabetical (A–Z)",
+      "projectsCount": "{count} {count, plural, one {project} other {projects}}",
+      "noResultsTitle": "No projects found",
+      "noResultsDescription": "Try adjusting your search query to see matching projects.",
+      "clearFilters": "Clear filters"
+    },
+    "card": {
+      "viewProject": "View project details for {title}",
+      "viewProjectAction": "View case study"
+    },
+    "cta": {
+      "title": "Have a project in mind?",
+      "subtitle": "Tell us about what you want to build.",
+      "button": "Start a project inquiry"
+    }
+  },
+  "ProjectDetail": {
+    "breadcrumb": {
+      "home": "Home",
+      "projects": "Projects",
+      "label": "Breadcrumbs"
+    },
+    "meta": {
+      "titleTemplate": "{title} — Musnad Tech",
+      "defaultDescription": "Explore project case studies from Musnad Tech."
+    },
+    "relatedProjects": "Related projects",
+    "gallery": {
+      "previewPrefix": "Preview"
+    },
+    "rating": {
+      "submit": "Submit Rating",
+      "ratingsCount": "ratings",
+      "integrationNotice": "Project ratings will be available when account interactions are connected.",
+      "previewNotice": "Rating preview only — ratings are not persisted."
+    },
+    "comments": {
+      "submit": "Post comment",
+      "reply": "Reply",
+      "empty": "No comments yet.",
+      "integrationNotice": "Comments will be available when account interactions are connected."
+    },
+    "eligibility": {
+      "signedOut": "Sign in to rate or comment on this project.",
+      "signIn": "Sign In",
+      "experienceRequired": "Try this project before rating or commenting.",
+      "experienceRequiredSecondary": "Ratings and comments are available to verified project users."
+    }
+  },
+  "Blog": {
+    "meta": {
+      "title": "Blog — Musnad Tech",
+      "description": "Technical articles and field notes from Musnad Tech."
+    },
+    "breadcrumb": {
+      "home": "Home",
+      "blog": "Blog",
+      "label": "Breadcrumbs"
+    },
+    "header": {
+      "eyebrow": "INSIGHTS",
+      "title": "Writing from the studio",
+      "subtitle": "Technical articles and field notes. We publish when we have something worth saying."
+    },
+    "filters": {
+      "searchPlaceholder": "Search articles...",
+      "clearSearch": "Clear search",
+      "noResultsTitle": "No articles match your search.",
+      "noResultsDescription": "Try adjusting your search terms or clearing your filters to explore other articles.",
+      "clearFilters": "Clear filters"
+    },
+    "sections": {
+      "featured": "FEATURED",
+      "articles": "ARTICLES"
+    },
+    "card": {
+      "readArticle": "Read article",
+      "featuredBadge": "Featured",
+      "minRead": "{count} min read"
+    },
+    "newsletter": {
+      "eyebrow": "NEWSLETTER",
+      "title": "Subscribe to the Musnad newsletter",
+      "description": "Technical articles and field notes. We send when there's something worth saying — no spam.",
+      "emailPlaceholder": "your@email.com",
+      "subscribeButton": "Subscribe",
+      "privacyNotice": "We respect your privacy. Unsubscribe anytime.",
+      "integrationNotice": "Newsletter signup will be available when email integration is connected."
+    },
+    "emptyState": {
+      "noArticles": "No articles are available yet.",
+      "noArticlesDescription": "Approved articles will appear here when published."
+    }
+  },
+  "ArticleDetail": {
+    "meta": {
+      "titleTemplate": "{title} — Musnad Tech",
+      "defaultDescription": "Technical articles and field notes from Musnad Tech."
+    },
+    "breadcrumb": {
+      "home": "Home",
+      "blog": "Blog",
+      "label": "Breadcrumbs"
+    },
+    "actions": {
+      "copyLink": "Copy link",
+      "copied": "Copied!",
+      "share": "Share"
+    },
+    "sidebar": {
+      "onThisPage": "ON THIS PAGE",
+      "fontSize": "FONT SIZE",
+      "fontSizeSmall": "Small font size",
+      "fontSizeDefault": "Default font size",
+      "fontSizeLarge": "Large font size",
+      "cite": "Cite this article",
+      "copyCitation": "Copy citation",
+      "citationCopied": "Citation copied!",
+      "shareTitle": "SHARE",
+      "shareOnX": "Share on X",
+      "shareOnLinkedIn": "Share on LinkedIn",
+      "moreIn": "MORE IN {category}",
+      "newsletterTitle": "SUBSCRIBE TO THE MUSNAD NEWSLETTER",
+      "newsletterDescription": "Technical articles and field notes. We send when there's something worth saying — no spam.",
+      "newsletterPlaceholder": "your@email.com",
+      "subscribe": "Subscribe",
+      "privacyNotice": "We respect your privacy. Unsubscribe anytime.",
+      "newsletterNotice": "Newsletter signup will be available when email integration is connected."
+    },
+    "author": {
+      "by": "BY",
+      "aboutAuthor": "About the author"
+    },
+    "shareBlock": {
+      "title": "Share",
+      "description": "If you found this useful, share it with someone who cares."
+    },
+    "related": {
+      "title": "Related articles",
+      "viewAll": "View all",
+      "forYou": "FOR YOU",
+      "youMightAlsoLike": "You might also like"
+    },
+    "comments": {
+      "title": "Comments",
+      "guidelines": "Verified members can comment and reply. Code of conduct applies; keeps discussions focused.",
+      "placeholder": "Sign in to leave a comment...",
+      "signIn": "Sign In",
+      "signUp": "Sign Up",
+      "empty": "No comments yet.",
+      "integrationNotice": "Article comments will be available when account interactions are connected."
+    },
+    "backToTop": "Back to top",
+    "code": {
+      "copy": "Copy code",
+      "copied": "Copied!"
+    }
+  },
+  "Contact": {
+    "meta": {
+      "title": "Contact — Musnad Tech",
+      "description": "Start a conversation with Musnad Tech. Tell us about your project, idea, or question."
+    },
+    "breadcrumb": {
+      "home": "Home",
+      "contact": "Contact",
+      "label": "Breadcrumbs"
+    },
+    "header": {
+      "eyebrow": "CONTACT",
+      "title": "Start a conversation",
+      "subtitle": "Tell us about your project, idea, or question. Submissions become a tracked inquiry — not just an email."
+    },
+    "form": {
+      "inquiryType": {
+        "label": "Inquiry type",
+        "placeholder": "Select inquiry type",
+        "options": {
+          "project": "Project inquiry",
+          "general": "General question",
+          "partnership": "Partnership",
+          "careers": "Careers inquiry"
+        }
+      },
+      "name": {
+        "label": "Name",
+        "placeholder": "Your name"
+      },
+      "email": {
+        "label": "Email",
+        "placeholder": "your@email.com"
+      },
+      "company": {
+        "label": "Company",
+        "placeholder": "Company name (optional)"
+      },
+      "phone": {
+        "label": "Phone",
+        "placeholder": "Phone number (optional)"
+      },
+      "projectDetails": {
+        "title": "Project details",
+        "projectType": {
+          "label": "Project type",
+          "placeholder": "Optional",
+          "options": {
+            "web": "Web Platform",
+            "mobile": "Mobile Application",
+            "enterprise": "Enterprise System",
+            "ai": "AI Integration",
+            "design": "Design Engineering",
+            "tools": "Developer Tools"
+          }
+        },
+        "budget": {
+          "label": "Budget",
+          "placeholder": "Optional",
+          "options": {
+            "tier1": "< $25k",
+            "tier2": "$25k – $50k",
+            "tier3": "$50k – $100k",
+            "tier4": "> $100k",
+            "undisclosed": "Not sure / Flexible"
+          }
+        },
+        "timeline": {
+          "label": "Timeline",
+          "placeholder": "Optional",
+          "options": {
+            "urgent": "< 1 month",
+            "standard": "1 – 3 months",
+            "extended": "3 – 6 months",
+            "flexible": "Flexible"
+          }
+        },
+        "currentProduct": {
+          "label": "Current product / website",
+          "placeholder": "example.com"
+        },
+        "attachment": {
+          "label": "Attachment",
+          "hint": "PDF, DOC, or ZIP up to 10MB. Project inquiries only.",
+          "selected": "Selected file: {fileName} ({fileSize})",
+          "remove": "Remove file"
+        }
+      },
+      "message": {
+        "label": "Message",
+        "placeholder": "Tell us about what you're building, the problem, timeline, and anything that helps us prepare."
+      },
+      "privacyNotice": {
+        "prefix": "By submitting, you agree to our",
+        "privacyLink": "privacy policy",
+        "suffix": "."
+      },
+      "submit": "Submit",
+      "integrationNotice": "Contact form submission will be available when messaging integration is connected."
+    },
+    "sidebar": {
+      "otherWaysTitle": "Other ways to reach us",
+      "emailLabel": "EMAIL",
+      "addressLabel": "ADDRESS",
+      "responseCard": {
+        "title": "Responses within two business days",
+        "description": "We respond to every inquiry personally."
+      },
+      "socialTitle": "Official channels"
+    }
+  },
+  "Careers": {
+    "metaTitle": "Careers — Musnad Tech",
+    "metaDescription": "We hire senior, curious engineers who care about quality. Explore open positions at Musnad Tech.",
+    "breadcrumb": {
+      "home": "Home",
+      "careers": "Careers",
+      "label": "Breadcrumb"
+    },
+    "intro": {
+      "eyebrow": "CAREERS",
+      "title": "Build with us",
+      "subtitle": "We hire senior, curious engineers who care about quality. Open positions are listed below."
+    },
+    "values": {
+      "eyebrow": "WHY WORK WITH US",
+      "title": "A studio where senior engineers thrive",
+      "subtitle": "Small team, real ownership, bilingual by default. We don't hire often — when we do, we mean it.",
+      "items": {
+        "seniorByDefault": {
+          "title": "Senior by default",
+          "description": "Every engineer on the team is senior. We hire for judgment, not headcount — and we keep teams small on purpose."
+        },
+        "bilingualFirst": {
+          "title": "Bilingual-first",
+          "description": "Arabic and English are first-class. RTL, copy, and content are designed in from the start — never an afterthought."
+        },
+        "openSourceFriendly": {
+          "title": "Open-source friendly",
+          "description": "We open-source what we learn. Internal tools, side projects, and technical writing are encouraged and supported."
+        },
+        "remoteFriendly": {
+          "title": "Remote-friendly",
+          "description": "Riyadh is home base. We work remotely across the region with deliberate async hours and weekly demos."
+        }
+      }
+    },
+    "positions": {
+      "eyebrow": "NOW HIRING",
+      "title": "Open positions",
+      "subtitle": "Browse our current openings. Filter by department to find the right fit.",
+      "filterPlaceholder": "Filter by department",
+      "positionsCount": "{count, plural, =1 {1 position} other {# positions}}",
+      "applyCta": "Apply for this position",
+      "departments": {
+        "all": "All",
+        "engineering": "Engineering",
+        "ai": "AI",
+        "design": "Design"
+      },
+      "workTypes": {
+        "fullTime": "Full-time"
+      },
+      "locations": {
+        "riyadhRemote": "Riyadh / Remote",
+        "remote": "Remote",
+        "riyadh": "Riyadh"
+      },
+      "modes": {
+        "hybrid": "Hybrid",
+        "remote": "Remote",
+        "onSite": "On-site"
+      },
+      "noPositions": "No open positions found for the selected filter."
+    },
+    "finalCta": {
+      "badge": "Responses within two business days",
+      "title": "Don't see your role?",
+      "subtitle": "We're always glad to hear from strong engineers. Send an open application and tell us how you'd contribute.",
+      "primaryAction": "Send an open application",
+      "secondaryAction": "Learn about us"
+    }
+  },
+  "JobDetail": {
+    "common": {
+      "breadcrumb": {
+        "home": "Home",
+        "careers": "Careers",
+        "label": "Breadcrumb"
+      },
+      "eyebrow": "CAREERS",
+      "deadlinePrefix": "Application deadline: ",
+      "responsibilitiesHeading": "Responsibilities",
+      "requirementsHeading": "Requirements",
+      "niceToHaveHeading": "Nice to have",
+      "form": {
+        "title": "Application form",
+        "subtitle": "Fill out the form below. Required fields are marked with *.",
+        "nameLabel": "Name",
+        "emailLabel": "Email",
+        "phoneLabel": "Phone",
+        "locationLabel": "Location",
+        "portfolioLabel": "Portfolio URL",
+        "portfolioPlaceholder": "https://",
+        "githubLabel": "GitHub",
+        "githubPlaceholder": "username or URL",
+        "linkedinLabel": "LinkedIn",
+        "linkedinPlaceholder": "username or URL",
+        "coverLetterLabel": "Cover letter",
+        "coverLetterPlaceholder": "Tell us why you're a fit and how you'd contribute...",
+        "cvLabel": "CV / Resume",
+        "optionalTag": "(Optional)",
+        "clickToUpload": "Click to upload",
+        "uploadTypes": "PDF, DOC, DOCX",
+        "cvRequiredNote": "CV is required for this position.",
+        "cvOptionalNote": "CV is optional but recommended.",
+        "submitButton": "Submit",
+        "submittingButton": "Submitting...",
+        "disclaimer": "By submitting, you agree to your data being processed for hiring.",
+        "successTitle": "Application Received",
+        "successMessage": "Thank you for applying. This is a frontend demo and no backend submission was performed.",
+        "resetForm": "Submit another application",
+        "errors": {
+          "nameRequired": "Please enter your name.",
+          "emailRequired": "Please enter a valid email address.",
+          "coverLetterRequired": "Please provide a cover letter.",
+          "cvRequired": "Please upload your CV."
+        }
+      },
+      "otherPositions": {
+        "heading": "Other open positions",
+        "viewAll": "View all positions"
+      }
+    },
+    "seniorBackendEngineer": {
+      "title": "Senior Backend Engineer",
+      "subtitle": "We're hiring a senior backend engineer to lead the design and delivery of client and internal systems. You'll own services end to end and shape how we build.",
+      "responsibilities": [
+        "Design and implement reliable backend services",
+        "Own service architecture and operability",
+        "Review code and raise the bar for quality",
+        "Pair with product and design to shape features"
+      ],
+      "requirements": [
+        "5+ years building production backend systems",
+        "Strong Go or TypeScript experience",
+        "Comfort with PostgreSQL and distributed concepts",
+        "A bias toward measuring before shipping"
+      ],
+      "niceToHave": [
+        "Experience with streaming or event-driven systems",
+        "Open-source contributions",
+        "Arabic language fluency"
+      ]
+    },
+    "machineLearningEngineer": {
+      "title": "Machine Learning Engineer",
+      "subtitle": "Join our AI practice to build and ship RAG systems, evals, and production LLM applications — with honesty about limits.",
+      "responsibilities": [
+        "Design and implement RAG and retrieval systems",
+        "Build eval harnesses and report honestly",
+        "Ship LLM features to production with guardrails",
+        "Pair with backend on integration"
+      ],
+      "requirements": [
+        "3+ years in ML or data engineering",
+        "Strong Python and SQL",
+        "Experience with vector stores and retrieval"
+      ],
+      "niceToHave": [
+        "Published eval sets or benchmarks",
+        "Arabic NLP experience"
+      ]
+    },
+    "designEngineer": {
+      "title": "Design Engineer",
+      "subtitle": "Bridge design and engineering. Own our design system, build accessible components, and craft interfaces that feel considered.",
+      "responsibilities": [
+        "Own and evolve our design system",
+        "Build accessible, reusable components",
+        "Prototype and ship production UI",
+        "Champion accessibility (WCAG 2.2 AA)"
+      ],
+      "requirements": [
+        "Strong TypeScript and React",
+        "Fluency in CSS and layout systems",
+        "An eye for detail and motion"
+      ],
+      "niceToHave": [
+        "Bilingual RTL/LTR experience",
+        "Figma plugin or tooling work"
+      ]
+    }
+  },
   "Faq": {
     "metaTitle": "Frequently Asked Questions — Musnad Tech",
     "metaDescription": "Quick answers about working with Musnad Tech, our engagement models, Riyadh base, account requirements, and inquiry process.",
@@ -903,7 +1460,3 @@
     }
   }
 }
-
-
-
-
