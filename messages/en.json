@@ -628,5 +628,88 @@
       "primaryAction": "Start a project inquiry",
       "secondaryAction": "Team"
     }
+  },
+  "Careers": {
+    "metaTitle": "Careers — Musnad Tech",
+    "metaDescription": "We hire senior, curious engineers who care about quality. Explore open positions at Musnad Tech.",
+    "breadcrumb": {
+      "home": "Home",
+      "careers": "Careers",
+      "label": "Breadcrumb"
+    },
+    "intro": {
+      "eyebrow": "CAREERS",
+      "title": "Build with us",
+      "subtitle": "We hire senior, curious engineers who care about quality. Open positions are listed below."
+    },
+    "values": {
+      "eyebrow": "WHY WORK WITH US",
+      "title": "A studio where senior engineers thrive",
+      "subtitle": "Small team, real ownership, bilingual by default. We don't hire often — when we do, we mean it.",
+      "items": {
+        "seniorByDefault": {
+          "title": "Senior by default",
+          "description": "Every engineer on the team is senior. We hire for judgment, not headcount — and we keep teams small on purpose."
+        },
+        "bilingualFirst": {
+          "title": "Bilingual-first",
+          "description": "Arabic and English are first-class. RTL, copy, and content are designed in from the start — never an afterthought."
+        },
+        "openSourceFriendly": {
+          "title": "Open-source friendly",
+          "description": "We open-source what we learn. Internal tools, side projects, and technical writing are encouraged and supported."
+        },
+        "remoteFriendly": {
+          "title": "Remote-friendly",
+          "description": "Riyadh is home base. We work remotely across the region with deliberate async hours and weekly demos."
+        }
+      }
+    },
+    "positions": {
+      "eyebrow": "NOW HIRING",
+      "title": "Open positions",
+      "subtitle": "Browse our current openings. Filter by department to find the right fit.",
+      "filterPlaceholder": "Filter by department",
+      "positionsCount": "{count, plural, =1 {1 position} other {# positions}}",
+      "applyCta": "Apply for this position",
+      "departments": {
+        "all": "All",
+        "engineering": "Engineering",
+        "ai": "AI",
+        "design": "Design"
+      },
+      "workTypes": {
+        "fullTime": "Full-time"
+      },
+      "locations": {
+        "riyadhRemote": "Riyadh / Remote",
+        "remote": "Remote",
+        "riyadh": "Riyadh"
+      },
+      "modes": {
+        "hybrid": "Hybrid",
+        "remote": "Remote",
+        "onSite": "On-site"
+      },
+      "noPositions": "No open positions found for the selected filter."
+    },
+    "finalCta": {
+      "badge": "Responses within two business days",
+      "title": "Don't see your role?",
+      "subtitle": "We're always glad to hear from strong engineers. Send an open application and tell us how you'd contribute.",
+      "primaryAction": "Send an open application",
+      "secondaryAction": "Learn about us"
+    }
+  },
+  "JobDetail": {
+    "seniorBackendEngineer": {
+      "title": "Senior Backend Engineer"
+    },
+    "machineLearningEngineer": {
+      "title": "Machine Learning Engineer"
+    },
+    "designEngineer": {
+      "title": "Design Engineer"
+    }
   }
 }
