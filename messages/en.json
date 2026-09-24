@@ -519,6 +519,70 @@
       "noArticlesDescription": "Approved articles will appear here when published."
     }
   },
+  "ArticleDetail": {
+    "meta": {
+      "titleTemplate": "{title} — Musnad Tech",
+      "defaultDescription": "Technical articles and field notes from Musnad Tech."
+    },
+    "breadcrumb": {
+      "home": "Home",
+      "blog": "Blog",
+      "label": "Breadcrumbs"
+    },
+    "actions": {
+      "copyLink": "Copy link",
+      "copied": "Copied!",
+      "share": "Share"
+    },
+    "sidebar": {
+      "onThisPage": "ON THIS PAGE",
+      "fontSize": "FONT SIZE",
+      "fontSizeSmall": "Small font size",
+      "fontSizeDefault": "Default font size",
+      "fontSizeLarge": "Large font size",
+      "cite": "Cite this article",
+      "copyCitation": "Copy citation",
+      "citationCopied": "Citation copied!",
+      "shareTitle": "SHARE",
+      "shareOnX": "Share on X",
+      "shareOnLinkedIn": "Share on LinkedIn",
+      "moreIn": "MORE IN {category}",
+      "newsletterTitle": "SUBSCRIBE TO THE MUSNAD NEWSLETTER",
+      "newsletterDescription": "Technical articles and field notes. We send when there's something worth saying — no spam.",
+      "newsletterPlaceholder": "your@email.com",
+      "subscribe": "Subscribe",
+      "privacyNotice": "We respect your privacy. Unsubscribe anytime.",
+      "newsletterNotice": "Newsletter signup will be available when email integration is connected."
+    },
+    "author": {
+      "by": "BY",
+      "aboutAuthor": "About the author"
+    },
+    "shareBlock": {
+      "title": "Share",
+      "description": "If you found this useful, share it with someone who cares."
+    },
+    "related": {
+      "title": "Related articles",
+      "viewAll": "View all",
+      "forYou": "FOR YOU",
+      "youMightAlsoLike": "You might also like"
+    },
+    "comments": {
+      "title": "Comments",
+      "guidelines": "Verified members can comment and reply. Code of conduct applies; keeps discussions focused.",
+      "placeholder": "Sign in to leave a comment...",
+      "signIn": "Sign In",
+      "signUp": "Sign Up",
+      "empty": "No comments yet.",
+      "integrationNotice": "Article comments will be available when account interactions are connected."
+    },
+    "backToTop": "Back to top",
+    "code": {
+      "copy": "Copy code",
+      "copied": "Copied!"
+    }
+  },
   "About": {
     "metaTitle": "About — Musnad Tech",
     "metaDescription": "A software engineering studio built on proof, not promises. Rigorous, honest, and accountable to outcomes.",

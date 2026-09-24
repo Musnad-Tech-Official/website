@@ -519,6 +519,70 @@
       "noArticlesDescription": "ستظهر المقالات المعتمدة هنا فور نشرها."
     }
   },
+  "ArticleDetail": {
+    "meta": {
+      "titleTemplate": "{title} — مسند للتقنية",
+      "defaultDescription": "مقالات تقنية وخلاصات تجارب ميدانية من مسند للتقنية."
+    },
+    "breadcrumb": {
+      "home": "الرئيسية",
+      "blog": "المدونة",
+      "label": "مسار التنقل"
+    },
+    "actions": {
+      "copyLink": "نسخ الرابط",
+      "copied": "تم النسخ!",
+      "share": "مشاركة"
+    },
+    "sidebar": {
+      "onThisPage": "في هذه الصفحة",
+      "fontSize": "حجم الخط",
+      "fontSizeSmall": "حجم خط صغير",
+      "fontSizeDefault": "حجم خط افتراضي",
+      "fontSizeLarge": "حجم خط كبير",
+      "cite": "اقتباس هذا المقال",
+      "copyCitation": "نسخ الاقتباس",
+      "citationCopied": "تم نسخ الاقتباس!",
+      "shareTitle": "مشاركة المقال",
+      "shareOnX": "مشاركة عبر X",
+      "shareOnLinkedIn": "مشاركة عبر LinkedIn",
+      "moreIn": "المزيد في {category}",
+      "newsletterTitle": "اشترك في نشرة مسند البريدية",
+      "newsletterDescription": "مقالات تقنية وخلاصات تجارب. نرسلها عندما يكون هناك ما يستحق القراءة — دون إزعاج.",
+      "newsletterPlaceholder": "بريدك@example.com",
+      "subscribe": "اشتراك",
+      "privacyNotice": "نحترم خصوصيتك. يمكنك إلغاء الاشتراك في أي وقت.",
+      "newsletterNotice": "سيصبح الاشتراك في النشرة البريدية متاحاً عند ربط خدمة البريد."
+    },
+    "author": {
+      "by": "بقلم",
+      "aboutAuthor": "عن الكاتب"
+    },
+    "shareBlock": {
+      "title": "مشاركة",
+      "description": "إذا وجدت هذا المحتوى مفيداً، شاركه مع من يهمه الأمر."
+    },
+    "related": {
+      "title": "مقالات ذات صلة",
+      "viewAll": "عرض الكل",
+      "forYou": "خصيصاً لك",
+      "youMightAlsoLike": "قد يعجبك أيضاً"
+    },
+    "comments": {
+      "title": "التعليقات",
+      "guidelines": "يمكن للأعضاء الموثقين التعليق والرد. تطبق مدونة السلوك للحفاظ على جودة النقاش.",
+      "placeholder": "سجل الدخول للمشاركة في النقاش...",
+      "signIn": "تسجيل الدخول",
+      "signUp": "إنشاء حساب",
+      "empty": "لا توجد تعليقات حتى الآن.",
+      "integrationNotice": "ستصبح تعليقات المقالات متاحة عند ربط تفاعلات الحساب."
+    },
+    "backToTop": "العودة إلى الأعلى",
+    "code": {
+      "copy": "نسخ الكود",
+      "copied": "تم النسخ!"
+    }
+  },
   "About": {
     "metaTitle": "من نحن — مسند للتقنية",
     "metaDescription": "استوديو هندسة برمجيات مبني على البراهين لا الوعود. هندسة دقيقة، وشفافة، ومسؤولة عن النتائج.",
