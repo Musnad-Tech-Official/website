@@ -628,5 +628,188 @@
       "primaryAction": "Start a project inquiry",
       "secondaryAction": "Team"
     }
+  },
+  "Careers": {
+    "metaTitle": "Careers — Musnad Tech",
+    "metaDescription": "We hire senior, curious engineers who care about quality. Explore open positions at Musnad Tech.",
+    "breadcrumb": {
+      "home": "Home",
+      "careers": "Careers",
+      "label": "Breadcrumb"
+    },
+    "intro": {
+      "eyebrow": "CAREERS",
+      "title": "Build with us",
+      "subtitle": "We hire senior, curious engineers who care about quality. Open positions are listed below."
+    },
+    "values": {
+      "eyebrow": "WHY WORK WITH US",
+      "title": "A studio where senior engineers thrive",
+      "subtitle": "Small team, real ownership, bilingual by default. We don't hire often — when we do, we mean it.",
+      "items": {
+        "seniorByDefault": {
+          "title": "Senior by default",
+          "description": "Every engineer on the team is senior. We hire for judgment, not headcount — and we keep teams small on purpose."
+        },
+        "bilingualFirst": {
+          "title": "Bilingual-first",
+          "description": "Arabic and English are first-class. RTL, copy, and content are designed in from the start — never an afterthought."
+        },
+        "openSourceFriendly": {
+          "title": "Open-source friendly",
+          "description": "We open-source what we learn. Internal tools, side projects, and technical writing are encouraged and supported."
+        },
+        "remoteFriendly": {
+          "title": "Remote-friendly",
+          "description": "Riyadh is home base. We work remotely across the region with deliberate async hours and weekly demos."
+        }
+      }
+    },
+    "positions": {
+      "eyebrow": "NOW HIRING",
+      "title": "Open positions",
+      "subtitle": "Browse our current openings. Filter by department to find the right fit.",
+      "filterPlaceholder": "Filter by department",
+      "positionsCount": "{count, plural, =1 {1 position} other {# positions}}",
+      "applyCta": "Apply for this position",
+      "departments": {
+        "all": "All",
+        "engineering": "Engineering",
+        "ai": "AI",
+        "design": "Design"
+      },
+      "workTypes": {
+        "fullTime": "Full-time"
+      },
+      "locations": {
+        "riyadhRemote": "Riyadh / Remote",
+        "remote": "Remote",
+        "riyadh": "Riyadh"
+      },
+      "modes": {
+        "hybrid": "Hybrid",
+        "remote": "Remote",
+        "onSite": "On-site"
+      },
+      "noPositions": "No open positions found for the selected filter."
+    },
+    "finalCta": {
+      "badge": "Responses within two business days",
+      "title": "Don't see your role?",
+      "subtitle": "We're always glad to hear from strong engineers. Send an open application and tell us how you'd contribute.",
+      "primaryAction": "Send an open application",
+      "secondaryAction": "Learn about us"
+    }
+  },
+  "JobDetail": {
+    "common": {
+      "breadcrumb": {
+        "home": "Home",
+        "careers": "Careers",
+        "label": "Breadcrumb"
+      },
+      "eyebrow": "CAREERS",
+      "deadlinePrefix": "Application deadline: ",
+      "responsibilitiesHeading": "Responsibilities",
+      "requirementsHeading": "Requirements",
+      "niceToHaveHeading": "Nice to have",
+      "form": {
+        "title": "Application form",
+        "subtitle": "Fill out the form below. Required fields are marked with *.",
+        "nameLabel": "Name",
+        "emailLabel": "Email",
+        "phoneLabel": "Phone",
+        "locationLabel": "Location",
+        "portfolioLabel": "Portfolio URL",
+        "portfolioPlaceholder": "https://",
+        "githubLabel": "GitHub",
+        "githubPlaceholder": "username or URL",
+        "linkedinLabel": "LinkedIn",
+        "linkedinPlaceholder": "username or URL",
+        "coverLetterLabel": "Cover letter",
+        "coverLetterPlaceholder": "Tell us why you're a fit and how you'd contribute...",
+        "cvLabel": "CV / Resume",
+        "optionalTag": "(Optional)",
+        "clickToUpload": "Click to upload",
+        "uploadTypes": "PDF, DOC, DOCX",
+        "cvRequiredNote": "CV is required for this position.",
+        "cvOptionalNote": "CV is optional but recommended.",
+        "submitButton": "Submit",
+        "submittingButton": "Submitting...",
+        "disclaimer": "By submitting, you agree to your data being processed for hiring.",
+        "successTitle": "Application Received",
+        "successMessage": "Thank you for applying. This is a frontend demo and no backend submission was performed.",
+        "resetForm": "Submit another application",
+        "errors": {
+          "nameRequired": "Please enter your name.",
+          "emailRequired": "Please enter a valid email address.",
+          "coverLetterRequired": "Please provide a cover letter.",
+          "cvRequired": "Please upload your CV."
+        }
+      },
+      "otherPositions": {
+        "heading": "Other open positions",
+        "viewAll": "View all positions"
+      }
+    },
+    "seniorBackendEngineer": {
+      "title": "Senior Backend Engineer",
+      "subtitle": "We're hiring a senior backend engineer to lead the design and delivery of client and internal systems. You'll own services end to end and shape how we build.",
+      "responsibilities": [
+        "Design and implement reliable backend services",
+        "Own service architecture and operability",
+        "Review code and raise the bar for quality",
+        "Pair with product and design to shape features"
+      ],
+      "requirements": [
+        "5+ years building production backend systems",
+        "Strong Go or TypeScript experience",
+        "Comfort with PostgreSQL and distributed concepts",
+        "A bias toward measuring before shipping"
+      ],
+      "niceToHave": [
+        "Experience with streaming or event-driven systems",
+        "Open-source contributions",
+        "Arabic language fluency"
+      ]
+    },
+    "machineLearningEngineer": {
+      "title": "Machine Learning Engineer",
+      "subtitle": "Join our AI practice to build and ship RAG systems, evals, and production LLM applications — with honesty about limits.",
+      "responsibilities": [
+        "Design and implement RAG and retrieval systems",
+        "Build eval harnesses and report honestly",
+        "Ship LLM features to production with guardrails",
+        "Pair with backend on integration"
+      ],
+      "requirements": [
+        "3+ years in ML or data engineering",
+        "Strong Python and SQL",
+        "Experience with vector stores and retrieval"
+      ],
+      "niceToHave": [
+        "Published eval sets or benchmarks",
+        "Arabic NLP experience"
+      ]
+    },
+    "designEngineer": {
+      "title": "Design Engineer",
+      "subtitle": "Bridge design and engineering. Own our design system, build accessible components, and craft interfaces that feel considered.",
+      "responsibilities": [
+        "Own and evolve our design system",
+        "Build accessible, reusable components",
+        "Prototype and ship production UI",
+        "Champion accessibility (WCAG 2.2 AA)"
+      ],
+      "requirements": [
+        "Strong TypeScript and React",
+        "Fluency in CSS and layout systems",
+        "An eye for detail and motion"
+      ],
+      "niceToHave": [
+        "Bilingual RTL/LTR experience",
+        "Figma plugin or tooling work"
+      ]
+    }
   }
 }
