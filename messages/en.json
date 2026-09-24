@@ -774,7 +774,23 @@
       ]
     },
     "machineLearningEngineer": {
-      "title": "Machine Learning Engineer"
+      "title": "Machine Learning Engineer",
+      "subtitle": "Join our AI practice to build and ship RAG systems, evals, and production LLM applications — with honesty about limits.",
+      "responsibilities": [
+        "Design and implement RAG and retrieval systems",
+        "Build eval harnesses and report honestly",
+        "Ship LLM features to production with guardrails",
+        "Pair with backend on integration"
+      ],
+      "requirements": [
+        "3+ years in ML or data engineering",
+        "Strong Python and SQL",
+        "Experience with vector stores and retrieval"
+      ],
+      "niceToHave": [
+        "Published eval sets or benchmarks",
+        "Arabic NLP experience"
+      ]
     },
     "designEngineer": {
       "title": "Design Engineer"
