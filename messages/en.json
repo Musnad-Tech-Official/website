@@ -251,10 +251,33 @@
     "search": "Search..."
   },
   "NotFoundPage": {
-    "title": "404",
+    "code": "404",
+    "title": "Page not found",
     "subtitle": "Page Not Found",
-    "description": "The page you are looking for does not exist or has been moved.",
-    "returnHome": "Return Home"
+    "description": "The page you're looking for doesn't exist or has moved.",
+    "returnHome": "Back to home",
+    "backHome": "Back to home",
+    "searchForPage": "Search for a page",
+    "keyboardHint": "⌘K",
+    "suggestedPagesEyebrow": "SUGGESTED PAGES",
+    "items": {
+      "sahim": {
+        "title": "Sahim Analytics",
+        "meta": "Projects · Fintech Platform"
+      },
+      "naft": {
+        "title": "Naft Deploy",
+        "meta": "Projects · Developer Tool"
+      },
+      "rag": {
+        "title": "Eval first, ship second: building...",
+        "meta": "Blog · AI Engineering"
+      },
+      "productEngineering": {
+        "title": "Product Engineering",
+        "meta": "Services · From discovery to launch — we ..."
+      }
+    }
   },
   "Hero": {
     "titlePrefix": "Musnad Tech",
