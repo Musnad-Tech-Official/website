@@ -14,6 +14,7 @@ export function ServiceProjectCard({
   featuredLabel,
   liveDemoLabel,
   completedLabel,
+  statusLabel,
   className = "",
 }: ServiceProjectCardProps) {
   return (
@@ -153,7 +154,7 @@ export function ServiceProjectCard({
               size="sm"
               className="font-normal text-[11px]"
             >
-              {completedLabel}
+              {statusLabel || completedLabel}
             </Badge>
           </div>
         </div>

@@ -14,6 +14,9 @@ import {
   LuDatabase,
   LuLayoutDashboard,
   LuSparkles,
+  LuNetwork,
+  LuBookOpen,
+  LuGitBranch,
 } from "react-icons/lu";
 import type { ServiceDetailData } from "./service-detail-types";
 
@@ -339,6 +342,123 @@ export const DATA_ENGINEERING_DETAIL: ServiceDetailData = {
         icon: LuCode,
         technologies: ["PostgreSQL"],
         href: "/services/product-engineering",
+      },
+    ],
+  },
+};
+
+/**
+ * Developer Tools Service Detail Configuration & Frontend Fixture Data.
+ * Matches 08-service-developer-tools.png specification.
+ */
+export const DEVELOPER_TOOLS_DETAIL: ServiceDetailData = {
+  slug: "developer-tools",
+  translationKey: "developerTools",
+  icon: LuTerminal,
+  technologies: ["Go", "Rust", "TypeScript"],
+  capabilities: [
+    {
+      id: "cli-sdk",
+      translationKey: "cliSdk",
+      icon: LuTerminal,
+    },
+    {
+      id: "api-design",
+      translationKey: "apiDesign",
+      icon: LuNetwork,
+    },
+    {
+      id: "documentation",
+      translationKey: "documentation",
+      icon: LuBookOpen,
+    },
+    {
+      id: "internal-tooling",
+      translationKey: "internalTooling",
+      icon: LuBoxes,
+    },
+    {
+      id: "open-source",
+      translationKey: "openSource",
+      icon: LuGitBranch,
+    },
+  ],
+  relatedProjects: [
+    {
+      id: "musnad-cli",
+      slug: "musnad-cli",
+      itemKey: "musnadCli",
+      year: "2025",
+      featured: false,
+      liveDemo: true,
+      technologies: ["Go", "TypeScript", "Rust"],
+      rating: 4.5,
+      reviewCount: 17,
+      status: "inDevelopment",
+      gradient: "from-slate-900 via-zinc-900 to-neutral-950",
+      href: "/projects/musnad-cli",
+    },
+    {
+      id: "naft",
+      slug: "naft-deploy",
+      itemKey: "naft",
+      year: "2024",
+      featured: true,
+      liveDemo: true,
+      technologies: ["Go", "Rust", "Docker", "TypeScript"],
+      rating: 4.9,
+      reviewCount: 124,
+      status: "completed",
+      gradient: "from-zinc-900 via-neutral-900 to-zinc-950",
+      href: "/projects/naft-deploy",
+    },
+  ],
+  relatedByTechnology: {
+    projects: [
+      {
+        id: "naft",
+        slug: "naft-deploy",
+        itemKey: "naft",
+        year: "2024",
+        categoryKey: "developerTool",
+        technologies: ["Go", "Rust", "TypeScript"],
+        href: "/projects/naft-deploy",
+      },
+      {
+        id: "sahim",
+        slug: "sahim-analytics",
+        itemKey: "sahim",
+        year: "2024",
+        categoryKey: "fintechPlatform",
+        technologies: ["TypeScript", "Go"],
+        href: "/projects/sahim-analytics",
+      },
+      {
+        id: "rakeen",
+        slug: "rakeen-portal",
+        itemKey: "rakeen",
+        year: "2023",
+        categoryKey: "clientPortal",
+        technologies: ["TypeScript"],
+        href: "/projects/rakeen-portal",
+      },
+    ],
+    services: [
+      {
+        id: "product-engineering",
+        slug: "product-engineering",
+        serviceKey: "productEngineering",
+        icon: LuCode,
+        technologies: ["TypeScript"],
+        href: "/services/product-engineering",
+      },
+      {
+        id: "platform-infrastructure",
+        slug: "platform-infrastructure",
+        serviceKey: "platformInfrastructure",
+        icon: LuCloud,
+        technologies: ["Go"],
+        href: "/services/platform-infrastructure",
       },
     ],
   },

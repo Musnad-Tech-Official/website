@@ -450,7 +450,8 @@
         "heading": "Related projects",
         "featured": "Featured",
         "liveDemo": "Live demo available",
-        "completed": "Completed"
+        "completed": "Completed",
+        "inDevelopment": "In Development"
       },
       "capabilities": {
         "eyebrow": "CAPABILITIES",
@@ -538,6 +539,31 @@
         "primaryButton": "Start a Data Engineering project"
       }
     },
+    "developerTools": {
+      "metaTitle": "Developer Tools — Musnad Tech",
+      "metaDescription": "CLIs, SDKs, and internal platforms that make engineers measurably faster.",
+      "intro": {
+        "eyebrow": "SERVICES",
+        "title": "Developer Tools",
+        "subtitle": "CLIs, SDKs, and internal platforms that make engineers measurably faster."
+      },
+      "overview": {
+        "statement": "We build the tools engineers reach for daily. Thoughtful APIs, sensible defaults, and documentation that respects your time. Often open source."
+      },
+      "capabilities": {
+        "cliSdk": "CLI & SDK design",
+        "apiDesign": "API design (REST & gRPC)",
+        "documentation": "Developer documentation",
+        "internalTooling": "Internal platform tooling",
+        "openSource": "Open-source stewardship"
+      },
+      "sidebar": {
+        "ctaButton": "Start a Developer Tools project"
+      },
+      "cta": {
+        "primaryButton": "Start a Developer Tools project"
+      }
+    },
     "projects": {
       "sahim": {
         "title": "Sahim Analytics",
@@ -557,7 +583,7 @@
       "musnadCli": {
         "title": "Musnad CLI",
         "category": "Developer Tool",
-        "description": "An internal CLI and developer platform that standardizes project scaffolding and deployment."
+        "description": "An open-source CLI that scaffolds production-ready projects with sensible defaults, CI, and documentation."
       },
       "wathq": {
         "title": "Wathq Observability",

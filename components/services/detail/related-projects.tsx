@@ -10,6 +10,7 @@ export function RelatedProjects({
   featuredLabel,
   liveDemoLabel,
   completedLabel,
+  inDevelopmentLabel,
   getProjectTranslations,
   className = "",
 }: RelatedProjectsProps) {
@@ -34,6 +35,10 @@ export function RelatedProjects({
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8 sm:mt-10">
         {projects.map((project) => {
           const trans = getProjectTranslations(project.itemKey);
+          const statusText =
+            project.status === "inDevelopment"
+              ? inDevelopmentLabel || "In Development"
+              : completedLabel;
           return (
             <ServiceProjectCard
               key={project.id}
@@ -44,6 +49,7 @@ export function RelatedProjects({
               featuredLabel={featuredLabel}
               liveDemoLabel={liveDemoLabel}
               completedLabel={completedLabel}
+              statusLabel={statusText}
             />
           );
         })}

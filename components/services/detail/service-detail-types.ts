@@ -24,6 +24,7 @@ export interface ProjectPreviewData {
   reviewCount: number;
   gradient?: string;
   href: string;
+  status?: "completed" | "inDevelopment" | string;
 }
 
 /**
@@ -130,6 +131,7 @@ export interface ServiceProjectCardProps {
   featuredLabel: string;
   liveDemoLabel: string;
   completedLabel: string;
+  statusLabel?: string;
   className?: string;
 }
 
@@ -143,6 +145,7 @@ export interface RelatedProjectsProps {
   featuredLabel: string;
   liveDemoLabel: string;
   completedLabel: string;
+  inDevelopmentLabel?: string;
   getProjectTranslations: (itemKey: string) => {
     title: string;
     category: string;

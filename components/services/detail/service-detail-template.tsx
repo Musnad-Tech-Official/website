@@ -85,6 +85,7 @@ export async function ServiceDetailTemplate({
         featuredLabel={tCommon("relatedProjects.featured")}
         liveDemoLabel={tCommon("relatedProjects.liveDemo")}
         completedLabel={tCommon("relatedProjects.completed")}
+        inDevelopmentLabel={tCommon("relatedProjects.inDevelopment")}
         getProjectTranslations={getProjectTranslations}
       />
 
