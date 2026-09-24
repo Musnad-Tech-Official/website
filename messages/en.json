@@ -801,9 +801,52 @@
         "supportingLinePrefix": "Email us at",
         "buttonText": "Email us"
       }
+    },
+    "cookiePolicy": {
+      "metaTitle": "Cookie Policy — Musnad Tech",
+      "metaDescription": "Learn how Musnad Tech uses cookies and local storage to provide preferences, sessions, and aggregated analytics.",
+      "breadcrumbCurrent": "Cookie policy",
+      "title": "Cookie policy",
+      "introNote": "This policy explains how Musnad Tech uses cookies and local storage, and how you can control them.",
+      "sections": {
+        "s01": {
+          "title": "What are cookies",
+          "p1": "Cookies are small text files stored on your device by your browser. They allow a website to remember things like your language, theme, and signed-in state across page loads. Local storage serves a similar purpose for slightly larger or longer-lived data."
+        },
+        "s02": {
+          "title": "Types we use",
+          "b1": "Essential: locale (Arabic/English), theme (light/dark), and signed-in session. The site does not function correctly without these.",
+          "b2": "Preference: saved projects and ratings you set are stored locally so they persist across visits.",
+          "b3": "Analytics: aggregated, anonymized usage data. No PII is collected or correlated with these."
+        },
+        "s03": {
+          "title": "Third-party cookies",
+          "p1": "We do not sell data, and we do not embed advertising networks. If we add a third-party analytics or support tool in the future, we will name it here and apply a strict PII-free configuration."
+        },
+        "s04": {
+          "title": "Managing and disabling cookies",
+          "p1": "Most browsers let you review and delete cookies from their settings. Disabling essential cookies means locale, theme, and sign-in will not persist between visits. Preference storage (saved projects, ratings) will reset."
+        },
+        "s05": {
+          "title": "Impact on features",
+          "b1": "Without essential cookies: language and theme reset on each visit; sign-in does not persist.",
+          "b2": "Without preference storage: saved projects and ratings cannot persist locally.",
+          "b3": "Without analytics: site functionality is unaffected — you simply help us less in improving it."
+        },
+        "s06": {
+          "title": "Changes to this policy",
+          "p1": "If we change the cookies we use, we will update this policy and revise the 'Last updated' date above."
+        }
+      },
+      "contactCard": {
+        "title": "Questions about this policy?",
+        "supportingLinePrefix": "Email us at",
+        "buttonText": "Email us"
+      }
     }
   }
 }
+
 
 
 
