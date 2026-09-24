@@ -441,192 +441,226 @@
       "button": "Start a project inquiry"
     }
   },
-  "ProjectDetail": {
-    "breadcrumb": {
-      "home": "Home",
-      "projects": "Projects",
-      "label": "Breadcrumbs"
-    },
-    "meta": {
-      "titleTemplate": "{title} — Musnad Tech",
-      "defaultDescription": "Explore project case studies from Musnad Tech."
-    },
-    "relatedProjects": "Related projects",
-    "gallery": {
-      "previewPrefix": "Preview"
-    },
-    "rating": {
-      "submit": "Submit Rating",
-      "ratingsCount": "ratings",
-      "integrationNotice": "Project ratings will be available when account interactions are connected.",
-      "previewNotice": "Rating preview only — ratings are not persisted."
-    },
-    "comments": {
-      "submit": "Post comment",
-      "reply": "Reply",
-      "empty": "No comments yet.",
-      "integrationNotice": "Comments will be available when account interactions are connected."
-    },
-    "eligibility": {
-      "signedOut": "Sign in to rate or comment on this project.",
-      "signIn": "Sign In",
-      "experienceRequired": "Try this project before rating or commenting.",
-      "experienceRequiredSecondary": "Ratings and comments are available to verified project users."
-    }
-  },
-  "Blog": {
-    "meta": {
-      "title": "Blog — Musnad Tech",
-      "description": "Technical articles and field notes from Musnad Tech."
-    },
-    "breadcrumb": {
-      "home": "Home",
-      "blog": "Blog",
-      "label": "Breadcrumbs"
-    },
-    "header": {
-      "eyebrow": "INSIGHTS",
-      "title": "Writing from the studio",
-      "subtitle": "Technical articles and field notes. We publish when we have something worth saying."
-    },
-    "filters": {
-      "searchPlaceholder": "Search articles...",
-      "clearSearch": "Clear search",
-      "noResultsTitle": "No articles match your search.",
-      "noResultsDescription": "Try adjusting your search terms or clearing your filters to explore other articles.",
-      "clearFilters": "Clear filters"
-    },
-    "sections": {
-      "featured": "FEATURED",
-      "articles": "ARTICLES"
-    },
-    "card": {
-      "readArticle": "Read article",
-      "featuredBadge": "Featured",
-      "minRead": "{count} min read"
-    },
-    "newsletter": {
-      "eyebrow": "NEWSLETTER",
-      "title": "Subscribe to the Musnad newsletter",
-      "description": "Technical articles and field notes. We send when there's something worth saying — no spam.",
-      "emailPlaceholder": "your@email.com",
-      "subscribeButton": "Subscribe",
-      "privacyNotice": "We respect your privacy. Unsubscribe anytime.",
-      "integrationNotice": "Newsletter signup will be available when email integration is connected."
-    },
-    "emptyState": {
-      "noArticles": "No articles are available yet.",
-      "noArticlesDescription": "Approved articles will appear here when published."
-    }
-  },
-  "About": {
-    "metaTitle": "About — Musnad Tech",
-    "metaDescription": "A software engineering studio built on proof, not promises. Rigorous, honest, and accountable to outcomes.",
-    "intro": {
-      "breadcrumbHome": "Home",
-      "breadcrumbAbout": "About",
-      "breadcrumbLabel": "Breadcrumbs",
-      "eyebrow": "ABOUT MUSNAD TECH",
-      "title": "A studio built on\nproof, not promises.",
-      "subtitle": "We started Musnad Tech to do software engineering the way we believe it should be done — rigorous, honest, and accountable to outcomes."
-    },
-    "missionVision": {
-      "missionTitle": "Our mission",
-      "missionDescription": "Help teams ship software that is reliable, maintainable, and worth trusting — and show our work so others can verify it.",
-      "visionTitle": "Our vision",
-      "visionDescription": "A regional engineering culture where quality is the default, not a premium."
-    },
-    "values": {
-      "eyebrow": "VALUES",
-      "title": "What we value",
-      "subtitle": "These aren't slogans. They show up in how we work every day.",
-      "items": {
-        "proof": {
-          "title": "Proof over claims",
-          "description": "We show our work. Case studies, evals, open source — verify us."
-        },
-        "flexibility": {
-          "title": "Structured flexibility",
-          "description": "Deliberate structure with room for the right exceptions — not a rigid template."
-        },
-        "security": {
-          "title": "Security by design",
-          "description": "Threat modeling and least privilege are defaults, not add-ons."
-        },
-        "bilingual": {
-          "title": "Bilingual first",
-          "description": "Arabic and English are first-class. RTL and LTR, end to end."
-        }
+  "ServiceDetail": {
+    "common": {
+      "breadcrumb": {
+        "home": "Home",
+        "services": "Services",
+        "label": "Breadcrumbs"
+      },
+      "onThisPage": "ON THIS PAGE",
+      "anchors": {
+        "overview": "Overview",
+        "capabilities": "Capabilities",
+        "relatedProjects": "Related projects"
+      },
+      "relatedTechnologies": "RELATED TECHNOLOGIES",
+      "relatedByTechnology": {
+        "eyebrow": "RELATED BY TECHNOLOGY",
+        "heading": "Built with similar tools",
+        "projectsEyebrow": "PROJECTS",
+        "servicesEyebrow": "SERVICES"
+      },
+      "relatedProjects": {
+        "eyebrow": "RELATED PROJECTS",
+        "heading": "Related projects",
+        "featured": "Featured",
+        "liveDemo": "Live demo available",
+        "completed": "Completed",
+        "inDevelopment": "In Development"
+      },
+      "capabilities": {
+        "eyebrow": "CAPABILITIES",
+        "heading": "Capabilities"
+      },
+      "cta": {
+        "badge": "Responses within two business days",
+        "title": "Have a project in mind?",
+        "subtitle": "Tell us what you're building. We respond within two business days — no sales theatre.",
+        "backToServices": "Back to Services"
       }
     },
-    "approach": {
-      "eyebrow": "APPROACH",
-      "title": "How we work",
-      "subtitle": "A deliberate process that keeps quality and accountability front and center.",
-      "steps": {
-        "discovery": {
-          "step": "01",
-          "title": "Discovery",
-          "description": "A paid engagement to align on the problem, constraints, and success metrics before committing to build."
-        },
-        "architecture": {
-          "step": "02",
-          "title": "Architecture & RFCs",
-          "description": "We write down the hard decisions — architecture, trade-offs, risks — and review them openly."
-        },
-        "cadence": {
-          "step": "03",
-          "title": "Build with cadence",
-          "description": "Weekly demos, continuous review, and honest progress. No black boxes, no surprises at the end."
-        },
-        "operate": {
-          "step": "04",
-          "title": "Ship & operate",
-          "description": "We deploy to production with observability and own the first weeks of operation. Then we hand over, or stay on."
-        }
+    "productEngineering": {
+      "metaTitle": "Product Engineering — Musnad Tech",
+      "metaDescription": "From discovery to launch — we build products end to end with engineering accountability.",
+      "intro": {
+        "eyebrow": "SERVICES",
+        "title": "Product Engineering",
+        "subtitle": "From discovery to launch — we build products end to end with engineering accountability."
+      },
+      "overview": {
+        "statement": "We partner with founders and product teams to turn ideas into reliable, maintainable software. We own architecture, implementation, and the hard decisions in between."
+      },
+      "capabilities": {
+        "architecture": "Architecture & system design",
+        "fullstack": "Full-stack implementation",
+        "discovery": "Technical discovery & RFCs",
+        "review": "Code review & quality gates",
+        "observability": "Observability & incident response"
+      },
+      "sidebar": {
+        "ctaButton": "Start a Product Engineering project"
+      },
+      "cta": {
+        "primaryButton": "Start a Product Engineering project"
       }
     },
-    "story": {
-      "title": "How we got here",
-      "p1": "Musnad Tech was founded in Riyadh in 2021 by a small group of senior engineers who had spent a decade building software at scale — and who were tired of the gap between what teams promise and what actually ships. We started the studio to do software engineering the way we believed it should be done: rigorous, honest, and accountable to outcomes you can verify.",
-      "p2": "From the first commit, we made a deliberate choice: bilingual-first, by default. Arabic and English are not translations bolted on at the end — they are first-class in our interfaces, our documentation, and our process. That same instinct shapes everything we ship. We publish case studies with real metrics, write RFCs for the hard decisions, open-source the tools we depend on, and stay honest about what worked and what didn't. Proof over claims is not a tagline; it is how we operate."
-    },
-    "milestones": {
-      "title": "Milestones",
-      "items": {
-        "2021": {
-          "year": "2021",
-          "title": "Musnad Tech founded",
-          "description": "Started as a two-person studio in Riyadh."
-        },
-        "2022": {
-          "year": "2022",
-          "title": "First regulated client portal",
-          "description": "Shipped Rakeen — our first bilingual, compliant product."
-        },
-        "2023": {
-          "year": "2023",
-          "title": "Open-source Naft",
-          "description": "Released Naft Deploy, our deployment tool for small teams."
-        },
-        "2024": {
-          "year": "2024",
-          "title": "Streaming analytics at scale",
-          "description": "Delivered Sahim — 48k events/min with sub-200ms queries."
-        },
-        "2025": {
-          "year": "2025",
-          "title": "AI practice & eval-first RAG",
-          "description": "Formalized our AI integration practice around evals and honesty."
-        }
+    "platformInfrastructure": {
+      "metaTitle": "Platform & Infrastructure — Musnad Tech",
+      "metaDescription": "Cloud-native platforms, CI/CD, and developer experience that scales with your team.",
+      "intro": {
+        "eyebrow": "SERVICES",
+        "title": "Platform & Infrastructure",
+        "subtitle": "Cloud-native platforms, CI/CD, and developer experience that scales with your team."
+      },
+      "overview": {
+        "statement": "We design and operate platforms that let product teams move fast without breaking things. Infrastructure as code, automated deployment pipelines, and sensible guardrails."
+      },
+      "capabilities": {
+        "cloudArchitecture": "Cloud architecture (AWS / GCP)",
+        "kubernetes": "Kubernetes & container orchestration",
+        "cicd": "CI/CD pipeline design",
+        "iac": "Infrastructure as code (Terraform)",
+        "finops": "Cost optimization & FinOps"
+      },
+      "sidebar": {
+        "ctaButton": "Start a Platform & Infrastructure project"
+      },
+      "cta": {
+        "primaryButton": "Start a Platform & Infrastructure project"
       }
     },
-    "cta": {
-      "badge": "We respond within two business days",
-      "title": "Have a project in mind?",
-      "subtitle": "Tell us what you're building. We respond within two business days — no sales theatre.",
-      "primaryAction": "Start a project inquiry",
-      "secondaryAction": "Team"
+    "dataEngineering": {
+      "metaTitle": "Data Engineering — Musnad Tech",
+      "metaDescription": "Pipelines, warehouses, and analytics surfaces built for trust and performance.",
+      "intro": {
+        "eyebrow": "SERVICES",
+        "title": "Data Engineering",
+        "subtitle": "Pipelines, warehouses, and analytics surfaces built for trust and performance."
+      },
+      "overview": {
+        "statement": "We help teams move from scattered data to reliable, queryable systems. ETL/ELT pipelines, warehouse modeling, and the dashboards people actually trust."
+      },
+      "capabilities": {
+        "pipelines": "ETL / ELT pipelines",
+        "modeling": "Warehouse modeling (dbt)",
+        "streaming": "Real-time streaming",
+        "dashboards": "Analytics dashboards",
+        "quality": "Data quality & contracts"
+      },
+      "sidebar": {
+        "ctaButton": "Start a Data Engineering project"
+      },
+      "cta": {
+        "primaryButton": "Start a Data Engineering project"
+      }
+    },
+    "developerTools": {
+      "metaTitle": "Developer Tools — Musnad Tech",
+      "metaDescription": "CLIs, SDKs, and internal platforms that make engineers measurably faster.",
+      "intro": {
+        "eyebrow": "SERVICES",
+        "title": "Developer Tools",
+        "subtitle": "CLIs, SDKs, and internal platforms that make engineers measurably faster."
+      },
+      "overview": {
+        "statement": "We build the tools engineers reach for daily. Thoughtful APIs, sensible defaults, and documentation that respects your time. Often open source."
+      },
+      "capabilities": {
+        "cliSdk": "CLI & SDK design",
+        "apiDesign": "API design (REST & gRPC)",
+        "documentation": "Developer documentation",
+        "internalTooling": "Internal platform tooling",
+        "openSource": "Open-source stewardship"
+      },
+      "sidebar": {
+        "ctaButton": "Start a Developer Tools project"
+      },
+      "cta": {
+        "primaryButton": "Start a Developer Tools project"
+      }
+    },
+    "aiIntegration": {
+      "metaTitle": "AI Integration — Musnad Tech",
+      "metaDescription": "Practical, production-ready AI features — grounded, observable, and honest about limits.",
+      "intro": {
+        "eyebrow": "SERVICES",
+        "title": "AI Integration",
+        "subtitle": "Practical, production-ready AI features — grounded, observable, and honest about limits."
+      },
+      "overview": {
+        "statement": "We ship AI features that work in production: retrieval-augmented generation, evaluation harnesses, and guardrails. No demo theatre — measured outcomes."
+      },
+      "capabilities": {
+        "ragPipelines": "RAG pipelines & evaluation",
+        "llmArchitecture": "LLM application architecture",
+        "promptEngineering": "Prompt engineering & evals",
+        "vectorSearch": "Vector search systems",
+        "guardrailsObservability": "Guardrails & observability"
+      },
+      "sidebar": {
+        "ctaButton": "Start an AI Integration project"
+      },
+      "cta": {
+        "primaryButton": "Start an AI Integration project"
+      }
+    },
+    "designEngineering": {
+      "metaTitle": "Design Engineering — Musnad Tech",
+      "metaDescription": "Where design meets implementation — interfaces that feel considered and perform.",
+      "intro": {
+        "eyebrow": "SERVICES",
+        "title": "Design Engineering",
+        "subtitle": "Where design meets implementation — interfaces that feel considered and perform."
+      },
+      "overview": {
+        "statement": "We bridge design and engineering with shared systems: design tokens, component libraries, and accessibility built in from the first commit."
+      },
+      "capabilities": {
+        "designSystems": "Design systems & tokens",
+        "componentLibraries": "Component libraries",
+        "accessibility": "Accessibility (WCAG 2.2 AA)",
+        "motionInteraction": "Motion & interaction",
+        "performanceBudgeting": "Performance budgeting"
+      },
+      "sidebar": {
+        "ctaButton": "Start a Design Engineering project"
+      },
+      "cta": {
+        "primaryButton": "Start a Design Engineering project"
+      }
+    },
+    "projects": {
+      "sahim": {
+        "title": "Sahim Analytics",
+        "category": "Fintech Platform",
+        "description": "A streaming analytics platform that aggregates market signals and turns them into actionable insight with sub-second latency."
+      },
+      "rakeen": {
+        "title": "Rakeen Portal",
+        "category": "Client Portal",
+        "description": "A secure, bilingual client portal for document exchange, case tracking, and confidential communication."
+      },
+      "naft": {
+        "title": "Naft Deploy",
+        "category": "Developer Tool",
+        "description": "An open-source deployment tool that gives small teams push-to-deploy without operating a full Kubernetes cluster."
+      },
+      "musnadCli": {
+        "title": "Musnad CLI",
+        "category": "Developer Tool",
+        "description": "An open-source CLI that scaffolds production-ready projects with sensible defaults, CI, and documentation."
+      },
+      "wathq": {
+        "title": "Wathq Observability",
+        "category": "Platform Engineering",
+        "description": "An observability stack — metrics, traces, and dashboards — that cut incident response time."
+      },
+      "hudhud": {
+        "title": "Hudhud Chat",
+        "category": "R&D",
+        "description": "An AI-powered conversational platform for enterprise knowledge retrieval and research."
+      }
     }
   },
   "Faq": {
