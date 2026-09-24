@@ -702,8 +702,76 @@
     }
   },
   "JobDetail": {
+    "common": {
+      "breadcrumb": {
+        "home": "Home",
+        "careers": "Careers",
+        "label": "Breadcrumb"
+      },
+      "eyebrow": "CAREERS",
+      "deadlinePrefix": "Application deadline: ",
+      "responsibilitiesHeading": "Responsibilities",
+      "requirementsHeading": "Requirements",
+      "niceToHaveHeading": "Nice to have",
+      "form": {
+        "title": "Application form",
+        "subtitle": "Fill out the form below. Required fields are marked with *.",
+        "nameLabel": "Name",
+        "emailLabel": "Email",
+        "phoneLabel": "Phone",
+        "locationLabel": "Location",
+        "portfolioLabel": "Portfolio URL",
+        "portfolioPlaceholder": "https://",
+        "githubLabel": "GitHub",
+        "githubPlaceholder": "username or URL",
+        "linkedinLabel": "LinkedIn",
+        "linkedinPlaceholder": "username or URL",
+        "coverLetterLabel": "Cover letter",
+        "coverLetterPlaceholder": "Tell us why you're a fit and how you'd contribute...",
+        "cvLabel": "CV / Resume",
+        "optionalTag": "(Optional)",
+        "clickToUpload": "Click to upload",
+        "uploadTypes": "PDF, DOC, DOCX",
+        "cvRequiredNote": "CV is required for this position.",
+        "cvOptionalNote": "CV is optional but recommended.",
+        "submitButton": "Submit",
+        "submittingButton": "Submitting...",
+        "disclaimer": "By submitting, you agree to your data being processed for hiring.",
+        "successTitle": "Application Received",
+        "successMessage": "Thank you for applying. This is a frontend demo and no backend submission was performed.",
+        "resetForm": "Submit another application",
+        "errors": {
+          "nameRequired": "Please enter your name.",
+          "emailRequired": "Please enter a valid email address.",
+          "coverLetterRequired": "Please provide a cover letter.",
+          "cvRequired": "Please upload your CV."
+        }
+      },
+      "otherPositions": {
+        "heading": "Other open positions",
+        "viewAll": "View all positions"
+      }
+    },
     "seniorBackendEngineer": {
-      "title": "Senior Backend Engineer"
+      "title": "Senior Backend Engineer",
+      "subtitle": "We're hiring a senior backend engineer to lead the design and delivery of client and internal systems. You'll own services end to end and shape how we build.",
+      "responsibilities": [
+        "Design and implement reliable backend services",
+        "Own service architecture and operability",
+        "Review code and raise the bar for quality",
+        "Pair with product and design to shape features"
+      ],
+      "requirements": [
+        "5+ years building production backend systems",
+        "Strong Go or TypeScript experience",
+        "Comfort with PostgreSQL and distributed concepts",
+        "A bias toward measuring before shipping"
+      ],
+      "niceToHave": [
+        "Experience with streaming or event-driven systems",
+        "Open-source contributions",
+        "Arabic language fluency"
+      ]
     },
     "machineLearningEngineer": {
       "title": "Machine Learning Engineer"
