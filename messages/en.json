@@ -695,6 +695,68 @@
         "about": "About"
       }
     }
+  },
+  "Legal": {
+    "common": {
+      "breadcrumb": {
+        "home": "Home",
+        "legal": "Legal",
+        "label": "Breadcrumb"
+      },
+      "eyebrow": "LEGAL",
+      "lastUpdatedLabel": "Last updated",
+      "lastUpdatedDate": "October 1, 2024",
+      "onThisPage": "ON THIS PAGE"
+    },
+    "privacyPolicy": {
+      "metaTitle": "Privacy Policy — Musnad Tech",
+      "metaDescription": "Learn how Musnad Tech collects, uses, protects, and retains your information, including cookies and account rights.",
+      "breadcrumbCurrent": "Privacy policy",
+      "title": "Privacy policy",
+      "introNote": "This policy explains what information Musnad Tech collects, how we use it, and the choices you have. It applies to this website and any inquiry or account you create.",
+      "sections": {
+        "s01": {
+          "title": "Information we collect",
+          "p1": "We collect only the information you choose to provide. When you submit an inquiry form, we receive your name, email, and the message you send — along with optional fields such as company, phone, budget, and timeline. If you attach a file, we keep the file for review and security scanning.",
+          "p2": "If you create an account, we store your display name, email, an optional profile (company, role, bio, phone), and your activity: saved projects, ratings, comments, and inquiries. Passwords are never stored in plain text."
+        },
+        "s02": {
+          "title": "How we use information",
+          "b1": "To respond to your inquiry and schedule a follow-up.",
+          "b2": "To operate your account and the features tied to it (saved projects, ratings, comments).",
+          "b3": "To improve the website and our content. Analytics are aggregated and do not include personally identifiable information (PII).",
+          "b4": "To detect and prevent fraud, abuse, and security incidents."
+        },
+        "s03": {
+          "title": "Cookies and analytics",
+          "p1": "We use a minimal set of cookies and local storage entries for locale, theme, and signed-in session. Analytics are aggregated only — we do not record IP addresses in association with PII. See our cookie policy for the full breakdown."
+        },
+        "s04": {
+          "title": "Attachments and scanning",
+          "p1": "Files attached to project inquiries are scanned for malware before review. We retain attachments for up to 30 days after a conversation closes, then delete them unless a longer retention is required by law."
+        },
+        "s05": {
+          "title": "Data retention",
+          "b1": "Inquiry data: retained for 12 months, then anonymized.",
+          "b2": "Account data: retained until you request deletion.",
+          "b3": "Comments and ratings: tied to your account and removed on deletion unless required for integrity of discussions."
+        },
+        "s06": {
+          "title": "Your rights",
+          "p1": "You may access, correct, or request deletion of your personal data. To delete your account and personal data, use the 'Delete account' action under Account & Security, or contact us at hello@musnad.tech."
+        },
+        "s07": {
+          "title": "Contact",
+          "p1": "For any privacy question, email hello@musnad.tech. We respond within two business days."
+        }
+      },
+      "contactCard": {
+        "title": "Questions about this policy?",
+        "supportingLinePrefix": "Email us at",
+        "buttonText": "Email us"
+      }
+    }
   }
 }
+
 
