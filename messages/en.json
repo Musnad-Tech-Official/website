@@ -564,6 +564,31 @@
         "primaryButton": "Start a Developer Tools project"
       }
     },
+    "aiIntegration": {
+      "metaTitle": "AI Integration — Musnad Tech",
+      "metaDescription": "Practical, production-ready AI features — grounded, observable, and honest about limits.",
+      "intro": {
+        "eyebrow": "SERVICES",
+        "title": "AI Integration",
+        "subtitle": "Practical, production-ready AI features — grounded, observable, and honest about limits."
+      },
+      "overview": {
+        "statement": "We ship AI features that work in production: retrieval-augmented generation, evaluation harnesses, and guardrails. No demo theatre — measured outcomes."
+      },
+      "capabilities": {
+        "ragPipelines": "RAG pipelines & evaluation",
+        "llmArchitecture": "LLM application architecture",
+        "promptEngineering": "Prompt engineering & evals",
+        "vectorSearch": "Vector search systems",
+        "guardrailsObservability": "Guardrails & observability"
+      },
+      "sidebar": {
+        "ctaButton": "Start an AI Integration project"
+      },
+      "cta": {
+        "primaryButton": "Start an AI Integration project"
+      }
+    },
     "projects": {
       "sahim": {
         "title": "Sahim Analytics",

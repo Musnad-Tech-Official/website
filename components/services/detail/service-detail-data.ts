@@ -17,6 +17,7 @@ import {
   LuNetwork,
   LuBookOpen,
   LuGitBranch,
+  LuSlidersHorizontal,
 } from "react-icons/lu";
 import type { ServiceDetailData } from "./service-detail-types";
 
@@ -463,4 +464,122 @@ export const DEVELOPER_TOOLS_DETAIL: ServiceDetailData = {
     ],
   },
 };
+
+/**
+ * AI Integration Service Detail Configuration & Frontend Fixture Data.
+ * Matches 09-service-ai-integration.png specification.
+ */
+export const AI_INTEGRATION_DETAIL: ServiceDetailData = {
+  slug: "ai-integration",
+  translationKey: "aiIntegration",
+  icon: LuSparkles,
+  technologies: ["Python", "TypeScript", "Redis"],
+  capabilities: [
+    {
+      id: "rag-pipelines",
+      translationKey: "ragPipelines",
+      icon: LuWorkflow,
+    },
+    {
+      id: "llm-architecture",
+      translationKey: "llmArchitecture",
+      icon: LuCpu,
+    },
+    {
+      id: "prompt-engineering",
+      translationKey: "promptEngineering",
+      icon: LuSlidersHorizontal,
+    },
+    {
+      id: "vector-search",
+      translationKey: "vectorSearch",
+      icon: LuDatabase,
+    },
+    {
+      id: "guardrails-observability",
+      translationKey: "guardrailsObservability",
+      icon: LuShieldCheck,
+    },
+  ],
+  relatedProjects: [
+    {
+      id: "musnad-cli",
+      slug: "musnad-cli",
+      itemKey: "musnadCli",
+      year: "2025",
+      featured: false,
+      liveDemo: true,
+      technologies: ["Go", "TypeScript", "Rust"],
+      rating: 4.5,
+      reviewCount: 17,
+      status: "inDevelopment",
+      gradient: "from-slate-900 via-zinc-900 to-neutral-950",
+      href: "/projects/musnad-cli",
+    },
+    {
+      id: "sahim",
+      slug: "sahim-analytics",
+      itemKey: "sahim",
+      year: "2024",
+      featured: true,
+      liveDemo: true,
+      technologies: ["TypeScript", "Go", "PostgreSQL", "Redis", "+1"],
+      rating: 4.7,
+      reviewCount: 38,
+      status: "completed",
+      gradient: "from-zinc-900 via-neutral-900 to-zinc-950",
+      href: "/projects/sahim-analytics",
+    },
+  ],
+  relatedByTechnology: {
+    projects: [
+      {
+        id: "hudhud",
+        slug: "hudhud-chat",
+        itemKey: "hudhud",
+        year: "2024",
+        categoryKey: "rd",
+        technologies: ["Python", "TypeScript", "Redis"],
+        href: "/projects/hudhud-chat",
+      },
+      {
+        id: "sahim",
+        slug: "sahim-analytics",
+        itemKey: "sahim",
+        year: "2024",
+        categoryKey: "fintechPlatform",
+        technologies: ["TypeScript", "Redis"],
+        href: "/projects/sahim-analytics",
+      },
+      {
+        id: "naft",
+        slug: "naft-deploy",
+        itemKey: "naft",
+        year: "2024",
+        categoryKey: "developerTool",
+        technologies: ["TypeScript"],
+        href: "/projects/naft-deploy",
+      },
+    ],
+    services: [
+      {
+        id: "data-engineering",
+        slug: "data-engineering",
+        serviceKey: "dataEngineering",
+        icon: LuDatabase,
+        technologies: ["Python", "Redis"],
+        href: "/services/data-engineering",
+      },
+      {
+        id: "product-engineering",
+        slug: "product-engineering",
+        serviceKey: "productEngineering",
+        icon: LuCode,
+        technologies: ["TypeScript"],
+        href: "/services/product-engineering",
+      },
+    ],
+  },
+};
+
 
