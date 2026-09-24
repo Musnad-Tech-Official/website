@@ -662,6 +662,225 @@
         "description": "An AI-powered conversational platform for enterprise knowledge retrieval and research."
       }
     }
+  },
+  "Faq": {
+    "metaTitle": "Frequently Asked Questions — Musnad Tech",
+    "metaDescription": "Quick answers about working with Musnad Tech, our engagement models, Riyadh base, account requirements, and inquiry process.",
+    "breadcrumb": {
+      "home": "Home",
+      "faq": "FAQ",
+      "label": "Breadcrumb"
+    },
+    "intro": {
+      "eyebrow": "FAQ",
+      "title": "Frequently\nasked questions",
+      "subtitle": "Quick answers about working with Musnad Tech. Can't find what you need? Contact us."
+    },
+    "topics": {
+      "workingWithUs": {
+        "title": "Working with us",
+        "q1": {
+          "question": "How does Musnad Tech engage with clients?",
+          "answer": "We work on an outcome-focused basis. Every engagement starts with a technical discovery and scoping phase to align on architecture, milestones, and success metrics before committing to build. We then work with clear cadence, transparent communication, weekly demos, and end-to-end engineering accountability through launch and initial operations."
+        },
+        "q2": {
+          "question": "Do you work with startups or only enterprises?",
+          "answer": "We work with both venture-backed startups and established enterprises. What matters most is strong technical ambition, problem complexity, and shared alignment on rigorous engineering standards and accountable delivery."
+        }
+      },
+      "company": {
+        "title": "Company",
+        "q1": {
+          "question": "Where is Musnad Tech based?",
+          "answer": "Musnad Tech is based in Riyadh, Saudi Arabia, serving clients across the Kingdom and GCC, with seamless remote collaboration capabilities for regional and international engagements."
+        },
+        "q2": {
+          "question": "Is your work open source?",
+          "answer": "We actively open-source selected internal tools, developer utilities, and research experiments to give back to the engineering community. Client code, proprietary systems, and business logic remain strictly confidential and protected under NDA."
+        }
+      },
+      "accounts": {
+        "title": "Accounts",
+        "q1": {
+          "question": "Do I need an account to browse or contact you?",
+          "answer": "No. You can browse our case studies, services, articles, and submit inquiries without an account. Accounts are completely optional and only needed if you wish to save projects, rate case studies, or leave comments."
+        }
+      },
+      "contact": {
+        "title": "Contact",
+        "q1": {
+          "question": "What happens after I submit an inquiry?",
+          "answer": "Our engineering leadership reviews every submission. Within two business days, we will get in touch to discuss technical scope, clarify details, and schedule an initial discovery session if there is a mutual fit."
+        }
+      }
+    },
+    "sidebar": {
+      "browseTitle": "BROWSE BY TOPIC",
+      "stillHaveQuestions": {
+        "title": "Still have questions?",
+        "description": "We're here to help. Send us an inquiry and our team will be in touch within two business days.",
+        "cta": "Contact"
+      },
+      "quickLinks": {
+        "title": "QUICK LINKS",
+        "services": "Services",
+        "projects": "Projects",
+        "careers": "Careers",
+        "about": "About"
+      }
+    }
+  },
+  "Legal": {
+    "common": {
+      "breadcrumb": {
+        "home": "Home",
+        "legal": "Legal",
+        "label": "Breadcrumb"
+      },
+      "eyebrow": "LEGAL",
+      "lastUpdatedLabel": "Last updated",
+      "lastUpdatedDate": "October 1, 2024",
+      "onThisPage": "ON THIS PAGE"
+    },
+    "privacyPolicy": {
+      "metaTitle": "Privacy Policy — Musnad Tech",
+      "metaDescription": "Learn how Musnad Tech collects, uses, protects, and retains your information, including cookies and account rights.",
+      "breadcrumbCurrent": "Privacy policy",
+      "title": "Privacy policy",
+      "introNote": "This policy explains what information Musnad Tech collects, how we use it, and the choices you have. It applies to this website and any inquiry or account you create.",
+      "sections": {
+        "s01": {
+          "title": "Information we collect",
+          "p1": "We collect only the information you choose to provide. When you submit an inquiry form, we receive your name, email, and the message you send — along with optional fields such as company, phone, budget, and timeline. If you attach a file, we keep the file for review and security scanning.",
+          "p2": "If you create an account, we store your display name, email, an optional profile (company, role, bio, phone), and your activity: saved projects, ratings, comments, and inquiries. Passwords are never stored in plain text."
+        },
+        "s02": {
+          "title": "How we use information",
+          "b1": "To respond to your inquiry and schedule a follow-up.",
+          "b2": "To operate your account and the features tied to it (saved projects, ratings, comments).",
+          "b3": "To improve the website and our content. Analytics are aggregated and do not include personally identifiable information (PII).",
+          "b4": "To detect and prevent fraud, abuse, and security incidents."
+        },
+        "s03": {
+          "title": "Cookies and analytics",
+          "p1": "We use a minimal set of cookies and local storage entries for locale, theme, and signed-in session. Analytics are aggregated only — we do not record IP addresses in association with PII. See our cookie policy for the full breakdown."
+        },
+        "s04": {
+          "title": "Attachments and scanning",
+          "p1": "Files attached to project inquiries are scanned for malware before review. We retain attachments for up to 30 days after a conversation closes, then delete them unless a longer retention is required by law."
+        },
+        "s05": {
+          "title": "Data retention",
+          "b1": "Inquiry data: retained for 12 months, then anonymized.",
+          "b2": "Account data: retained until you request deletion.",
+          "b3": "Comments and ratings: tied to your account and removed on deletion unless required for integrity of discussions."
+        },
+        "s06": {
+          "title": "Your rights",
+          "p1": "You may access, correct, or request deletion of your personal data. To delete your account and personal data, use the 'Delete account' action under Account & Security, or contact us at hello@musnad.tech."
+        },
+        "s07": {
+          "title": "Contact",
+          "p1": "For any privacy question, email hello@musnad.tech. We respond within two business days."
+        }
+      },
+      "contactCard": {
+        "title": "Questions about this policy?",
+        "supportingLinePrefix": "Email us at",
+        "buttonText": "Email us"
+      }
+    },
+    "termsOfService": {
+      "metaTitle": "Terms of Service — Musnad Tech",
+      "metaDescription": "Terms governing the use of the Musnad Tech website, services, intellectual property, and user conduct.",
+      "breadcrumbCurrent": "Terms of service",
+      "title": "Terms of service",
+      "introNote": "These terms govern your use of the Musnad Tech website. By browsing, contacting us, or creating an account, you agree to these terms.",
+      "sections": {
+        "s01": {
+          "title": "Service description",
+          "p1": "Musnad Tech operates a bilingual software engineering studio website at musnad.tech. The site publishes case studies, articles, services, and open positions. It also offers optional accounts that unlock saving projects, rating, and commenting, and provides a contact channel for inquiries."
+        },
+        "s02": {
+          "title": "Acceptable use",
+          "b1": "Do not abuse, overload, or attempt to disrupt the website or its infrastructure.",
+          "b2": "Do not scrape content at scale, resell, or redistribute our case studies or articles without permission.",
+          "b3": "Do not create accounts using false identities or for fraudulent purposes.",
+          "b4": "Do not submit unlawful, harmful, or infringing content in comments or inquiries."
+        },
+        "s03": {
+          "title": "Intellectual property",
+          "p1": "The website, its design, branding, case studies, articles, and source code we publish are owned by Musnad Tech. Open-source projects we release remain under their stated licenses.",
+          "p2": "Content you submit — such as comments, ratings, or messages — remains yours. By submitting, you grant Musnad Tech a non-exclusive, royalty-free license to display and use that content on the website for the purpose of operating the service."
+        },
+        "s04": {
+          "title": "Disclaimers",
+          "p1": "The website and its content are provided 'as is' without warranties of any kind. We do not guarantee that the site will be uninterrupted, error-free, or fit for a particular purpose."
+        },
+        "s05": {
+          "title": "Limitation of liability",
+          "p1": "To the maximum extent permitted by applicable law, Musnad Tech shall not be liable for any indirect, incidental, or consequential damages arising from your use of the website."
+        },
+        "s06": {
+          "title": "Governing law",
+          "p1": "These terms are governed by the laws of the Kingdom of Saudi Arabia. Any dispute shall be subject to the exclusive jurisdiction of the competent courts in Riyadh, Saudi Arabia."
+        },
+        "s07": {
+          "title": "Changes to these terms",
+          "p1": "We may update these terms periodically. Material changes will be reflected by updating the 'Last updated' date above. Continued use after changes constitutes acceptance."
+        }
+      },
+      "contactCard": {
+        "title": "Questions about this policy?",
+        "supportingLinePrefix": "Email us at",
+        "buttonText": "Email us"
+      }
+    },
+    "cookiePolicy": {
+      "metaTitle": "Cookie Policy — Musnad Tech",
+      "metaDescription": "Learn how Musnad Tech uses cookies and local storage to provide preferences, sessions, and aggregated analytics.",
+      "breadcrumbCurrent": "Cookie policy",
+      "title": "Cookie policy",
+      "introNote": "This policy explains how Musnad Tech uses cookies and local storage, and how you can control them.",
+      "sections": {
+        "s01": {
+          "title": "What are cookies",
+          "p1": "Cookies are small text files stored on your device by your browser. They allow a website to remember things like your language, theme, and signed-in state across page loads. Local storage serves a similar purpose for slightly larger or longer-lived data."
+        },
+        "s02": {
+          "title": "Types we use",
+          "b1": "Essential: locale (Arabic/English), theme (light/dark), and signed-in session. The site does not function correctly without these.",
+          "b2": "Preference: saved projects and ratings you set are stored locally so they persist across visits.",
+          "b3": "Analytics: aggregated, anonymized usage data. No PII is collected or correlated with these."
+        },
+        "s03": {
+          "title": "Third-party cookies",
+          "p1": "We do not sell data, and we do not embed advertising networks. If we add a third-party analytics or support tool in the future, we will name it here and apply a strict PII-free configuration."
+        },
+        "s04": {
+          "title": "Managing and disabling cookies",
+          "p1": "Most browsers let you review and delete cookies from their settings. Disabling essential cookies means locale, theme, and sign-in will not persist between visits. Preference storage (saved projects, ratings) will reset."
+        },
+        "s05": {
+          "title": "Impact on features",
+          "b1": "Without essential cookies: language and theme reset on each visit; sign-in does not persist.",
+          "b2": "Without preference storage: saved projects and ratings cannot persist locally.",
+          "b3": "Without analytics: site functionality is unaffected — you simply help us less in improving it."
+        },
+        "s06": {
+          "title": "Changes to this policy",
+          "p1": "If we change the cookies we use, we will update this policy and revise the 'Last updated' date above."
+        }
+      },
+      "contactCard": {
+        "title": "Questions about this policy?",
+        "supportingLinePrefix": "Email us at",
+        "buttonText": "Email us"
+      }
+    }
   }
 }
+
+
+
 
