@@ -589,6 +589,31 @@
         "primaryButton": "Start an AI Integration project"
       }
     },
+    "designEngineering": {
+      "metaTitle": "Design Engineering — Musnad Tech",
+      "metaDescription": "Where design meets implementation — interfaces that feel considered and perform.",
+      "intro": {
+        "eyebrow": "SERVICES",
+        "title": "Design Engineering",
+        "subtitle": "Where design meets implementation — interfaces that feel considered and perform."
+      },
+      "overview": {
+        "statement": "We bridge design and engineering with shared systems: design tokens, component libraries, and accessibility built in from the first commit."
+      },
+      "capabilities": {
+        "designSystems": "Design systems & tokens",
+        "componentLibraries": "Component libraries",
+        "accessibility": "Accessibility (WCAG 2.2 AA)",
+        "motionInteraction": "Motion & interaction",
+        "performanceBudgeting": "Performance budgeting"
+      },
+      "sidebar": {
+        "ctaButton": "Start a Design Engineering project"
+      },
+      "cta": {
+        "primaryButton": "Start a Design Engineering project"
+      }
+    },
     "projects": {
       "sahim": {
         "title": "Sahim Analytics",

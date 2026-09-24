@@ -18,6 +18,10 @@ import {
   LuBookOpen,
   LuGitBranch,
   LuSlidersHorizontal,
+  LuPalette,
+  LuComponent,
+  LuAccessibility,
+  LuGauge,
 } from "react-icons/lu";
 import type { ServiceDetailData } from "./service-detail-types";
 
@@ -577,6 +581,109 @@ export const AI_INTEGRATION_DETAIL: ServiceDetailData = {
         icon: LuCode,
         technologies: ["TypeScript"],
         href: "/services/product-engineering",
+      },
+    ],
+  },
+};
+
+/**
+ * Design Engineering Service Detail Configuration & Frontend Fixture Data.
+ * Matches 10-service-design-engineering.png specification.
+ */
+export const DESIGN_ENGINEERING_DETAIL: ServiceDetailData = {
+  slug: "design-engineering",
+  translationKey: "designEngineering",
+  icon: LuLayoutGrid,
+  technologies: ["React", "Next.js", "TypeScript"],
+  capabilities: [
+    {
+      id: "design-systems",
+      translationKey: "designSystems",
+      icon: LuPalette,
+    },
+    {
+      id: "component-libraries",
+      translationKey: "componentLibraries",
+      icon: LuComponent,
+    },
+    {
+      id: "accessibility",
+      translationKey: "accessibility",
+      icon: LuAccessibility,
+    },
+    {
+      id: "motion-interaction",
+      translationKey: "motionInteraction",
+      icon: LuActivity,
+    },
+    {
+      id: "performance-budgeting",
+      translationKey: "performanceBudgeting",
+      icon: LuGauge,
+    },
+  ],
+  relatedProjects: [
+    {
+      id: "rakeen",
+      slug: "rakeen-portal",
+      itemKey: "rakeen",
+      year: "2023",
+      featured: true,
+      liveDemo: true,
+      technologies: ["TypeScript", "Next.js", "PostgreSQL", "Docker"],
+      rating: 4.6,
+      reviewCount: 22,
+      status: "completed",
+      gradient: "from-slate-900 via-zinc-900 to-neutral-950",
+      href: "/projects/rakeen-portal",
+    },
+  ],
+  relatedByTechnology: {
+    projects: [
+      {
+        id: "sahim",
+        slug: "sahim-analytics",
+        itemKey: "sahim",
+        year: "2024",
+        categoryKey: "fintechPlatform",
+        technologies: ["TypeScript", "Next.js"],
+        href: "/projects/sahim-analytics",
+      },
+      {
+        id: "naft",
+        slug: "naft-deploy",
+        itemKey: "naft",
+        year: "2024",
+        categoryKey: "developerTool",
+        technologies: ["TypeScript"],
+        href: "/projects/naft-deploy",
+      },
+      {
+        id: "musnad-cli",
+        slug: "musnad-cli",
+        itemKey: "musnadCli",
+        year: "2025",
+        categoryKey: "developerTool",
+        technologies: ["TypeScript"],
+        href: "/projects/musnad-cli",
+      },
+    ],
+    services: [
+      {
+        id: "product-engineering",
+        slug: "product-engineering",
+        serviceKey: "productEngineering",
+        icon: LuCode,
+        technologies: ["TypeScript", "Next.js"],
+        href: "/services/product-engineering",
+      },
+      {
+        id: "developer-tools",
+        slug: "developer-tools",
+        serviceKey: "developerTools",
+        icon: LuTerminal,
+        technologies: ["TypeScript"],
+        href: "/services/developer-tools",
       },
     ],
   },
