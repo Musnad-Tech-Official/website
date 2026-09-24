@@ -628,5 +628,73 @@
       "primaryAction": "Start a project inquiry",
       "secondaryAction": "Team"
     }
+  },
+  "Faq": {
+    "metaTitle": "Frequently Asked Questions — Musnad Tech",
+    "metaDescription": "Quick answers about working with Musnad Tech, our engagement models, Riyadh base, account requirements, and inquiry process.",
+    "breadcrumb": {
+      "home": "Home",
+      "faq": "FAQ",
+      "label": "Breadcrumb"
+    },
+    "intro": {
+      "eyebrow": "FAQ",
+      "title": "Frequently\nasked questions",
+      "subtitle": "Quick answers about working with Musnad Tech. Can't find what you need? Contact us."
+    },
+    "topics": {
+      "workingWithUs": {
+        "title": "Working with us",
+        "q1": {
+          "question": "How does Musnad Tech engage with clients?",
+          "answer": "We work on an outcome-focused basis. Every engagement starts with a technical discovery and scoping phase to align on architecture, milestones, and success metrics before committing to build. We then work with clear cadence, transparent communication, weekly demos, and end-to-end engineering accountability through launch and initial operations."
+        },
+        "q2": {
+          "question": "Do you work with startups or only enterprises?",
+          "answer": "We work with both venture-backed startups and established enterprises. What matters most is strong technical ambition, problem complexity, and shared alignment on rigorous engineering standards and accountable delivery."
+        }
+      },
+      "company": {
+        "title": "Company",
+        "q1": {
+          "question": "Where is Musnad Tech based?",
+          "answer": "Musnad Tech is based in Riyadh, Saudi Arabia, serving clients across the Kingdom and GCC, with seamless remote collaboration capabilities for regional and international engagements."
+        },
+        "q2": {
+          "question": "Is your work open source?",
+          "answer": "We actively open-source selected internal tools, developer utilities, and research experiments to give back to the engineering community. Client code, proprietary systems, and business logic remain strictly confidential and protected under NDA."
+        }
+      },
+      "accounts": {
+        "title": "Accounts",
+        "q1": {
+          "question": "Do I need an account to browse or contact you?",
+          "answer": "No. You can browse our case studies, services, articles, and submit inquiries without an account. Accounts are completely optional and only needed if you wish to save projects, rate case studies, or leave comments."
+        }
+      },
+      "contact": {
+        "title": "Contact",
+        "q1": {
+          "question": "What happens after I submit an inquiry?",
+          "answer": "Our engineering leadership reviews every submission. Within two business days, we will get in touch to discuss technical scope, clarify details, and schedule an initial discovery session if there is a mutual fit."
+        }
+      }
+    },
+    "sidebar": {
+      "browseTitle": "BROWSE BY TOPIC",
+      "stillHaveQuestions": {
+        "title": "Still have questions?",
+        "description": "We're here to help. Send us an inquiry and our team will be in touch within two business days.",
+        "cta": "Contact"
+      },
+      "quickLinks": {
+        "title": "QUICK LINKS",
+        "services": "Services",
+        "projects": "Projects",
+        "careers": "Careers",
+        "about": "About"
+      }
+    }
   }
 }
+
