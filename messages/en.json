@@ -165,6 +165,21 @@
           "quote": "They replaced a costly vendor SaaS with a self-hosted observability stack and cut our incident response time by more than half. Calm, competent engineering.",
           "author": "Faisal Al-Nasser",
           "role": "CTO · Logistics Operator"
+        },
+        "tariq": {
+          "quote": "The architectural clarity Musnad Tech brought to our financial infrastructure gave us complete confidence during our highest-volume transaction periods.",
+          "author": "Tariq Al-Hamdani",
+          "role": "VP of Engineering · FinTech Solutions"
+        },
+        "mona": {
+          "quote": "Delivering a bilingual enterprise portal with zero accessibility compromises was critical for our institution. Musnad's engineering discipline was exemplary.",
+          "author": "Mona Al-Khatib",
+          "role": "Head of Digital Transformation · Healthcare Network"
+        },
+        "khalid": {
+          "quote": "From day one, Musnad operated like an elite in-house team. The resilient distributed systems they designed scaled effortlessly as our operations expanded.",
+          "author": "Khalid Al-Ariqi",
+          "role": "Founder & CEO · Cloud Logistics"
         }
       }
     },
@@ -191,6 +206,7 @@
       "heading": "Latest insights",
       "description": "Technical writing and field notes from the team.",
       "viewAll": "View all",
+      "readArticle": "Read article",
       "trending": "Trending",
       "minRead": "{count} min read",
       "timeAgo": "1y ago",
@@ -648,3 +664,4 @@
     }
   }
 }
+
