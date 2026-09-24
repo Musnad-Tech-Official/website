@@ -755,8 +755,55 @@
         "supportingLinePrefix": "Email us at",
         "buttonText": "Email us"
       }
+    },
+    "termsOfService": {
+      "metaTitle": "Terms of Service — Musnad Tech",
+      "metaDescription": "Terms governing the use of the Musnad Tech website, services, intellectual property, and user conduct.",
+      "breadcrumbCurrent": "Terms of service",
+      "title": "Terms of service",
+      "introNote": "These terms govern your use of the Musnad Tech website. By browsing, contacting us, or creating an account, you agree to these terms.",
+      "sections": {
+        "s01": {
+          "title": "Service description",
+          "p1": "Musnad Tech operates a bilingual software engineering studio website at musnad.tech. The site publishes case studies, articles, services, and open positions. It also offers optional accounts that unlock saving projects, rating, and commenting, and provides a contact channel for inquiries."
+        },
+        "s02": {
+          "title": "Acceptable use",
+          "b1": "Do not abuse, overload, or attempt to disrupt the website or its infrastructure.",
+          "b2": "Do not scrape content at scale, resell, or redistribute our case studies or articles without permission.",
+          "b3": "Do not create accounts using false identities or for fraudulent purposes.",
+          "b4": "Do not submit unlawful, harmful, or infringing content in comments or inquiries."
+        },
+        "s03": {
+          "title": "Intellectual property",
+          "p1": "The website, its design, branding, case studies, articles, and source code we publish are owned by Musnad Tech. Open-source projects we release remain under their stated licenses.",
+          "p2": "Content you submit — such as comments, ratings, or messages — remains yours. By submitting, you grant Musnad Tech a non-exclusive, royalty-free license to display and use that content on the website for the purpose of operating the service."
+        },
+        "s04": {
+          "title": "Disclaimers",
+          "p1": "The website and its content are provided 'as is' without warranties of any kind. We do not guarantee that the site will be uninterrupted, error-free, or fit for a particular purpose."
+        },
+        "s05": {
+          "title": "Limitation of liability",
+          "p1": "To the maximum extent permitted by applicable law, Musnad Tech shall not be liable for any indirect, incidental, or consequential damages arising from your use of the website."
+        },
+        "s06": {
+          "title": "Governing law",
+          "p1": "These terms are governed by the laws of the Kingdom of Saudi Arabia. Any dispute shall be subject to the exclusive jurisdiction of the competent courts in Riyadh, Saudi Arabia."
+        },
+        "s07": {
+          "title": "Changes to these terms",
+          "p1": "We may update these terms periodically. Material changes will be reflected by updating the 'Last updated' date above. Continued use after changes constitutes acceptance."
+        }
+      },
+      "contactCard": {
+        "title": "Questions about this policy?",
+        "supportingLinePrefix": "Email us at",
+        "buttonText": "Email us"
+      }
     }
   }
 }
+
 
 
