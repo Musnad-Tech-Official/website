@@ -692,5 +692,117 @@
       "primaryAction": "بدء استفسار عن مشروع",
       "secondaryAction": "فريق العمل"
     }
+  },
+  "Contact": {
+    "meta": {
+      "title": "تواصل معنا — مسند للتقنية",
+      "description": "ابدأ محادثة مع مسند للتقنية. أخبرنا عن مشروعك أو فكرتك أو سؤالك."
+    },
+    "breadcrumb": {
+      "home": "الرئيسية",
+      "contact": "تواصل معنا",
+      "label": "مسار التنقل"
+    },
+    "header": {
+      "eyebrow": "تواصل معنا",
+      "title": "ابدأ محادثة",
+      "subtitle": "أخبرنا عن مشروعك أو فكرتك أو سؤالك. تتحول جميع الطلبات إلى استفسار مُتابع — وليست مجرد رسالة بريد."
+    },
+    "form": {
+      "inquiryType": {
+        "label": "نوع الاستفسار",
+        "placeholder": "اختر نوع الاستفسار",
+        "options": {
+          "project": "استفسار عن مشروع",
+          "general": "سؤال عام",
+          "partnership": "شراكة",
+          "careers": "استفسار وظيفي"
+        }
+      },
+      "name": {
+        "label": "الاسم",
+        "placeholder": "اسمك الكامل"
+      },
+      "email": {
+        "label": "البريد الإلكتروني",
+        "placeholder": "your@email.com"
+      },
+      "company": {
+        "label": "الشركة",
+        "placeholder": "اسم الشركة (اختياري)"
+      },
+      "phone": {
+        "label": "رقم الهاتف",
+        "placeholder": "رقم الهاتف (اختياري)"
+      },
+      "projectDetails": {
+        "title": "تفاصيل المشروع",
+        "projectType": {
+          "label": "نوع المشروع",
+          "placeholder": "اختياري",
+          "options": {
+            "web": "منصة ويب",
+            "mobile": "تطبيق جوال",
+            "enterprise": "نظام مؤسسي",
+            "ai": "تكامل الذكاء الاصطناعي",
+            "design": "هندسة التصميم",
+            "tools": "أدوات المطورين"
+          }
+        },
+        "budget": {
+          "label": "الميزانية التقديرية",
+          "placeholder": "اختياري",
+          "options": {
+            "tier1": "أقل من 25 ألف دولار",
+            "tier2": "25 – 50 ألف دولار",
+            "tier3": "50 – 100 ألف دولار",
+            "tier4": "أكثر من 100 ألف دولار",
+            "undisclosed": "غير محدد / مرن"
+          }
+        },
+        "timeline": {
+          "label": "الإطار الزمني",
+          "placeholder": "اختياري",
+          "options": {
+            "urgent": "أقل من شهر",
+            "standard": "1 – 3 أشهر",
+            "extended": "3 – 6 أشهر",
+            "flexible": "مرن"
+          }
+        },
+        "currentProduct": {
+          "label": "المنتج الحالي / الموقع الإلكتروني",
+          "placeholder": "example.com"
+        },
+        "attachment": {
+          "label": "المرفقات",
+          "hint": "ملفات PDF أو DOC أو ZIP بحد أقصى 10 ميغابايت. لاستفسارات المشاريع فقط.",
+          "selected": "الملف المختار: {fileName} ({fileSize})",
+          "remove": "إزالة الملف"
+        }
+      },
+      "message": {
+        "label": "الرسالة",
+        "placeholder": "أخبرنا عما تبنيه، والمشكلة، والجدول الزمني، وأي تفاصيل تساعدنا في التحضير."
+      },
+      "privacyNotice": {
+        "prefix": "بإرسال هذا النموذج، فإنك توافق على",
+        "privacyLink": "سياسة الخصوصية",
+        "suffix": "."
+      },
+      "submit": "إرسال",
+      "integrationNotice": "سيصبح إرسال نموذج التواصل متاحاً عند ربط خدمة المراسلة."
+    },
+    "sidebar": {
+      "otherWaysTitle": "طرق أخرى للتواصل معنا",
+      "emailLabel": "البريد الإلكتروني",
+      "addressLabel": "العنوان",
+      "responseCard": {
+        "title": "نرد خلال يومي عمل",
+        "description": "نقوم بالرد على كل استفسار بشكل شخصي."
+      },
+      "socialTitle": "قنوات التواصل الرسمية"
+    }
   }
 }
+

@@ -692,5 +692,117 @@
       "primaryAction": "Start a project inquiry",
       "secondaryAction": "Team"
     }
+  },
+  "Contact": {
+    "meta": {
+      "title": "Contact — Musnad Tech",
+      "description": "Start a conversation with Musnad Tech. Tell us about your project, idea, or question."
+    },
+    "breadcrumb": {
+      "home": "Home",
+      "contact": "Contact",
+      "label": "Breadcrumbs"
+    },
+    "header": {
+      "eyebrow": "CONTACT",
+      "title": "Start a conversation",
+      "subtitle": "Tell us about your project, idea, or question. Submissions become a tracked inquiry — not just an email."
+    },
+    "form": {
+      "inquiryType": {
+        "label": "Inquiry type",
+        "placeholder": "Select inquiry type",
+        "options": {
+          "project": "Project inquiry",
+          "general": "General question",
+          "partnership": "Partnership",
+          "careers": "Careers inquiry"
+        }
+      },
+      "name": {
+        "label": "Name",
+        "placeholder": "Your name"
+      },
+      "email": {
+        "label": "Email",
+        "placeholder": "your@email.com"
+      },
+      "company": {
+        "label": "Company",
+        "placeholder": "Company name (optional)"
+      },
+      "phone": {
+        "label": "Phone",
+        "placeholder": "Phone number (optional)"
+      },
+      "projectDetails": {
+        "title": "Project details",
+        "projectType": {
+          "label": "Project type",
+          "placeholder": "Optional",
+          "options": {
+            "web": "Web Platform",
+            "mobile": "Mobile Application",
+            "enterprise": "Enterprise System",
+            "ai": "AI Integration",
+            "design": "Design Engineering",
+            "tools": "Developer Tools"
+          }
+        },
+        "budget": {
+          "label": "Budget",
+          "placeholder": "Optional",
+          "options": {
+            "tier1": "< $25k",
+            "tier2": "$25k – $50k",
+            "tier3": "$50k – $100k",
+            "tier4": "> $100k",
+            "undisclosed": "Not sure / Flexible"
+          }
+        },
+        "timeline": {
+          "label": "Timeline",
+          "placeholder": "Optional",
+          "options": {
+            "urgent": "< 1 month",
+            "standard": "1 – 3 months",
+            "extended": "3 – 6 months",
+            "flexible": "Flexible"
+          }
+        },
+        "currentProduct": {
+          "label": "Current product / website",
+          "placeholder": "example.com"
+        },
+        "attachment": {
+          "label": "Attachment",
+          "hint": "PDF, DOC, or ZIP up to 10MB. Project inquiries only.",
+          "selected": "Selected file: {fileName} ({fileSize})",
+          "remove": "Remove file"
+        }
+      },
+      "message": {
+        "label": "Message",
+        "placeholder": "Tell us about what you're building, the problem, timeline, and anything that helps us prepare."
+      },
+      "privacyNotice": {
+        "prefix": "By submitting, you agree to our",
+        "privacyLink": "privacy policy",
+        "suffix": "."
+      },
+      "submit": "Submit",
+      "integrationNotice": "Contact form submission will be available when messaging integration is connected."
+    },
+    "sidebar": {
+      "otherWaysTitle": "Other ways to reach us",
+      "emailLabel": "EMAIL",
+      "addressLabel": "ADDRESS",
+      "responseCard": {
+        "title": "Responses within two business days",
+        "description": "We respond to every inquiry personally."
+      },
+      "socialTitle": "Official channels"
+    }
   }
 }
+
