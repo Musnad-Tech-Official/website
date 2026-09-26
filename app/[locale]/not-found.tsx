@@ -1,31 +1,29 @@
-import { useTranslations } from "next-intl";
-import { Link } from "@/i18n/routing";
+import { NotFoundHero } from "@/components/not-found/not-found-hero";
+import { SuggestedPages } from "@/components/not-found/suggested-pages";
 
+/**
+ * Localized 404 / Not Found Page for Musnad Tech.
+ *
+ * Renders within app/[locale]/layout.tsx with global Navbar, ThemeProvider,
+ * and global Footer preserved.
+ */
 export default function NotFoundPage() {
-  const t = useTranslations("NotFoundPage");
-
   return (
-    <div className="flex-1 flex items-center justify-center p-6 sm:p-12">
-      <div className="text-center space-y-5 max-w-md mx-auto">
-        <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-primary/10 text-primary mb-2 shadow-inner border border-primary/20">
-          <span className="text-3xl font-extrabold tracking-tight">404</span>
-        </div>
-        <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground">
-          {t("subtitle")}
-        </h1>
-        <p className="text-muted-foreground text-sm sm:text-base leading-relaxed">
-          {t("description")}
-        </p>
-        <div className="pt-2">
-          <Link
-            href="/"
-            className="inline-flex items-center justify-center rounded-xl bg-primary px-6 py-2.5 text-sm font-medium text-primary-foreground shadow-sm hover:opacity-95 active:scale-[0.98] transition-all"
-          >
-            {t("returnHome")}
-          </Link>
-        </div>
+    <div className="relative flex-1 flex flex-col justify-center items-center px-4 sm:px-6 lg:px-8 py-10 sm:py-14 md:py-20 overflow-hidden">
+      {/* Subtle atmospheric ambient glow matching screenshot */}
+      <div
+        className="pointer-events-none absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[340px] sm:w-[520px] md:w-[680px] h-[260px] sm:h-[380px] bg-primary/4 dark:bg-primary/7 rounded-full blur-3xl -z-10"
+        aria-hidden="true"
+      />
+      <div
+        className="pointer-events-none absolute top-1/2 right-[10%] w-72 sm:w-96 h-72 sm:h-96 bg-primary/3 dark:bg-primary/5 rounded-full blur-3xl -z-10"
+        aria-hidden="true"
+      />
+
+      <div className="w-full max-w-3xl mx-auto flex flex-col items-center">
+        <NotFoundHero />
+        <SuggestedPages className="w-full mt-12 sm:mt-16 md:mt-20" />
       </div>
     </div>
   );
 }
-

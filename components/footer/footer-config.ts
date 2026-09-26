@@ -99,9 +99,9 @@ export function getFooterSections(t: (key: string) => string): FooterSection[] {
       id: "legal",
       title: t("legalTitle"),
       links: [
-        { id: "privacy", label: t("nav.privacy"), href: "/privacy" },
-        { id: "terms", label: t("nav.terms"), href: "/terms" },
-        { id: "cookies", label: t("nav.cookies"), href: "/cookies" },
+        { id: "privacy", label: t("nav.privacy"), href: "/legal/privacy-policy" },
+        { id: "terms", label: t("nav.terms"), href: "/legal/terms-of-service" },
+        { id: "cookies", label: t("nav.cookies"), href: "/legal/cookie-policy" },
       ],
     },
   ];

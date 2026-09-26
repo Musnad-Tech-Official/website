@@ -4,3 +4,4 @@ export * from "./services-intro";
 export * from "./service-card";
 export * from "./services-grid";
 export * from "./services-process";
+export * from "./detail";

@@ -6,3 +6,4 @@ export * from "./blog-filter";
 export * from "./blog-grid";
 export * from "./blog-explorer";
 export * from "./blog-newsletter";
+export * from "./detail";
