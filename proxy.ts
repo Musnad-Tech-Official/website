@@ -1,10 +1,18 @@
 import { clerkMiddleware } from "@clerk/nextjs/server";
 import createMiddleware from "next-intl/middleware";
+import { NextResponse } from "next/server";
 import { routing } from "./i18n/routing";
 
 const intlMiddleware = createMiddleware(routing);
 
-export const proxy = clerkMiddleware(async (auth, request) => {
+export const proxy = clerkMiddleware(async (_auth, request) => {
+  const pathname = request.nextUrl.pathname;
+
+  // Infrastructure/API endpoints are never locale-rewritten.
+  if (pathname === "/api" || pathname.startsWith("/api/") || pathname.startsWith("/__clerk/")) {
+    return NextResponse.next();
+  }
+
   return intlMiddleware(request);
 });
 

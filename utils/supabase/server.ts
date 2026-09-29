@@ -1,19 +1,19 @@
-import { createClient as createSupabaseClient } from "@supabase/supabase-js";
-import { auth } from "@clerk/nextjs/server";
+import "server-only";
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
+import { auth } from "@clerk/nextjs/server";
+import { createClient as createSupabaseClient } from "@supabase/supabase-js";
+import type { Database } from "../../types/database.types";
+import { getSupabasePublicConfig } from "./config";
 
 /**
- * Creates a Supabase client configured with the current Clerk user session token
- * for server-side operations (Server Components, Server Actions, Route Handlers).
+ * User-scoped server client. Requests carry the active Clerk session token and
+ * remain subject to PostgreSQL grants and RLS.
  */
 export const createClient = async () => {
   const { getToken } = await auth();
+  const { url, publishableKey } = getSupabasePublicConfig();
 
-  return createSupabaseClient(supabaseUrl!, supabaseKey!, {
-    accessToken: async () => {
-      return (await getToken()) ?? null;
-    },
+  return createSupabaseClient<Database>(url, publishableKey, {
+    accessToken: async () => (await getToken()) ?? null,
   });
 };
