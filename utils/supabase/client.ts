@@ -2,32 +2,33 @@
 
 import { useSession } from "@clerk/nextjs";
 import { createClient as createSupabaseClient } from "@supabase/supabase-js";
+import type { Database } from "../../types/database.types";
 import { useMemo } from "react";
-
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
+import { getSupabasePublicConfig } from "./config";
 
 /**
- * Creates a standalone Supabase client for browser usage.
- * @param token Optional JWT token from Clerk
+ * Browser Supabase client using Clerk as the third-party auth provider.
+ * The optional token form is kept for compatibility with existing call sites.
  */
 export const createClient = (token?: string | null) => {
-  return createSupabaseClient(supabaseUrl!, supabaseKey!, {
+  const { url, publishableKey } = getSupabasePublicConfig();
+
+  return createSupabaseClient<Database>(url, publishableKey, {
     accessToken: async () => token ?? null,
   });
 };
 
 /**
- * React hook for Client Components to get a Supabase client attached to the active Clerk session.
+ * Returns a browser Supabase client that always resolves the active Clerk session token.
  */
 export const useSupabaseClient = () => {
   const { session } = useSession();
 
   return useMemo(() => {
-    return createSupabaseClient(supabaseUrl!, supabaseKey!, {
-      accessToken: async () => {
-        return (await session?.getToken()) ?? null;
-      },
+    const { url, publishableKey } = getSupabasePublicConfig();
+
+    return createSupabaseClient<Database>(url, publishableKey, {
+      accessToken: async () => (await session?.getToken()) ?? null,
     });
   }, [session]);
 };
