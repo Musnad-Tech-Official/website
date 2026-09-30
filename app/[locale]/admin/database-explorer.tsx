@@ -1,7 +1,8 @@
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/routing";
-import { Alert, Card, CardContent, CardDescription, CardHeader, CardTitle, EmptyState } from "@/components/ui";
+import { Alert, Button, Card, CardContent, CardDescription, CardHeader, CardTitle, EmptyState, Select } from "@/components/ui";
 import { createClient } from "@/utils/supabase/server";
+import { updateWorkflowStatus } from "./actions";
 
 const tables = {
   content: [
@@ -16,6 +17,11 @@ const tables = {
 } as const;
 
 const allowed = new Set<string>(Object.values(tables).flat());
+const workflows: Record<string, string[]> = {
+  comments: ["pending", "published", "hidden", "rejected"],
+  comment_reports: ["pending", "reviewed", "dismissed", "actioned"],
+  job_applications: ["submitted", "reviewing", "shortlisted", "rejected", "hired", "withdrawn"],
+};
 type Query = { table?: string; page?: string; row?: string };
 type RecordRow = Record<string, unknown>;
 
@@ -81,6 +87,13 @@ export async function DatabaseExplorer({ locale, query }: { locale: string; quer
         <dl className="grid gap-4 sm:grid-cols-2">{Object.entries(selected).map(([key, value]) => (
           <div key={key} className="min-w-0 rounded-lg border border-border p-3"><dt className="mb-1 text-xs font-medium text-muted-foreground" dir="ltr">{key}</dt><dd className="max-h-64 overflow-auto whitespace-pre-wrap break-words text-sm text-foreground">{textValue(value)}</dd></div>
         ))}</dl>
+        {workflows[table] && typeof selected.id === "string" && <form action={updateWorkflowStatus} className="mt-6 flex flex-wrap items-end gap-3 border-t border-border pt-5">
+          <input type="hidden" name="locale" value={locale} /><input type="hidden" name="table" value={table} /><input type="hidden" name="id" value={selected.id} />
+          <Select name="status" label={t("statusLabel")} defaultValue={String(selected.status ?? "")} containerClassName="min-w-48 flex-1">
+            {workflows[table].map((value) => <option key={value} value={value}>{t("workflowStatus." + value)}</option>)}
+          </Select>
+          <Button type="submit">{t("updateStatus")}</Button>
+        </form>}
       </CardContent></Card>}
     </div>
   </div>;

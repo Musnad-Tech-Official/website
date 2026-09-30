@@ -105,7 +105,7 @@
     "updateStatus": "Update status",
     "database": "Database",
     "databaseTables": "Database tables",
-    "readOnlyExplorer": "Read-only table explorer",
+    "readOnlyExplorer": "Table records and available actions",
     "tableLoadError": "This table could not be loaded. Check its Data API grants and row policies.",
     "emptyTable": "This table has no visible rows.",
     "recordDetails": "Record details",
@@ -142,6 +142,20 @@
       "inquiries": "Inquiries",
       "notifications": "Notifications",
       "profiles": "Profiles"
+    },
+    "workflowStatus": {
+      "pending": "Pending",
+      "published": "Published",
+      "hidden": "Hidden",
+      "rejected": "Rejected",
+      "reviewed": "Reviewed",
+      "dismissed": "Dismissed",
+      "actioned": "Actioned",
+      "submitted": "Submitted",
+      "reviewing": "Reviewing",
+      "shortlisted": "Shortlisted",
+      "hired": "Hired",
+      "withdrawn": "Withdrawn"
     }
   },
   "Brand": {

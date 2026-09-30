@@ -166,3 +166,30 @@ export async function updateInquiry(form: FormData) {
   revalidatePath(`/${locale}/admin`);
   go(base, "saved");
 }
+
+const workflowStatuses = {
+  comments: ["pending", "published", "hidden", "rejected"],
+  comment_reports: ["pending", "reviewed", "dismissed", "actioned"],
+  job_applications: ["submitted", "reviewing", "shortlisted", "rejected", "hired", "withdrawn"],
+} as const;
+
+export async function updateWorkflowStatus(form: FormData) {
+  const supabase = await requireAdmin();
+  const locale = field(form, "locale", 2) === "ar" ? "ar" : "en";
+  const table = field(form, "table", 40);
+  const id = field(form, "id", 36);
+  const nextStatus = field(form, "status", 20);
+  if (!(table in workflowStatuses)) throw new Error("Invalid workflow table");
+  const allowed = workflowStatuses[table as keyof typeof workflowStatuses] as readonly string[];
+  const base = `/${locale}/admin?section=database&table=${table}`;
+  if (!validId(id) || !allowed.includes(nextStatus)) go(base, "invalid");
+
+  const values = table === "comment_reports"
+    ? { status: nextStatus, resolved_at: nextStatus === "pending" ? null : new Date().toISOString() }
+    : { status: nextStatus };
+  const { data, error } = await supabase.from(table).update(values).eq("id", id).select("id").single();
+  if (error || !data) go(base, "error");
+
+  revalidatePath(`/${locale}/admin`);
+  go(base, "saved");
+}

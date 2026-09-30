@@ -6,7 +6,7 @@ The live schema draft defines 24 tables. The public.profiles table is created se
 
 - Protect the admin route with Clerk's server-side metadata.role=admin check.
 - Keep Supabase RLS as the database authorization boundary.
-- Provide a bilingual, responsive overview, specialized editors for projects, articles, and technologies, an inquiry queue, and a read-only explorer for every table.
+- Provide a bilingual, responsive overview, specialized editors for projects, articles, and technologies, an inquiry queue, and an explorer for every table. Support guarded status changes for comments, reports, and applications.
 - Verify build, typing, and localization. Verify the running app with a real Clerk admin session before deployment.
 
 ## Phase 2 — Complete admin workflows

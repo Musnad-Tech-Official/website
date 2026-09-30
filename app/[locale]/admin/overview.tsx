@@ -26,10 +26,10 @@ export async function Overview({ locale }: { locale: string }) {
   const number = (value: number | null) => value === null ? "—" : new Intl.NumberFormat(locale === "ar" ? "ar" : "en").format(value);
   const date = (value: string) => new Intl.DateTimeFormat(locale === "ar" ? "ar" : "en", { dateStyle: "medium" }).format(new Date(value));
   const metrics = [
-    { label: t("projects"), count: projects.count, detail: t("draftCount", { count: draftProjects.count ?? 0 }), href: "/admin?section=projects" },
-    { label: t("articles"), count: articles.count, detail: t("draftCount", { count: draftArticles.count ?? 0 }), href: "/admin?section=articles" },
+    { label: t("projects"), count: projects.count, detail: draftProjects.error ? "—" : t("draftCount", { count: draftProjects.count ?? 0 }), href: "/admin?section=projects" },
+    { label: t("articles"), count: articles.count, detail: draftArticles.error ? "—" : t("draftCount", { count: draftArticles.count ?? 0 }), href: "/admin?section=articles" },
     { label: t("technologies"), count: technologies.count, detail: t("catalogItems"), href: "/admin?section=technologies" },
-    { label: t("inquiries"), count: inquiries.count, detail: t("newCount", { count: newInquiries.count ?? 0 }), href: "/admin?section=inquiries" },
+    { label: t("inquiries"), count: inquiries.count, detail: newInquiries.error ? "—" : t("newCount", { count: newInquiries.count ?? 0 }), href: "/admin?section=inquiries" },
   ];
   const inquiryLabel = (status: string) => status === "in_progress" ? t("status.in_progress") : status === "resolved" ? t("status.resolved") : status === "closed" ? t("status.closed") : t("status.new");
 

@@ -105,7 +105,7 @@
     "updateStatus": "تحديث الحالة",
     "database": "قاعدة البيانات",
     "databaseTables": "جداول قاعدة البيانات",
-    "readOnlyExplorer": "مستعرض جداول للقراءة فقط",
+    "readOnlyExplorer": "سجلات الجداول والإجراءات المتاحة",
     "tableLoadError": "تعذر تحميل هذا الجدول. تحقق من صلاحيات واجهة البيانات وسياسات الصفوف.",
     "emptyTable": "لا توجد صفوف ظاهرة في هذا الجدول.",
     "recordDetails": "تفاصيل السجل",
@@ -142,6 +142,20 @@
       "inquiries": "الاستفسارات",
       "notifications": "الإشعارات",
       "profiles": "الملفات الشخصية"
+    },
+    "workflowStatus": {
+      "pending": "قيد الانتظار",
+      "published": "منشور",
+      "hidden": "مخفي",
+      "rejected": "مرفوض",
+      "reviewed": "تمت المراجعة",
+      "dismissed": "مستبعد",
+      "actioned": "تم اتخاذ إجراء",
+      "submitted": "مقدّم",
+      "reviewing": "قيد المراجعة",
+      "shortlisted": "ضمن القائمة المختصرة",
+      "hired": "تم التوظيف",
+      "withdrawn": "مسحوب"
     }
   },
   "Brand": {
