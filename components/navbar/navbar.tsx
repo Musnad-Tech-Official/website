@@ -91,7 +91,7 @@ export function Navbar({
 
           {/* Authentication Controls */}
           <Show when="signed-out">
-            <SignInButton>
+            <SignInButton mode="modal">
               <Button
                 variant="ghost"
                 size="sm"
@@ -100,7 +100,7 @@ export function Navbar({
                 {labels.signIn}
               </Button>
             </SignInButton>
-            <SignUpButton>
+            <SignUpButton mode="modal">
               <Button
                 variant="outline"
                 size="sm"

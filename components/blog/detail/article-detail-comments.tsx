@@ -1,6 +1,6 @@
 import React from "react";
 import { useTranslations } from "next-intl";
-import { Link } from "@/i18n/routing";
+import { SignInButton, SignUpButton } from "@clerk/nextjs";
 import { LuMessageSquare, LuInfo } from "react-icons/lu";
 import type { ArticleDetailCommentsProps } from "./article-detail-types";
 import { cn } from "@/lib/utils";
@@ -52,18 +52,22 @@ export function ArticleDetailComments({
         </div>
 
         <div className="flex items-center gap-2 text-xs font-semibold">
-          <Link
-            href="/sign-in"
-            className="px-3 py-1.5 rounded-lg bg-primary text-primary-foreground hover:bg-primary-hover transition-colors"
-          >
-            {t("signIn")}
-          </Link>
-          <Link
-            href="/sign-up"
-            className="px-3 py-1.5 rounded-lg bg-muted text-foreground hover:bg-muted/80 transition-colors border border-border/60"
-          >
-            {t("signUp")}
-          </Link>
+          <SignInButton mode="modal">
+            <button
+              type="button"
+              className="px-3 py-1.5 rounded-lg bg-primary text-primary-foreground hover:bg-primary-hover transition-colors cursor-pointer"
+            >
+              {t("signIn")}
+            </button>
+          </SignInButton>
+          <SignUpButton mode="modal">
+            <button
+              type="button"
+              className="px-3 py-1.5 rounded-lg bg-muted text-foreground hover:bg-muted/80 transition-colors border border-border/60 cursor-pointer"
+            >
+              {t("signUp")}
+            </button>
+          </SignUpButton>
         </div>
       </div>
 

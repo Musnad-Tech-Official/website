@@ -42,7 +42,8 @@ export function TrustedCompanies({ className = "" }: TrustedCompaniesProps) {
                     alt={companyName}
                     width={120}
                     height={40}
-                    className="max-h-8 sm:max-h-10 max-w-32.5 w-auto h-auto object-contain filter grayscale opacity-75 dark:opacity-85 dark:brightness-200 transition-all duration-300 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-105"
+                    style={{ width: "auto", height: "auto" }}
+                    className="max-h-8 sm:max-h-10 max-w-32.5 object-contain filter grayscale opacity-75 dark:opacity-85 dark:brightness-200 transition-all duration-300 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-105"
                   />
                 </div>
                 <span className="mt-2 text-[11px] font-medium text-muted-foreground/80 group-hover:text-foreground transition-colors truncate max-w-full text-center">

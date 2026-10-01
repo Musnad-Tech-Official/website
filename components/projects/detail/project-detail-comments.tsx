@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { Link } from "@/i18n/routing";
+import { SignInButton } from "@clerk/nextjs";
 import { Avatar } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -193,12 +193,14 @@ export function ProjectDetailComments({
           </div>
 
           {reason === "signed_out" && (
-            <Link
-              href="/sign-in"
-              className="inline-flex items-center justify-center h-8 px-3.5 text-xs rounded-lg font-medium border border-border bg-background text-foreground hover:bg-muted transition-colors shrink-0 shadow-sm"
-            >
-              {eligibilityMessages.signIn}
-            </Link>
+            <SignInButton mode="modal">
+              <button
+                type="button"
+                className="inline-flex items-center justify-center h-8 px-3.5 text-xs rounded-lg font-medium border border-border bg-background text-foreground hover:bg-muted transition-colors shrink-0 shadow-sm cursor-pointer"
+              >
+                {eligibilityMessages.signIn}
+              </button>
+            </SignInButton>
           )}
         </div>
       )}

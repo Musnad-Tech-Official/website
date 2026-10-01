@@ -30,7 +30,6 @@ export function MobileNav({
   showCareers = true,
   homeHref = DEFAULT_NAV_CONFIG.homeHref,
   contactHref = DEFAULT_NAV_CONFIG.contactHref,
-  signInHref = DEFAULT_NAV_CONFIG.signInHref,
   direction = "ltr",
   labels: customLabels,
   className = "",
@@ -301,7 +300,7 @@ export function MobileNav({
             <div className="flex flex-col gap-2.5 pt-4 border-t border-border/80">
               {/* Authentication Controls */}
               <Show when="signed-out">
-                <SignInButton>
+                <SignInButton mode="modal">
                   <Button
                     variant="outline"
                     size="md"
@@ -312,7 +311,7 @@ export function MobileNav({
                     {labels.signIn}
                   </Button>
                 </SignInButton>
-                <SignUpButton>
+                <SignUpButton mode="modal">
                   <Button
                     variant="outline"
                     size="md"

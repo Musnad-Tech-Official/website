@@ -14,14 +14,14 @@ import { ClerkProvider } from "@clerk/nextjs";
 
 const poppins = Poppins({
   subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700"],
+  weight: ["400", "500", "600", "700"],
   variable: "--font-poppins",
   display: "swap",
 });
 
 const tajawal = Tajawal({
   subsets: ["arabic"],
-  weight: ["300", "400", "500", "700"],
+  weight: ["400", "500", "700"],
   variable: "--font-tajawal",
   display: "swap",
 });
