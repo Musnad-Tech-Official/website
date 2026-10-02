@@ -9,6 +9,7 @@ import { ArticleSidebarShare } from "./article-sidebar-share";
 import { ArticleSidebarNewsletter } from "./article-sidebar-newsletter";
 import { ArticleAuthorBio } from "./article-author-bio";
 import { ArticleShareBox } from "./article-share-box";
+import { ArticleCareersCallout } from "./article-careers-callout";
 import type { ArticleDetailBodyProps, ArticleFontSize } from "./article-detail-types";
 import { cn } from "@/lib/utils";
 
@@ -66,6 +67,9 @@ export function ArticleDetailBody({
               ))}
             </div>
           )}
+
+          {/* Contextual Engineering Careers Callout (Stripe/Linear tech blog standard) */}
+          <ArticleCareersCallout category={article.category} />
 
           {/* Author Bio (only if author exists) */}
           <ArticleAuthorBio author={article.author} />
