@@ -1,10 +1,40 @@
-import { clerkMiddleware } from "@clerk/nextjs/server";
+import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 import createMiddleware from "next-intl/middleware";
 import { routing } from "./i18n/routing";
+import { NextResponse } from "next/server";
 
 const intlMiddleware = createMiddleware(routing);
 
+const isAdminRoute = createRouteMatcher(["/:locale/admin(.*)", "/admin(.*)"]);
+
 export const proxy = clerkMiddleware(async (auth, request) => {
+  const pathname = request.nextUrl.pathname;
+  const isMatchAdmin = isAdminRoute(request);
+
+  if (isMatchAdmin) {
+    const session = await auth();
+
+    // 1. If not logged in, redirect to Clerk sign-in with return URL
+    if (!session.userId) {
+      return session.redirectToSignIn({ returnBackUrl: request.url });
+    }
+
+    // 2. Check admin role in sessionClaims.metadata.role
+    const role = session.sessionClaims?.metadata?.role;
+    if (role !== "admin") {
+      const segments = pathname.split("/").filter(Boolean);
+      const locale = routing.locales.includes(segments[0] as "en" | "ar")
+        ? segments[0]
+        : routing.defaultLocale;
+      const url = new URL(`/${locale}`, request.url);
+      return NextResponse.redirect(url);
+    }
+
+    request.headers.set("x-is-admin-route", "1");
+  }
+
+  request.headers.set("x-pathname", pathname);
+
   return intlMiddleware(request);
 });
 

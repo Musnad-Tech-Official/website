@@ -1458,5 +1458,49 @@
         "buttonText": "Email us"
       }
     }
+  },
+  "Admin": {
+    "nav": {
+      "dashboard": "Overview",
+      "projects": "Projects",
+      "articles": "Articles CMS",
+      "inquiries": "Client Inquiries",
+      "users": "Team & Roles",
+      "settings": "System Settings",
+      "viewSite": "View Live Site",
+      "roleBadge": "Admin Portal"
+    },
+    "header": {
+      "searchPlaceholder": "Search dashboard, projects, articles... (Cmd + K)",
+      "notifications": "Notifications",
+      "newAction": "New Entry"
+    },
+    "cockpit": {
+      "badge": "Operational Cockpit",
+      "title": "System Overview & Analytics",
+      "description": "Real-time performance metrics, operational workflows, and system health status.",
+      "kpi": {
+        "projects": "Active Projects",
+        "projectsSub": "Across all engineering stages",
+        "articles": "Published Articles",
+        "articlesSub": "Engineering insights & updates",
+        "inquiries": "Client Inquiries",
+        "inquiriesSub": "Pending review & response",
+        "users": "System Accounts",
+        "usersSub": "Admins & verified contributors"
+      },
+      "actions": {
+        "quickTitle": "Quick Management Actions",
+        "createArticle": "Draft Technical Article",
+        "createProject": "Register New Project",
+        "reviewInquiries": "Review Client Inquiries",
+        "manageTeam": "Manage Team Access"
+      },
+      "activity": {
+        "title": "Recent Operational Activity",
+        "viewAll": "View Audit Log",
+        "empty": "No recent actions recorded."
+      }
+    }
   }
 }
