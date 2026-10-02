@@ -2,7 +2,7 @@ import { useTranslations } from "next-intl";
 import { FooterBrand } from "./footer-brand";
 import { FooterLinks } from "./footer-links";
 import { FooterBottom } from "./footer-bottom";
-import { getFooterSections } from "./footer-config";
+import { getFooterSections, filterFooterSectionsByVisibility } from "./footer-config";
 import type { FooterProps } from "./footer-types";
 import { cn } from "@/lib/utils";
 
@@ -21,10 +21,12 @@ export function Footer({
   locale,
   direction = "ltr",
   className = "",
+  pageSettings,
 }: FooterProps) {
   const t = useTranslations("Footer");
   const tBrand = useTranslations("Brand");
-  const sections = getFooterSections(t);
+  const rawSections = getFooterSections(t);
+  const sections = filterFooterSectionsByVisibility(rawSections, pageSettings);
 
   return (
     <footer

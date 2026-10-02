@@ -6,6 +6,7 @@ import {
   ContactForm,
   ContactInfoCards,
 } from "@/components/contact";
+import { PageGuard } from "@/lib/page-control/guard";
 
 interface ContactPageProps {
   params: Promise<{ locale: string }>;
@@ -30,7 +31,8 @@ export default async function ContactPage({ params }: ContactPageProps) {
   const contactInfo = getContactInfo(locale);
 
   return (
-    <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 w-full flex-1 pb-16 sm:pb-24 lg:pb-32">
+    <PageGuard slug="contact" locale={locale}>
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 w-full flex-1 pb-16 sm:pb-24 lg:pb-32">
       {/* 1. Page Header with Breadcrumbs, Eyebrow, Title & Subtitle */}
       <ContactHeader
         eyebrow={tHeader("eyebrow")}
@@ -63,5 +65,6 @@ export default async function ContactPage({ params }: ContactPageProps) {
         </aside>
       </div>
     </div>
+    </PageGuard>
   );
 }

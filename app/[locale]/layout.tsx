@@ -11,7 +11,9 @@ import { getMessages } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { routing } from "@/i18n/routing";
 import { ClerkProvider } from "@clerk/nextjs";
+import { auth } from "@clerk/nextjs/server";
 import { headers } from "next/headers";
+import { getPageControlsAction } from "@/lib/page-control/actions";
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -64,6 +66,10 @@ export default async function LocaleLayout({
   const activeFont = isRtl ? tajawal : poppins;
   const announcement = getAnnouncement(locale);
 
+  const pageSettings = isAdminRoute ? [] : await getPageControlsAction();
+  const { sessionClaims } = await auth();
+  const isAdmin = sessionClaims?.metadata?.role === "admin";
+
   return (
     <html
       lang={locale}
@@ -90,9 +96,15 @@ export default async function LocaleLayout({
                     direction={isRtl ? "rtl" : "ltr"}
                     announcement={announcement}
                     utilities={<NavbarUtilities />}
+                    pageSettings={pageSettings}
+                    isAdmin={isAdmin}
                   />
                   <main className="flex-1 flex flex-col">{children}</main>
-                  <Footer locale={locale} direction={isRtl ? "rtl" : "ltr"} />
+                  <Footer
+                    locale={locale}
+                    direction={isRtl ? "rtl" : "ltr"}
+                    pageSettings={pageSettings}
+                  />
                 </>
               )}
             </ThemeProvider>

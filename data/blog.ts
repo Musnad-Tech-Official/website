@@ -1,21 +1,4 @@
-/**
- * Musnad Tech — Blog Frontend Data Fixtures
- *
- * ARCHITECTURAL NOTE:
- * This file contains typed frontend-only fixtures for Page 18 (Blog Listing).
- *
- * CONTENT INTEGRITY POLICY:
- * In accordance with repository content integrity rules, these temporary
- * fixtures use neutral preview copy. No unsupported technical claims,
- * unverified author attributions, fabricated publication dates, or fake
- * engagement metrics are included.
- *
- * FUTURE BACKEND INTEGRATION:
- * The future Backend Owner will replace local fixture resolvers with real
- * CMS/database queries.
- * The core routing identity is:
- *   - slug: Stable URL-safe slug used for /blog/[slug] dynamic routing
- */
+
 
 export interface BlogAuthor {
   id?: string;
@@ -35,6 +18,7 @@ export interface BlogArticle {
   publishedAt?: string;
   readTime?: string;
 
+  coverImage?: string;
   layoutVariant?: "default" | "featured";
   visualKey?: string;
   previewGradient?: string;

@@ -6,6 +6,7 @@ import {
   ProjectsExplorer,
 } from "@/components/projects";
 import { CTA } from "@/components/ui";
+import { PageGuard } from "@/lib/page-control/guard";
 
 interface ProjectsPageProps {
   params: Promise<{ locale: string }>;
@@ -31,28 +32,30 @@ export default async function ProjectsPage({ params }: ProjectsPageProps) {
   const projects = getProjects(locale);
 
   return (
-    <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 w-full flex-1">
-      {/* 1. Header & Breadcrumbs */}
-      <ProjectsHeader
-        eyebrow={t("header.eyebrow")}
-        title={t("header.title")}
-        subtitle={t("header.subtitle")}
-        homeLabel={t("breadcrumb.home")}
-        projectsLabel={t("breadcrumb.projects")}
-        breadcrumbLabel={t("breadcrumb.label")}
-      />
+    <PageGuard slug="projects" locale={locale}>
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 w-full flex-1">
+        {/* 1. Header & Breadcrumbs */}
+        <ProjectsHeader
+          eyebrow={t("header.eyebrow")}
+          title={t("header.title")}
+          subtitle={t("header.subtitle")}
+          homeLabel={t("breadcrumb.home")}
+          projectsLabel={t("breadcrumb.projects")}
+          breadcrumbLabel={t("breadcrumb.label")}
+        />
 
-      {/* 2. Interactive Search, Filter & Projects Grid */}
-      <ProjectsExplorer projects={projects} locale={locale} />
+        {/* 2. Interactive Search, Filter & Projects Grid */}
+        <ProjectsExplorer projects={projects} locale={locale} />
 
-      {/* 3. Project Inquiry Callout Banner (Reusable CTA component) */}
-      <CTA
-        variant="projects"
-        title={t("cta.title")}
-        subtitle={t("cta.subtitle")}
-        buttonLabel={t("cta.button")}
-        contactHref="/contact"
-      />
-    </div>
+        {/* 3. Project Inquiry Callout Banner (Reusable CTA component) */}
+        <CTA
+          variant="projects"
+          title={t("cta.title")}
+          subtitle={t("cta.subtitle")}
+          buttonLabel={t("cta.button")}
+          contactHref="/contact"
+        />
+      </div>
+    </PageGuard>
   );
 }

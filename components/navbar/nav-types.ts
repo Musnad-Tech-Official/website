@@ -67,8 +67,11 @@ export interface MobileNavProps {
   labels?: NavLabels;
   utilities?: ReactNode;
   showUtilities?: boolean;
+  isAdmin?: boolean;
   className?: string;
 }
+
+import type { PageControlItem } from "@/lib/page-control/types";
 
 export interface NavbarProps {
   currentPath?: string;
@@ -82,6 +85,8 @@ export interface NavbarProps {
   locale?: string;
   direction?: "ltr" | "rtl";
   customItems?: NavItem[];
+  pageSettings?: PageControlItem[];
+  isAdmin?: boolean;
   labels?: NavLabels;
   utilities?: ReactNode;
   showUtilities?: boolean;

@@ -6,6 +6,7 @@ import {
   ServicesProcess,
 } from "@/components/services";
 import { CtaSection } from "@/components/ui/cta-section";
+import { PageGuard } from "@/lib/page-control/guard";
 
 interface ServicesPageProps {
   params: Promise<{ locale: string }>;
@@ -28,7 +29,8 @@ export default async function ServicesPage({ params }: ServicesPageProps) {
   const t = await getTranslations({ locale, namespace: "Services" });
 
   return (
-    <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 w-full flex-1">
+    <PageGuard slug="services" locale={locale}>
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 w-full flex-1">
       {/* 1. Services Page Intro & Breadcrumb */}
       <ServicesIntro
         eyebrow={t("intro.eyebrow")}
@@ -58,5 +60,6 @@ export default async function ServicesPage({ params }: ServicesPageProps) {
         }}
       />
     </div>
+    </PageGuard>
   );
 }

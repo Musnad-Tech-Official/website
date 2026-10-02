@@ -44,6 +44,11 @@ export function AdminSidebar({
       exact: true,
     },
     {
+      title: t("nav.pages"),
+      href: "/admin/pages",
+      icon: LuGlobe,
+    },
+    {
       title: t("nav.projects"),
       href: "/admin/projects",
       icon: LuFolderGit2,

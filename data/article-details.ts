@@ -1,24 +1,4 @@
-/**
- * Musnad Tech — Dynamic Article Detail Data & Resolvers
- *
- * ARCHITECTURAL NOTE:
- * This file provides the typed data contract and local frontend fixtures
- * for the dynamic Article Detail template (Page 19-23).
- *
- * All current and future articles resolve through the single dynamic route:
- *   app/[locale]/blog/[slug]/page.tsx
- *
- * CONTENT INTEGRITY POLICY:
- * In accordance with repository content integrity rules, these temporary
- * fixtures use neutral preview copy. No unsupported technical claims,
- * unverified author attributions, fabricated publication dates, fake
- * engagement metrics, or speculative citation metadata are included.
- *
- * FUTURE BACKEND INTEGRATION:
- * The future Backend Owner will replace local fixture resolvers with real
- * CMS/database queries (e.g., Supabase lookup by slug -> stable internal ID).
- * The Article Detail presentation components remain fully data-driven.
- */
+
 
 export type ArticleContentBlock =
   | { type: "paragraph"; text: string }
@@ -50,6 +30,7 @@ export interface ArticleAuthorData {
   name: string;
   role?: string;
   bio?: string;
+  avatar?: string;
   initials?: string;
   topics?: string[];
 }
@@ -90,7 +71,9 @@ export interface ArticleDetailData {
   readTime?: string;
 
   hero?: ArticleHeroData;
+  coverImage?: string;
   intro?: string[];
+  contentHtml?: string;
   blocks?: ArticleContentBlock[];
   tableOfContents?: ArticleTocItem[];
   citation?: ArticleCitationData;

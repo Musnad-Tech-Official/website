@@ -43,8 +43,11 @@ export interface FooterBottomProps {
   className?: string;
 }
 
+import type { PageControlItem } from "@/lib/page-control/types";
+
 export interface FooterProps {
   locale?: string;
   direction?: "ltr" | "rtl";
   className?: string;
+  pageSettings?: PageControlItem[];
 }

@@ -9,6 +9,7 @@ import {
   MilestonesSection,
   AboutCta,
 } from "@/components/about";
+import { PageGuard } from "@/lib/page-control/guard";
 
 interface AboutPageProps {
   params: Promise<{ locale: string }>;
@@ -27,12 +28,12 @@ export async function generateMetadata({
 }
 
 export default async function AboutPage({ params }: AboutPageProps) {
-  // Await params per Next.js 15+ conventions
-  await params;
+  const { locale } = await params;
 
   return (
-    <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 w-full flex-1 space-y-16 sm:space-y-24 lg:space-y-28 py-4 sm:py-6 lg:py-8">
-      {/* 1. About Intro / Page Hero */}
+    <PageGuard slug="about" locale={locale}>
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 w-full flex-1 space-y-16 sm:space-y-24 lg:space-y-28 py-4 sm:py-6 lg:py-8">
+        {/* 1. About Intro / Page Hero */}
       <AboutIntro />
 
       {/* 2. Mission & Vision */}
@@ -53,5 +54,6 @@ export default async function AboutPage({ params }: AboutPageProps) {
       {/* 7. Final Project CTA */}
       <AboutCta />
     </div>
+    </PageGuard>
   );
 }

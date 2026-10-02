@@ -1462,6 +1462,7 @@
   "Admin": {
     "nav": {
       "dashboard": "Overview",
+      "pages": "Pages Management",
       "projects": "Projects",
       "articles": "Articles CMS",
       "inquiries": "Client Inquiries",

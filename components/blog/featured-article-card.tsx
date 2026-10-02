@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 import React from "react";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/routing";
@@ -30,25 +31,43 @@ export function FeaturedArticleCard({
         <div
           className={cn(
             "relative w-full lg:w-1/2 min-h-[220px] sm:min-h-[280px] lg:min-h-[320px] bg-linear-to-br border-b lg:border-b-0 lg:border-e border-border/60 overflow-hidden flex items-center justify-center",
-            article.previewGradient || "from-zinc-800/90 via-zinc-900/70 to-zinc-950"
+            !article.coverImage && (article.previewGradient || "from-zinc-800/90 via-zinc-900/70 to-zinc-950")
           )}
         >
-          {/* Subtle architectural background texture */}
-          <div
-            aria-hidden="true"
-            className="absolute inset-0 opacity-[0.14] dark:opacity-[0.20] pointer-events-none"
-            style={{
-              backgroundImage:
-                "radial-gradient(circle at 1px 1px, currentColor 1px, transparent 0)",
-              backgroundSize: "24px 24px",
-            }}
-          />
+          {article.coverImage ? (
+            <img
+              src={article.coverImage}
+              alt={article.title}
+              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+            />
+          ) : (
+            <>
+              {/* Subtle architectural background texture */}
+              <div
+                aria-hidden="true"
+                className="absolute inset-0 opacity-[0.14] dark:opacity-[0.20] pointer-events-none"
+                style={{
+                  backgroundImage:
+                    "radial-gradient(circle at 1px 1px, currentColor 1px, transparent 0)",
+                  backgroundSize: "24px 24px",
+                }}
+              />
 
-          {/* Ambient gradient aura */}
-          <div
-            aria-hidden="true"
-            className="absolute -top-12 -right-12 h-48 w-48 rounded-full bg-primary/15 blur-3xl dark:bg-primary/25 pointer-events-none"
-          />
+              {/* Ambient gradient aura */}
+              <div
+                aria-hidden="true"
+                className="absolute -top-12 -right-12 h-48 w-48 rounded-full bg-primary/15 blur-3xl dark:bg-primary/25 pointer-events-none"
+              />
+
+              {/* Center decorative emblem */}
+              <div
+                aria-hidden="true"
+                className="h-14 w-14 rounded-2xl border border-border/40 bg-background/30 backdrop-blur-xs flex items-center justify-center text-muted-foreground/60 shadow-xs group-hover:scale-105 transition-transform"
+              >
+                <LuArrowUpRight className="h-6 w-6 rtl:-scale-x-100" />
+              </div>
+            </>
+          )}
 
           {/* Featured Presentation Overlaid Badge */}
           {article.layoutVariant === "featured" && (
@@ -59,14 +78,6 @@ export function FeaturedArticleCard({
               </span>
             </div>
           )}
-
-          {/* Center decorative emblem */}
-          <div
-            aria-hidden="true"
-            className="h-14 w-14 rounded-2xl border border-border/40 bg-background/30 backdrop-blur-xs flex items-center justify-center text-muted-foreground/60 shadow-xs group-hover:scale-105 transition-transform"
-          >
-            <LuArrowUpRight className="h-6 w-6 rtl:-scale-x-100" />
-          </div>
         </div>
 
         {/* Content Body */}

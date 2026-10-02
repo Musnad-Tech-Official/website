@@ -8,11 +8,13 @@ import {
   DEFAULT_NAV_LABELS,
   ARABIC_NAV_LABELS,
   getLocalizedNavItems,
+  filterNavItemsByVisibility,
 } from "./nav-config";
 import { NavLogo } from "./nav-logo";
 import { NavLinks } from "./nav-links";
 import { MobileNav } from "./mobile-nav";
 import { AnnouncementBanner } from "./announcement-banner";
+import { LuShieldCheck } from "react-icons/lu";
 import { cn } from "@/lib/utils";
 
 /**
@@ -36,13 +38,16 @@ export function Navbar({
   locale,
   direction = "ltr",
   customItems,
+  pageSettings,
+  isAdmin = false,
   labels: customLabels,
   utilities,
   showUtilities = true,
   className = "",
 }: NavbarProps) {
   // Locale-aware default items and labels
-  const navItems = customItems || getLocalizedNavItems(locale);
+  const rawNavItems = customItems || getLocalizedNavItems(locale);
+  const navItems = filterNavItemsByVisibility(rawNavItems, pageSettings);
   const defaultLabels = locale === "ar" ? ARABIC_NAV_LABELS : DEFAULT_NAV_LABELS;
   const labels = { ...defaultLabels, ...customLabels };
   const stickyClass = isSticky ? "sticky top-0 z-40" : "relative";
@@ -111,6 +116,18 @@ export function Navbar({
             </SignUpButton>
           </Show>
           <Show when="signed-in">
+            {isAdmin && (
+              <Link href="/admin">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="font-semibold text-xs border-primary/40 bg-primary/5 text-primary hover:bg-primary/10 hover:border-primary gap-1.5 shadow-xs px-3 h-9 rounded-lg cursor-pointer"
+                >
+                  <LuShieldCheck className="w-3.5 h-3.5 text-primary" />
+                  <span>{locale === "ar" ? "لوحة التحكم" : "Dashboard"}</span>
+                </Button>
+              </Link>
+            )}
             <UserButton />
           </Show>
 
@@ -146,6 +163,7 @@ export function Navbar({
             signInHref={signInHref}
             direction={direction}
             labels={labels}
+            isAdmin={isAdmin}
           />
         </div>
       </div>

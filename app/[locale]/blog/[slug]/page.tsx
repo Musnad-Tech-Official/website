@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
-import { getArticleDetail } from "@/data/article-details";
-import { getBlogArticles } from "@/data/blog";
+import type { ArticleDetailData } from "@/data/article-details";
+import type { BlogArticle } from "@/data/blog";
+import { getArticleBySlugAction, getArticlesAction } from "@/lib/articles/actions";
 import {
   ArticleDetailHeader,
   ArticleDetailBody,
@@ -15,21 +16,51 @@ interface ArticleDetailPageProps {
   params: Promise<{ locale: string; slug: string }>;
 }
 
+function processHtmlHeadings(html: string) {
+  let counter = 0;
+  const items: { id: string; label: string; level?: 2 | 3 }[] = [];
+
+  const processedHtml = html.replace(/<h([23])([^>]*)>(.*?)<\/h\1>/gi, (full, levelStr, attrs, inner) => {
+    const level = parseInt(levelStr, 10) as 2 | 3;
+    const text = inner.replace(/<[^>]+>/g, "").trim();
+    if (!text) return full;
+
+    const idMatch = attrs.match(/id=["']([^"']+)["']/);
+    const id = idMatch ? idMatch[1] : `section-${++counter}-${text.toLowerCase().replace(/[^\w\s-]/g, "").replace(/\s+/g, "-")}`;
+
+    items.push({ id, label: text, level });
+
+    if (idMatch) {
+      return full;
+    }
+    return `<h${level}${attrs} id="${id}">${inner}</h${level}>`;
+  });
+
+  return { processedHtml, tocItems: items };
+}
+
 export async function generateMetadata({
   params,
 }: ArticleDetailPageProps): Promise<Metadata> {
   const { locale, slug } = await params;
-  const article = getArticleDetail(slug, locale);
+  const dbArticle = await getArticleBySlugAction(slug);
 
-  if (!article) {
+  if (!dbArticle) {
     return {};
   }
+
+  const title = locale === "ar"
+    ? (dbArticle.titleAr || dbArticle.titleEn)
+    : (dbArticle.titleEn || dbArticle.titleAr);
+  const excerpt = locale === "ar"
+    ? (dbArticle.excerptAr || dbArticle.excerptEn)
+    : (dbArticle.excerptEn || dbArticle.excerptAr);
 
   const t = await getTranslations({ locale, namespace: "ArticleDetail" });
 
   return {
-    title: t("meta.titleTemplate", { title: article.title }),
-    description: article.excerpt || t("meta.defaultDescription"),
+    title: t("meta.titleTemplate", { title }),
+    description: excerpt || t("meta.defaultDescription"),
   };
 }
 
@@ -37,17 +68,60 @@ export default async function ArticleDetailPage({
   params,
 }: ArticleDetailPageProps) {
   const { locale, slug } = await params;
-  const article = getArticleDetail(slug, locale);
+  const dbArticle = await getArticleBySlugAction(slug);
 
-  if (!article) {
+  if (!dbArticle) {
     notFound();
   }
 
   const t = await getTranslations({ locale, namespace: "ArticleDetail" });
 
-  // Related articles: select up to 3 other articles from approved blog fixtures
-  const allArticles = getBlogArticles(locale);
-  const relatedArticles = allArticles
+  const isAr = locale === "ar";
+  const rawHtml = isAr
+    ? (dbArticle.contentHtmlAr || dbArticle.contentHtmlEn || "")
+    : (dbArticle.contentHtmlEn || dbArticle.contentHtmlAr || "");
+
+  const { processedHtml, tocItems } = processHtmlHeadings(rawHtml);
+
+  const article: ArticleDetailData = {
+    id: dbArticle.id,
+    slug: dbArticle.slug,
+    title: isAr ? (dbArticle.titleAr || dbArticle.titleEn) : (dbArticle.titleEn || dbArticle.titleAr),
+    excerpt: isAr ? (dbArticle.excerptAr || dbArticle.excerptEn) : (dbArticle.excerptEn || dbArticle.excerptAr),
+    coverImage: dbArticle.coverImage,
+    category: dbArticle.category,
+    categorySlug: dbArticle.categorySlug,
+    tags: dbArticle.tags,
+    publishedAt: dbArticle.publishedAt,
+    readTime: isAr ? dbArticle.readTimeAr : dbArticle.readTimeEn,
+    author: {
+      name: dbArticle.authorName,
+      role: dbArticle.authorRole,
+      avatar: dbArticle.authorAvatar,
+    },
+    contentHtml: processedHtml,
+    tableOfContents: tocItems.length > 0 ? tocItems : undefined,
+  };
+
+  // Related articles: from other database published articles
+  const dbPublished = await getArticlesAction("published");
+
+  const mappedPublished: BlogArticle[] = dbPublished.map((a) => ({
+    id: a.id,
+    slug: a.slug,
+    title: locale === "ar" ? (a.titleAr || a.titleEn) : (a.titleEn || a.titleAr),
+    excerpt: locale === "ar" ? (a.excerptAr || a.excerptEn) : (a.excerptEn || a.excerptAr),
+    coverImage: a.coverImage,
+    category: a.category,
+    categorySlug: a.categorySlug,
+    tags: a.tags,
+    publishedAt: a.publishedAt,
+    readTime: locale === "ar" ? a.readTimeAr : a.readTimeEn,
+    layoutVariant: a.layoutVariant,
+    author: { name: a.authorName },
+  }));
+
+  const relatedArticles = mappedPublished
     .filter((a) => a.slug !== article.slug)
     .slice(0, 3);
 
@@ -57,6 +131,7 @@ export default async function ArticleDetailPage({
       <ArticleDetailHeader
         title={article.title}
         excerpt={article.excerpt}
+        coverImage={article.coverImage}
         category={article.category}
         author={article.author}
         publishedAt={article.publishedAt}
@@ -66,7 +141,7 @@ export default async function ArticleDetailPage({
         breadcrumbLabel={t("breadcrumb.label")}
       />
 
-      {/* 2. Main Body (Content Blocks) & Sidebar Widgets (TOC, Font Size, Cite, Share, Newsletter) */}
+      {/* 2. Main Body (Content Blocks or Tiptap HTML) & Sidebar Widgets (TOC, Font Size, Cite, Share, Newsletter) */}
       <ArticleDetailBody article={article} />
 
       {/* 3. Related Articles */}
@@ -86,3 +161,4 @@ export default async function ArticleDetailPage({
     </div>
   );
 }
+

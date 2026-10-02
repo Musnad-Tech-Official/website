@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 import React from "react";
 import { Link } from "@/i18n/routing";
 import { Badge } from "@/components/ui/badge";
@@ -9,6 +10,7 @@ import { cn } from "@/lib/utils";
 export function ArticleDetailHeader({
   title,
   excerpt,
+  coverImage,
   category,
   author,
   publishedAt,
@@ -61,6 +63,17 @@ export function ArticleDetailHeader({
         </ol>
       </nav>
 
+      {/* Full-width Cover Image BEFORE Title */}
+      {coverImage && (
+        <div className="relative w-full aspect-video sm:aspect-21/9 max-h-[520px] rounded-2xl overflow-hidden mb-8 sm:mb-10 border border-border/80 bg-muted/40 shadow-sm">
+          <img
+            src={coverImage}
+            alt={title}
+            className="w-full h-full object-cover"
+          />
+        </div>
+      )}
+
       {/* 2. Optional Category Eyebrow Badge */}
       {category && (
         <div className="mb-4">
@@ -88,13 +101,21 @@ export function ArticleDetailHeader({
         {hasMetadata ? (
           <div className="flex items-center flex-wrap gap-3 sm:gap-4 text-xs sm:text-sm text-muted-foreground">
             {author && (
-              <div className="flex items-center gap-2">
-                <div
-                  aria-hidden="true"
-                  className="h-7 w-7 rounded-full bg-primary/10 text-primary font-bold text-xs flex items-center justify-center border border-primary/20 shrink-0"
-                >
-                  {author.initials || author.name.charAt(0)}
-                </div>
+              <div className="flex items-center gap-2.5">
+                {author.avatar ? (
+                  <img
+                    src={author.avatar}
+                    alt={author.name}
+                    className="h-8 w-8 rounded-full object-cover border border-border/80 shrink-0"
+                  />
+                ) : (
+                  <div
+                    aria-hidden="true"
+                    className="h-8 w-8 rounded-full bg-primary/10 text-primary font-bold text-xs flex items-center justify-center border border-primary/20 shrink-0"
+                  >
+                    {author.initials || author.name.charAt(0)}
+                  </div>
+                )}
                 <div className="flex flex-col sm:flex-row sm:items-center gap-0.5 sm:gap-1.5">
                   <span className="font-semibold text-foreground">
                     {author.name}

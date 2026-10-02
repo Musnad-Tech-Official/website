@@ -7,6 +7,7 @@ import {
   TeamCulture,
 } from "@/components/team";
 import { CtaSection } from "@/components/ui/cta-section";
+import { PageGuard } from "@/lib/page-control/guard";
 
 interface TeamPageProps {
   params: Promise<{ locale: string }>;
@@ -32,7 +33,8 @@ export default async function TeamPage({ params }: TeamPageProps) {
   const stats = getTeamStats(locale);
 
   return (
-    <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 w-full flex-1">
+    <PageGuard slug="team" locale={locale}>
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 w-full flex-1">
       {/* 1. Header & Breadcrumbs */}
       <TeamHeader
         eyebrow={t("header.eyebrow")}
@@ -72,5 +74,6 @@ export default async function TeamPage({ params }: TeamPageProps) {
         }}
       />
     </div>
+    </PageGuard>
   );
 }
