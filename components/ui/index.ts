@@ -15,6 +15,7 @@ export * from "./tooltip";
 export * from "./cta-section";
 export * from "./page-header";
 export * from "./empty-state";
+export * from "./rich-text-editor";
 export * from "../theme-switcher";
 export * from "../language-switcher";
 export * from "../navbar-utilities";

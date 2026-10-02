@@ -4,7 +4,13 @@ import React, { useState } from "react";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { LuCopy, LuCheck } from "react-icons/lu";
-import { FaXTwitter, FaLinkedinIn } from "react-icons/fa6";
+import {
+  FaXTwitter,
+  FaLinkedinIn,
+  FaWhatsapp,
+  FaTelegram,
+  FaFacebookF,
+} from "react-icons/fa6";
 import type { ArticleShareBoxProps } from "./article-detail-types";
 import { cn } from "@/lib/utils";
 
@@ -36,6 +42,17 @@ export function ArticleShareBox({
     }
   };
 
+  const handleShareWhatsApp = () => {
+    const text = encodeURIComponent(`${title}\n${getUrl()}`);
+    if (typeof window !== "undefined") {
+      window.open(
+        `https://api.whatsapp.com/send?text=${text}`,
+        "_blank",
+        "noopener,noreferrer"
+      );
+    }
+  };
+
   const handleShareX = () => {
     const url = encodeURIComponent(getUrl());
     const text = encodeURIComponent(`${title} — Musnad Tech`);
@@ -53,6 +70,29 @@ export function ArticleShareBox({
     if (typeof window !== "undefined") {
       window.open(
         `https://www.linkedin.com/sharing/share-offsite/?url=${url}`,
+        "_blank",
+        "noopener,noreferrer"
+      );
+    }
+  };
+
+  const handleShareTelegram = () => {
+    const url = encodeURIComponent(getUrl());
+    const text = encodeURIComponent(title);
+    if (typeof window !== "undefined") {
+      window.open(
+        `https://t.me/share/url?url=${url}&text=${text}`,
+        "_blank",
+        "noopener,noreferrer"
+      );
+    }
+  };
+
+  const handleShareFacebook = () => {
+    const url = encodeURIComponent(getUrl());
+    if (typeof window !== "undefined") {
+      window.open(
+        `https://www.facebook.com/sharer/sharer.php?u=${url}`,
         "_blank",
         "noopener,noreferrer"
       );
@@ -104,9 +144,20 @@ export function ArticleShareBox({
           type="button"
           variant="outline"
           size="sm"
+          onClick={handleShareWhatsApp}
+          aria-label="Share on WhatsApp"
+          className="rounded-xl p-2.5 text-xs hover:bg-emerald-500/10 hover:border-emerald-500/30 transition-colors"
+        >
+          <FaWhatsapp className="h-3.5 w-3.5 text-[#25D366]" aria-hidden="true" />
+        </Button>
+
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
           onClick={handleShareX}
           aria-label="Share on X"
-          className="rounded-xl p-2.5 text-xs"
+          className="rounded-xl p-2.5 text-xs hover:bg-foreground/5 transition-colors"
         >
           <FaXTwitter className="h-3.5 w-3.5" aria-hidden="true" />
         </Button>
@@ -117,9 +168,31 @@ export function ArticleShareBox({
           size="sm"
           onClick={handleShareLinkedIn}
           aria-label="Share on LinkedIn"
-          className="rounded-xl p-2.5 text-xs"
+          className="rounded-xl p-2.5 text-xs hover:bg-[#0077b5]/10 hover:border-[#0077b5]/30 transition-colors"
         >
           <FaLinkedinIn className="h-3.5 w-3.5 text-[#0077b5]" aria-hidden="true" />
+        </Button>
+
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          onClick={handleShareTelegram}
+          aria-label="Share on Telegram"
+          className="rounded-xl p-2.5 text-xs hover:bg-[#229ED9]/10 hover:border-[#229ED9]/30 transition-colors"
+        >
+          <FaTelegram className="h-3.5 w-3.5 text-[#229ED9]" aria-hidden="true" />
+        </Button>
+
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          onClick={handleShareFacebook}
+          aria-label="Share on Facebook"
+          className="rounded-xl p-2.5 text-xs hover:bg-[#1877F2]/10 hover:border-[#1877F2]/30 transition-colors"
+        >
+          <FaFacebookF className="h-3.5 w-3.5 text-[#1877F2]" aria-hidden="true" />
         </Button>
       </div>
     </section>

@@ -20,6 +20,7 @@ export type {
 export interface ArticleDetailHeaderProps {
   title: string;
   excerpt: string;
+  coverImage?: string;
   category?: string;
   author?: ArticleAuthorData;
   publishedAt?: string;

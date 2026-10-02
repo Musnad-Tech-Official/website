@@ -9,6 +9,7 @@ import { DEFAULT_NAV_CONFIG, DEFAULT_NAV_LABELS } from "./nav-config";
 import { NavLogo } from "./nav-logo";
 import { NavLinks } from "./nav-links";
 import { getFocusableElements } from "./nav-utils";
+import { LuShieldCheck } from "react-icons/lu";
 import { cn } from "@/lib/utils";
 
 /**
@@ -32,6 +33,7 @@ export function MobileNav({
   contactHref = DEFAULT_NAV_CONFIG.contactHref,
   direction = "ltr",
   labels: customLabels,
+  isAdmin = false,
   className = "",
 }: MobileNavProps) {
   // Mounting and animation states
@@ -325,6 +327,25 @@ export function MobileNav({
               </Show>
 
               <Show when="signed-in">
+                {isAdmin && (
+                  <Link
+                    href="/admin"
+                    onClick={handleClose}
+                    className="w-full block mb-2"
+                  >
+                    <Button
+                      variant="outline"
+                      size="md"
+                      fullWidth
+                      className="rounded-xl font-semibold border-primary/40 bg-primary/5 text-primary hover:bg-primary/10 gap-2 h-11"
+                    >
+                      <LuShieldCheck className="w-4 h-4 text-primary" />
+                      <span>
+                        {direction === "rtl" ? "لوحة تحكم المسؤول" : "Admin Dashboard"}
+                      </span>
+                    </Button>
+                  </Link>
+                )}
                 <div className="flex items-center justify-between p-3 rounded-xl bg-muted/40 border border-border/40">
                   <span className="text-sm font-medium text-foreground">
                     {direction === "rtl" ? "الحساب الشخصي" : "My Account"}

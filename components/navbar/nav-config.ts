@@ -92,3 +92,23 @@ export function getLocalizedNavItems(locale?: string): NavItem[] {
   return DEFAULT_NAV_ITEMS;
 }
 
+import type { PageControlItem } from "@/lib/page-control/types";
+
+/**
+ * Filters navigation items according to administrator visibility settings.
+ */
+export function filterNavItemsByVisibility(
+  items: NavItem[],
+  pageSettings?: PageControlItem[]
+): NavItem[] {
+  if (!pageSettings || pageSettings.length === 0) return items;
+
+  return items.filter((item) => {
+    const setting = pageSettings.find(
+      (p) => p.id === item.id || p.path === item.href
+    );
+    if (!setting) return true;
+    return setting.showInNavbar !== false && setting.status !== "hidden";
+  });
+}
+

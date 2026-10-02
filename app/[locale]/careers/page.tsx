@@ -7,6 +7,7 @@ import {
   CareersOpenPositions,
   CareersFinalCta,
 } from "@/components/careers";
+import { PageGuard } from "@/lib/page-control/guard";
 
 interface CareersPageProps {
   params: Promise<{ locale: string }>;
@@ -29,7 +30,8 @@ export default async function CareersPage({ params }: CareersPageProps) {
   const t = await getTranslations({ locale, namespace: "Careers" });
 
   return (
-    <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 w-full flex-1">
+    <PageGuard slug="careers" locale={locale}>
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 w-full flex-1">
       {/* 1. Intro & Breadcrumbs */}
       <CareersIntro
         homeLabel={t("breadcrumb.home")}
@@ -63,5 +65,6 @@ export default async function CareersPage({ params }: CareersPageProps) {
         secondaryActionLabel={t("finalCta.secondaryAction")}
       />
     </div>
+    </PageGuard>
   );
 }

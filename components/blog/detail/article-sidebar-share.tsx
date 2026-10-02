@@ -1,10 +1,16 @@
 "use client";
 
 import React, { useState } from "react";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { LuCopy, LuCheck, LuShare2 } from "react-icons/lu";
-import { FaXTwitter, FaLinkedinIn } from "react-icons/fa6";
+import {
+  FaXTwitter,
+  FaLinkedinIn,
+  FaWhatsapp,
+  FaTelegram,
+  FaFacebookF,
+} from "react-icons/fa6";
 import type { ArticleSidebarShareProps } from "./article-detail-types";
 import { cn } from "@/lib/utils";
 
@@ -14,6 +20,8 @@ export function ArticleSidebarShare({
   className = "",
 }: ArticleSidebarShareProps) {
   const t = useTranslations("ArticleDetail.sidebar");
+  const locale = useLocale();
+  const isRtl = locale === "ar";
   const [copied, setCopied] = useState(false);
 
   const getUrl = () => {
@@ -35,6 +43,17 @@ export function ArticleSidebarShare({
     }
   };
 
+  const handleShareWhatsApp = () => {
+    const text = encodeURIComponent(`${title}\n${getUrl()}`);
+    if (typeof window !== "undefined") {
+      window.open(
+        `https://api.whatsapp.com/send?text=${text}`,
+        "_blank",
+        "noopener,noreferrer"
+      );
+    }
+  };
+
   const handleShareX = () => {
     const url = encodeURIComponent(getUrl());
     const text = encodeURIComponent(`${title} — Musnad Tech`);
@@ -52,6 +71,29 @@ export function ArticleSidebarShare({
     if (typeof window !== "undefined") {
       window.open(
         `https://www.linkedin.com/sharing/share-offsite/?url=${url}`,
+        "_blank",
+        "noopener,noreferrer"
+      );
+    }
+  };
+
+  const handleShareTelegram = () => {
+    const url = encodeURIComponent(getUrl());
+    const text = encodeURIComponent(title);
+    if (typeof window !== "undefined") {
+      window.open(
+        `https://t.me/share/url?url=${url}&text=${text}`,
+        "_blank",
+        "noopener,noreferrer"
+      );
+    }
+  };
+
+  const handleShareFacebook = () => {
+    const url = encodeURIComponent(getUrl());
+    if (typeof window !== "undefined") {
+      window.open(
+        `https://www.facebook.com/sharer/sharer.php?u=${url}`,
         "_blank",
         "noopener,noreferrer"
       );
@@ -88,9 +130,21 @@ export function ArticleSidebarShare({
           ) : (
             <>
               <LuCopy className="h-3.5 w-3.5 text-muted-foreground" aria-hidden="true" />
-              <span>{t("shareTitle")} (URL)</span>
+              <span>{isRtl ? "نسخ رابط المقال" : "Copy Link"}</span>
             </>
           )}
+        </Button>
+
+        {/* Share on WhatsApp */}
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          onClick={handleShareWhatsApp}
+          className="w-full justify-center rounded-xl text-xs font-medium gap-2 hover:bg-emerald-500/10 hover:border-emerald-500/30 transition-colors"
+        >
+          <FaWhatsapp className="h-3.5 w-3.5 text-[#25D366]" aria-hidden="true" />
+          <span>{isRtl ? "مشاركة عبر واتساب" : "WhatsApp"}</span>
         </Button>
 
         {/* Share on X */}
@@ -111,10 +165,34 @@ export function ArticleSidebarShare({
           variant="outline"
           size="sm"
           onClick={handleShareLinkedIn}
-          className="w-full justify-center rounded-xl text-xs font-medium gap-2"
+          className="w-full justify-center rounded-xl text-xs font-medium gap-2 hover:bg-[#0077b5]/10 hover:border-[#0077b5]/30 transition-colors"
         >
           <FaLinkedinIn className="h-3.5 w-3.5 text-[#0077b5]" aria-hidden="true" />
           <span>{t("shareOnLinkedIn")}</span>
+        </Button>
+
+        {/* Share on Telegram */}
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          onClick={handleShareTelegram}
+          className="w-full justify-center rounded-xl text-xs font-medium gap-2 hover:bg-[#229ED9]/10 hover:border-[#229ED9]/30 transition-colors"
+        >
+          <FaTelegram className="h-3.5 w-3.5 text-[#229ED9]" aria-hidden="true" />
+          <span>{isRtl ? "تيليجرام" : "Telegram"}</span>
+        </Button>
+
+        {/* Share on Facebook */}
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          onClick={handleShareFacebook}
+          className="w-full justify-center rounded-xl text-xs font-medium gap-2 hover:bg-[#1877F2]/10 hover:border-[#1877F2]/30 transition-colors"
+        >
+          <FaFacebookF className="h-3.5 w-3.5 text-[#1877F2]" aria-hidden="true" />
+          <span>{isRtl ? "فيسبوك" : "Facebook"}</span>
         </Button>
       </div>
     </div>

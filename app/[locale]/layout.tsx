@@ -11,6 +11,9 @@ import { getMessages } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { routing } from "@/i18n/routing";
 import { ClerkProvider } from "@clerk/nextjs";
+import { auth } from "@clerk/nextjs/server";
+import { headers } from "next/headers";
+import { getPageControlsAction } from "@/lib/page-control/actions";
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -54,9 +57,18 @@ export default async function LocaleLayout({
   // Load message bundle for this locale
   const messages = await getMessages();
 
+  const headerList = await headers();
+  const isAdminRoute =
+    headerList.get("x-is-admin-route") === "1" ||
+    headerList.get("x-pathname")?.includes("/admin") === true;
+
   const isRtl = locale === "ar";
   const activeFont = isRtl ? tajawal : poppins;
   const announcement = getAnnouncement(locale);
+
+  const pageSettings = isAdminRoute ? [] : await getPageControlsAction();
+  const { sessionClaims } = await auth();
+  const isAdmin = sessionClaims?.metadata?.role === "admin";
 
   return (
     <html
@@ -75,14 +87,26 @@ export default async function LocaleLayout({
               disableTransitionOnChange
               scriptProps={{ async: true }}
             >
-              <Navbar
-                locale={locale}
-                direction={isRtl ? "rtl" : "ltr"}
-                announcement={announcement}
-                utilities={<NavbarUtilities />}
-              />
-              <main className="flex-1 flex flex-col">{children}</main>
-              <Footer locale={locale} direction={isRtl ? "rtl" : "ltr"} />
+              {isAdminRoute ? (
+                <div className="flex-1 flex flex-col min-h-screen">{children}</div>
+              ) : (
+                <>
+                  <Navbar
+                    locale={locale}
+                    direction={isRtl ? "rtl" : "ltr"}
+                    announcement={announcement}
+                    utilities={<NavbarUtilities />}
+                    pageSettings={pageSettings}
+                    isAdmin={isAdmin}
+                  />
+                  <main className="flex-1 flex flex-col">{children}</main>
+                  <Footer
+                    locale={locale}
+                    direction={isRtl ? "rtl" : "ltr"}
+                    pageSettings={pageSettings}
+                  />
+                </>
+              )}
             </ThemeProvider>
           </NextIntlClientProvider>
         </ClerkProvider>

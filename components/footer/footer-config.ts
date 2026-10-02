@@ -106,3 +106,33 @@ export function getFooterSections(t: (key: string) => string): FooterSection[] {
     },
   ];
 }
+
+import type { PageControlItem } from "@/lib/page-control/types";
+
+/**
+ * Filters footer navigation links according to administrator visibility settings.
+ */
+export function filterFooterSectionsByVisibility(
+  sections: FooterSection[],
+  pageSettings?: PageControlItem[]
+): FooterSection[] {
+  if (!pageSettings || pageSettings.length === 0) return sections;
+
+  return sections
+    .map((section) => ({
+      ...section,
+      links: section.links.filter((link) => {
+        const setting = pageSettings.find(
+          (p) =>
+            p.id === link.id ||
+            p.path === link.href ||
+            (link.id === "privacy" && p.id === "legal-privacy") ||
+            (link.id === "terms" && p.id === "legal-terms") ||
+            (link.id === "cookies" && p.id === "legal-cookies")
+        );
+        if (!setting) return true;
+        return setting.showInFooter !== false && setting.status !== "hidden";
+      }),
+    }))
+    .filter((section) => section.links.length > 0);
+}
