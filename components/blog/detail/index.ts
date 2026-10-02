@@ -14,3 +14,8 @@ export * from "./article-detail-related";
 export * from "./article-detail-comments";
 export * from "./article-back-to-top";
 export * from "./article-detail-body";
+export * from "./article-reading-progress";
+export * from "./article-careers-callout";
+export * from "./article-tldr";
+export * from "./article-metric-card";
+export * from "./article-architecture-flow";

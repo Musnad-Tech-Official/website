@@ -1,6 +1,9 @@
 import React from "react";
 import { LuInfo, LuTriangleAlert, LuCircleCheck } from "react-icons/lu";
 import { ArticleCodeBlock } from "./article-code-block";
+import { ArticleTldr } from "./article-tldr";
+import { ArticleMetricCard } from "./article-metric-card";
+import { ArticleArchitectureFlow } from "./article-architecture-flow";
 import type { ArticleContentRendererProps } from "./article-detail-types";
 import { cn } from "@/lib/utils";
 
@@ -172,6 +175,34 @@ export function ArticleContentRenderer({
                   </figcaption>
                 )}
               </figure>
+            );
+
+          case "tldr":
+            return (
+              <ArticleTldr
+                key={index}
+                title={block.title}
+                items={block.items}
+              />
+            );
+
+          case "metric":
+            return (
+              <ArticleMetricCard
+                key={index}
+                caption={block.caption}
+                stats={block.stats}
+              />
+            );
+
+          case "diagram":
+            return (
+              <ArticleArchitectureFlow
+                key={index}
+                title={block.title}
+                caption={block.caption}
+                steps={block.steps}
+              />
             );
 
           default:

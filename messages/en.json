@@ -947,6 +947,12 @@
     "code": {
       "copy": "Copy code",
       "copied": "Copied!"
+    },
+    "careers": {
+      "badge": "We're Hiring",
+      "title": "Interested in solving challenges like this?",
+      "description": "Musnad Tech builds mission-critical digital infrastructure, distributed systems, and AI workflows. Work with a calm, high-autonomy engineering team.",
+      "button": "View Open Roles"
     }
   },
   "Contact": {
