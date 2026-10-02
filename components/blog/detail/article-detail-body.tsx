@@ -60,9 +60,9 @@ export function ArticleDetailBody({
                 [&_ul]:list-disc [&_ul]:ps-6 [&_ul]:space-y-2 [&_ul]:text-foreground/90
                 [&_ol]:list-decimal [&_ol]:ps-6 [&_ol]:space-y-2 [&_ol]:text-foreground/90
                 [&_blockquote]:my-8 [&_blockquote]:ps-5 sm:[&_blockquote]:ps-6 [&_blockquote]:py-2 [&_blockquote]:border-s-4 [&_blockquote]:border-primary [&_blockquote]:bg-muted/20 [&_blockquote]:rounded-e-xl [&_blockquote]:text-lg sm:[&_blockquote]:text-xl [&_blockquote]:italic [&_blockquote]:text-foreground
-                [&_pre]:bg-zinc-950 dark:[&_pre]:bg-zinc-900 [&_pre]:text-zinc-100 [&_pre]:p-4 [&_pre]:rounded-xl [&_pre]:font-mono [&_pre]:text-xs [&_pre]:overflow-x-auto [&_pre]:my-6 [&_pre]:border [&_pre]:border-border/60
-                [&_code]:font-mono [&_code]:text-xs [&_code]:px-1.5 [&_code]:py-0.5 [&_code]:rounded-md [&_code]:bg-muted/80 [&_code]:border [&_code]:border-border/60
-                [&_pre_code]:bg-transparent [&_pre_code]:border-none [&_pre_code]:p-0
+                [&_pre]:bg-zinc-950 dark:[&_pre]:bg-zinc-900 [&_pre]:text-zinc-100 [&_pre]:p-4 [&_pre]:rounded-xl [&_pre]:font-mono [&_pre]:text-xs [&_pre]:overflow-x-auto [&_pre]:my-6 [&_pre]:border [&_pre]:border-border/60 [&_pre]:[direction:ltr] [&_pre]:text-left [&_pre]:[text-align:left]
+                [&_code]:font-mono [&_code]:text-xs [&_code]:px-1.5 [&_code]:py-0.5 [&_code]:rounded-md [&_code]:bg-muted/80 [&_code]:border [&_code]:border-border/60 [&_code]:[direction:ltr] [&_code]:[unicode-bidi:isolate]
+                [&_pre_code]:bg-transparent [&_pre_code]:border-none [&_pre_code]:p-0 [&_pre_code]:[direction:ltr] [&_pre_code]:text-left
                 [&_img]:rounded-2xl [&_img]:border [&_img]:border-border/60 [&_img]:my-6 [&_img]:w-full [&_img]:max-w-3xl [&_img]:object-cover [&_img]:shadow-sm
                 [&_a]:text-primary [&_a]:underline [&_a]:underline-offset-4 [&_a]:hover:opacity-80
               "

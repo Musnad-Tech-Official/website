@@ -1,8 +1,10 @@
 /* eslint-disable @next/next/no-img-element */
 import React from "react";
+import { useLocale } from "next-intl";
 import { Link } from "@/i18n/routing";
 import { Badge } from "@/components/ui/badge";
 import { LuChevronRight } from "react-icons/lu";
+import { formatArticleDate } from "@/lib/utils/date";
 import { ArticleHeaderActions } from "./article-header-actions";
 import type { ArticleDetailHeaderProps } from "./article-detail-types";
 import { cn } from "@/lib/utils";
@@ -20,6 +22,7 @@ export function ArticleDetailHeader({
   breadcrumbLabel = "Breadcrumbs",
   className = "",
 }: ArticleDetailHeaderProps) {
+  const locale = useLocale();
   const hasMetadata = Boolean(author || publishedAt || readTime);
 
   return (
@@ -134,7 +137,9 @@ export function ArticleDetailHeader({
                 <span aria-hidden="true" className="select-none text-muted-foreground/50">
                   ·
                 </span>
-                <time dateTime={publishedAt}>{publishedAt}</time>
+                <time dateTime={publishedAt}>
+                  {formatArticleDate(publishedAt, locale)}
+                </time>
               </div>
             )}
 

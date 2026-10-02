@@ -68,9 +68,13 @@ export function ArticleCodeBlock({
         </button>
       </div>
 
-      {/* Code contents */}
-      <pre className="p-4 sm:p-5 overflow-x-auto text-xs sm:text-sm font-mono leading-relaxed text-zinc-200">
-        <code>{code}</code>
+      {/* Code contents (always LTR) */}
+      <pre
+        dir="ltr"
+        style={{ direction: "ltr", textAlign: "left" }}
+        className="p-4 sm:p-5 overflow-x-auto text-xs sm:text-sm font-mono leading-relaxed text-zinc-200 text-left"
+      >
+        <code dir="ltr" style={{ direction: "ltr" }}>{code}</code>
       </pre>
     </div>
   );

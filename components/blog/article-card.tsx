@@ -1,14 +1,16 @@
 /* eslint-disable @next/next/no-img-element */
 import React from "react";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { Link } from "@/i18n/routing";
 import { Card } from "@/components/ui/card";
 import { LuArrowUpRight } from "react-icons/lu";
+import { formatArticleDate } from "@/lib/utils/date";
 import type { ArticleCardProps } from "./blog-types";
 import { cn } from "@/lib/utils";
 
 export function ArticleCard({ article, className = "" }: ArticleCardProps) {
   const t = useTranslations("Blog.card");
+  const locale = useLocale();
 
   return (
     <Link
@@ -83,6 +85,14 @@ export function ArticleCard({ article, className = "" }: ArticleCardProps) {
               <span className="font-semibold text-foreground">
                 {article.author.name}
               </span>
+              {article.publishedAt && (
+                <>
+                  <span aria-hidden="true">·</span>
+                  <time dateTime={article.publishedAt}>
+                    {formatArticleDate(article.publishedAt, locale)}
+                  </time>
+                </>
+              )}
               {article.readTime && (
                 <>
                   <span aria-hidden="true">·</span>

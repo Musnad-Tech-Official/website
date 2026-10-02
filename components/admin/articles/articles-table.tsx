@@ -13,6 +13,7 @@ import {
   LuTrash2,
   LuSparkles,
 } from "react-icons/lu";
+import { formatArticleDate } from "@/lib/utils/date";
 import type { Article, ArticleStatus } from "@/lib/articles/types";
 
 interface ArticlesTableProps {
@@ -141,13 +142,24 @@ export function ArticlesTable({
                     </button>
                   </td>
 
-                  {/* Author & Read Time */}
+                  {/* Author & Read Time / Published Date */}
                   <td className="py-3.5 px-4 hidden lg:table-cell">
-                    <div className="text-foreground font-medium text-xs">
-                      {article.authorName}
+                    <div className="flex items-center gap-2">
+                      {article.authorAvatar && (
+                        <img
+                          src={article.authorAvatar}
+                          alt={article.authorName}
+                          className="w-5 h-5 rounded-full object-cover border border-border/60 shrink-0"
+                        />
+                      )}
+                      <span className="text-foreground font-medium text-xs">
+                        {article.authorName}
+                      </span>
                     </div>
                     <div className="text-[11px] text-muted-foreground mt-0.5">
-                      {isRtl ? article.readTimeAr : article.readTimeEn}
+                      {article.publishedAt
+                        ? formatArticleDate(article.publishedAt, isRtl ? "ar" : "en")
+                        : (isRtl ? article.readTimeAr : article.readTimeEn)}
                     </div>
                   </td>
 

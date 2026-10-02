@@ -13,6 +13,27 @@ import { EditorToolbar } from "./editor-toolbar";
 import { uploadImageAction } from "@/lib/storage/actions";
 import { cn } from "@/lib/utils";
 
+import { ReactNodeViewRenderer } from "@tiptap/react";
+import { ImageNodeView } from "./image-node-view";
+
+const CustomImage = Image.extend({
+  addAttributes() {
+    return {
+      ...this.parent?.(),
+      align: {
+        default: "center",
+        renderHTML: (attributes) => ({
+          "data-align": attributes.align,
+        }),
+        parseHTML: (element) => element.getAttribute("data-align") || "center",
+      },
+    };
+  },
+  addNodeView() {
+    return ReactNodeViewRenderer(ImageNodeView);
+  },
+});
+
 export interface RichTextEditorProps {
   /**
    * HTML string or ProseMirror JSONContent
@@ -102,13 +123,17 @@ export function RichTextEditor({
     editable,
     extensions: [
       StarterKit.configure({
-        codeBlock: false, // Using standalone CodeBlock for finer configuration
+        codeBlock: false,
+        link: false,
+        underline: false,
       }),
       Underline,
       CodeBlock.configure({
         HTMLAttributes: {
           class:
-            "bg-muted/70 text-foreground p-4 rounded-xl font-mono text-xs my-4 overflow-x-auto border border-border/80 shadow-xs",
+            "bg-muted/70 text-foreground p-4 rounded-xl font-mono text-xs my-4 overflow-x-auto border border-border/80 shadow-xs text-left",
+          dir: "ltr",
+          style: "direction: ltr; text-align: left;",
         },
       }),
       Link.configure({
@@ -117,12 +142,9 @@ export function RichTextEditor({
           class: "text-primary underline hover:opacity-80 transition-opacity",
         },
       }),
-      Image.configure({
-        inline: true,
+      CustomImage.configure({
+        inline: false,
         allowBase64: true,
-        HTMLAttributes: {
-          class: "rounded-xl max-w-full my-4 border border-border/60 shadow-xs object-contain",
-        },
       }),
       TextAlign.configure({
         types: ["heading", "paragraph"],
@@ -139,6 +161,7 @@ export function RichTextEditor({
       attributes: {
         class: cn(
           "prose dark:prose-invert max-w-none focus:outline-none p-4 text-foreground text-sm sm:text-base leading-relaxed",
+          "[&_pre]:text-left [&_pre]:[direction:ltr] [&_code]:[direction:ltr]",
           isRtl && "text-end"
         ),
         style: `min-height: ${minHeight}; direction: ${dir};`,

@@ -1,10 +1,11 @@
 /* eslint-disable @next/next/no-img-element */
 import React from "react";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { Link } from "@/i18n/routing";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { LuArrowUpRight, LuSparkles } from "react-icons/lu";
+import { formatArticleDate } from "@/lib/utils/date";
 import type { FeaturedArticleCardProps } from "./blog-types";
 import { cn } from "@/lib/utils";
 
@@ -13,6 +14,7 @@ export function FeaturedArticleCard({
   className = "",
 }: FeaturedArticleCardProps) {
   const t = useTranslations("Blog.card");
+  const locale = useLocale();
 
   return (
     <Link
@@ -111,10 +113,20 @@ export function FeaturedArticleCard({
                   {article.author.name}
                 </span>
               )}
-              {article.author && article.readTime && (
-                <span aria-hidden="true">·</span>
+              {article.publishedAt && (
+                <>
+                  <span aria-hidden="true">·</span>
+                  <time dateTime={article.publishedAt}>
+                    {formatArticleDate(article.publishedAt, locale)}
+                  </time>
+                </>
               )}
-              {article.readTime && <span>{article.readTime}</span>}
+              {article.readTime && (
+                <>
+                  <span aria-hidden="true">·</span>
+                  <span>{article.readTime}</span>
+                </>
+              )}
             </div>
 
             <div className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-semibold text-primary group-hover:underline">
