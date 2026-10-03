@@ -5,10 +5,7 @@ import { ArticleContentRenderer } from "./article-content-renderer";
 import { ArticleTableOfContents } from "./article-table-of-contents";
 import { ArticleFontSizeControl } from "./article-font-size-control";
 import { ArticleCitation } from "./article-citation";
-import { ArticleSidebarShare } from "./article-sidebar-share";
 import { ArticleSidebarNewsletter } from "./article-sidebar-newsletter";
-import { ArticleAuthorBio } from "./article-author-bio";
-import { ArticleShareBox } from "./article-share-box";
 import type { ArticleDetailBodyProps, ArticleFontSize } from "./article-detail-types";
 import { cn } from "@/lib/utils";
 
@@ -85,12 +82,6 @@ export function ArticleDetailBody({
               ))}
             </div>
           )}
-
-          {/* Author Bio (only if author exists) */}
-          <ArticleAuthorBio author={article.author} />
-
-          {/* Bottom Share Box */}
-          <ArticleShareBox title={article.title} slug={article.slug} />
         </article>
       </div>
 
@@ -117,9 +108,6 @@ export function ArticleDetailBody({
             citation={article.citation}
           />
         )}
-
-        {/* Sidebar Quick Share */}
-        <ArticleSidebarShare title={article.title} slug={article.slug} />
 
         {/* Compact Newsletter Widget */}
         <ArticleSidebarNewsletter />
