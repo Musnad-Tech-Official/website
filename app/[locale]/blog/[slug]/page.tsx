@@ -4,6 +4,7 @@ import { getTranslations } from "next-intl/server";
 import type { ArticleDetailData } from "@/data/article-details";
 import type { BlogArticle } from "@/data/blog";
 import { getArticleBySlugAction, getArticlesAction } from "@/lib/articles/actions";
+import { getArticleCommentsAction } from "@/lib/comments/actions";
 import {
   ArticleDetailHeader,
   ArticleDetailBody,
@@ -125,6 +126,9 @@ export default async function ArticleDetailPage({
     .filter((a) => a.slug !== article.slug)
     .slice(0, 3);
 
+  // Comments: fetch initial comments for zero-flicker SSR
+  const initialComments = await getArticleCommentsAction(article.slug);
+
   return (
     <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 w-full flex-1">
       {/* 1. Header & Breadcrumbs with optional Metadata & Actions */}
@@ -153,8 +157,13 @@ export default async function ArticleDetailPage({
         />
       )}
 
-      {/* 4. Comments Section (Non-persistent structural presentation with empty state) */}
-      <ArticleDetailComments />
+      {/* 4. Comments Section (Interactive with Clerk auth and TanStack Query) */}
+      <ArticleDetailComments
+        articleId={article.id}
+        articleSlug={article.slug}
+        initialComments={initialComments}
+        authorName={article.author?.name}
+      />
 
       {/* 5. Back to Top Button */}
       <ArticleBackToTop label={t("backToTop")} />
