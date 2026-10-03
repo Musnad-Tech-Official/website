@@ -20,6 +20,7 @@ const poppins = Poppins({
   weight: ["400", "500", "600", "700"],
   variable: "--font-poppins",
   display: "swap",
+  fallback: ["system-ui", "-apple-system", "BlinkMacSystemFont", "Segoe UI", "sans-serif"],
 });
 
 const tajawal = Tajawal({
@@ -27,6 +28,7 @@ const tajawal = Tajawal({
   weight: ["400", "500", "700"],
   variable: "--font-tajawal",
   display: "swap",
+  fallback: ["system-ui", "-apple-system", "BlinkMacSystemFont", "Segoe UI", "sans-serif"],
 });
 
 export const metadata: Metadata = {
