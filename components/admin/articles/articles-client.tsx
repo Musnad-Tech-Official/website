@@ -4,10 +4,11 @@ import * as React from "react";
 import { LuCircleCheck } from "react-icons/lu";
 import type { Article, ArticleFormData, ArticleStatus } from "@/lib/articles/types";
 import {
-  saveArticleAction,
-  deleteArticleAction,
-  toggleArticleStatusAction,
-} from "@/lib/articles/actions";
+  useArticlesQuery,
+  useSaveArticleMutation,
+  useToggleArticleStatusMutation,
+  useDeleteArticleMutation,
+} from "@/lib/articles/hooks";
 import { ArticlesFilters, type ArticleFiltersState } from "./articles-filters";
 import { ArticlesTable } from "./articles-table";
 import { ArticleEditorModal } from "./article-editor-modal";
@@ -19,7 +20,12 @@ interface ArticlesClientProps {
 
 export function ArticlesClient({ initialArticles, locale }: ArticlesClientProps) {
   const isRtl = locale === "ar";
-  const [articles, setArticles] = React.useState<Article[]>(initialArticles);
+
+  // 1. TanStack Query for articles state & cache
+  const { data: articles = initialArticles } = useArticlesQuery({
+    initialData: initialArticles,
+  });
+
   const [filters, setFilters] = React.useState<ArticleFiltersState>({
     search: "",
     status: "all",
@@ -34,6 +40,11 @@ export function ArticlesClient({ initialArticles, locale }: ArticlesClientProps)
     setNotification(msg);
     setTimeout(() => setNotification(null), 3500);
   };
+
+  // 2. Mutations
+  const saveMutation = useSaveArticleMutation();
+  const toggleStatusMutation = useToggleArticleStatusMutation();
+  const deleteMutation = useDeleteArticleMutation();
 
   // Distinct categories
   const categories = React.useMemo(() => {
@@ -80,44 +91,35 @@ export function ArticlesClient({ initialArticles, locale }: ArticlesClientProps)
   };
 
   const handleSave = async (data: ArticleFormData): Promise<boolean> => {
-    const res = await saveArticleAction(data);
-    if (res.success && res.article) {
-      const saved = res.article;
-      setArticles((prev) => {
-        const index = prev.findIndex((a) => a.id === saved.id);
-        if (index >= 0) {
-          const clone = [...prev];
-          clone[index] = saved;
-          return clone;
-        }
-        return [saved, ...prev];
-      });
+    try {
+      await saveMutation.mutateAsync(data);
       showToast(isRtl ? "تم حفظ المقال بنجاح" : "Article saved successfully");
       return true;
-    } else {
-      alert(res.error || "Failed to save article");
+    } catch (err: unknown) {
+      alert((err as Error).message || "Failed to save article");
       return false;
     }
   };
 
-  const handleToggleStatus = async (id: string, newStatus: ArticleStatus) => {
-    setArticles((prev) =>
-      prev.map((a) => (a.id === id ? { ...a, status: newStatus } : a))
+  const handleToggleStatus = (id: string, newStatus: ArticleStatus) => {
+    toggleStatusMutation.mutate(
+      { id, newStatus },
+      {
+        onSuccess: () => {
+          showToast(
+            isRtl
+              ? `تم تحويل حالة المقال إلى ${newStatus === "published" ? "منشور" : "مسودة"}`
+              : `Article status updated to ${newStatus}`
+          );
+        },
+        onError: (err: Error) => {
+          alert(err.message || "Failed to update status");
+        },
+      }
     );
-
-    const res = await toggleArticleStatusAction(id, newStatus);
-    if (res.success) {
-      showToast(
-        isRtl
-          ? `تم تحويل حالة المقال إلى ${newStatus === "published" ? "منشور" : "مسودة"}`
-          : `Article status updated to ${newStatus}`
-      );
-    } else {
-      alert(res.error || "Failed to update status");
-    }
   };
 
-  const handleDelete = async (id: string) => {
+  const handleDelete = (id: string) => {
     if (
       !confirm(
         isRtl
@@ -128,13 +130,14 @@ export function ArticlesClient({ initialArticles, locale }: ArticlesClientProps)
       return;
     }
 
-    setArticles((prev) => prev.filter((a) => a.id !== id));
-    const res = await deleteArticleAction(id);
-    if (res.success) {
-      showToast(isRtl ? "تم حذف المقال بنجاح" : "Article deleted successfully");
-    } else {
-      alert(res.error || "Failed to delete article");
-    }
+    deleteMutation.mutate(id, {
+      onSuccess: () => {
+        showToast(isRtl ? "تم حذف المقال بنجاح" : "Article deleted successfully");
+      },
+      onError: (err: Error) => {
+        alert(err.message || "Failed to delete article");
+      },
+    });
   };
 
   return (
