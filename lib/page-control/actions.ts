@@ -8,6 +8,8 @@ import { createClient } from "@/utils/supabase/server";
 
 // Fallback in-memory storage for active development / offline resilience
 let memoryCache: PageControlItem[] = [...MASTER_PAGE_INVENTORY];
+let lastFetchTime = 0;
+const CACHE_TTL_MS = 60 * 1000; // 60 seconds in-memory TTL across requests
 
 /**
  * Ensures the caller is an authenticated administrator.
@@ -45,14 +47,30 @@ interface PageSettingRow {
 
 /**
  * Retrieves all page controls, merging DB settings on top of the master inventory.
+ * Uses in-memory TTL caching and a fast timeout fallback so that slow DB handshakes
+ * never block SSR page renders for 15+ seconds.
  */
 export async function getPageControlsAction(): Promise<PageControlItem[]> {
+  const now = Date.now();
+  if (lastFetchTime > 0 && now - lastFetchTime < CACHE_TTL_MS && memoryCache.length > 0) {
+    return memoryCache;
+  }
+
   try {
-    const supabase = await createClient();
-    const { data, error } = await supabase
-      .from("page_settings")
-      .select("*")
-      .order("family", { ascending: true });
+    const fetchPromise = (async () => {
+      const supabase = await createClient();
+      return supabase
+        .from("page_settings")
+        .select("*")
+        .order("family", { ascending: true });
+    })();
+
+    // 2.5s maximum wait for DB roundtrip to avoid high-latency connection stalls
+    const timeoutPromise = new Promise<{ data: null; error: Error }>((_, reject) =>
+      setTimeout(() => reject(new Error("Supabase request timeout")), 2500)
+    );
+
+    const { data, error } = await Promise.race([fetchPromise, timeoutPromise]);
 
     if (!error && data && data.length > 0) {
       const dbMap = new Map((data as unknown as PageSettingRow[]).map((r) => [r.id, r]));
@@ -75,12 +93,15 @@ export async function getPageControlsAction(): Promise<PageControlItem[]> {
       });
 
       memoryCache = merged;
+      lastFetchTime = Date.now();
       return merged;
     }
   } catch {
-    // If Supabase table isn't migrated yet or connection fails, use memory cache
+    // If Supabase table isn't migrated yet or connection times out, use memory cache
   }
 
+  // Update lastFetchTime on fallback so repeated calls in the same render don't re-trigger timeouts
+  lastFetchTime = Date.now();
   return memoryCache;
 }
 
@@ -108,6 +129,7 @@ export async function updatePageControlAction(
       updatedBy: adminId,
     };
     memoryCache[index] = updated;
+    lastFetchTime = Date.now();
 
     // 2. Persist to Supabase via atomic upsert
     try {
@@ -168,6 +190,7 @@ export async function batchUpdatePageStatusAction(
       }
       return item;
     });
+    lastFetchTime = Date.now();
 
     try {
       const supabase = await createClient();
@@ -205,6 +228,7 @@ export async function resetPageControlsAction(): Promise<{ success: boolean; err
       updatedAt: now,
       updatedBy: adminId,
     }));
+    lastFetchTime = Date.now();
 
     try {
       const supabase = await createClient();
