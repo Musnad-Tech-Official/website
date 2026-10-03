@@ -1,15 +1,25 @@
-import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
+import { clerkMiddleware } from "@clerk/nextjs/server";
 import createMiddleware from "next-intl/middleware";
 import { routing } from "./i18n/routing";
 import { NextResponse } from "next/server";
 
 const intlMiddleware = createMiddleware(routing);
 
-const isAdminRoute = createRouteMatcher(["/:locale/admin(.*)", "/admin(.*)"]);
+function checkIsAdminRoute(pathname: string): boolean {
+  const segments = pathname.split("/").filter(Boolean);
+  if (segments.length === 0) return false;
+
+  if (segments[0] === "admin") return true;
+
+  return (
+    routing.locales.includes(segments[0] as "en" | "ar") &&
+    segments[1] === "admin"
+  );
+}
 
 export const proxy = clerkMiddleware(async (auth, request) => {
   const pathname = request.nextUrl.pathname;
-  const isMatchAdmin = isAdminRoute(request);
+  const isMatchAdmin = checkIsAdminRoute(pathname);
 
   if (isMatchAdmin) {
     const session = await auth();
