@@ -21,4 +21,8 @@ export const pageControlKeys = {
 export const commentKeys = {
   all: ["comments"] as const,
   byArticle: (articleSlug: string) => [...commentKeys.all, "article", articleSlug] as const,
+  admin: () => [...commentKeys.all, "admin"] as const,
+  adminList: (filters?: Record<string, unknown>) =>
+    [...commentKeys.admin(), "list", filters ?? {}] as const,
+  adminStats: () => [...commentKeys.admin(), "stats"] as const,
 };
