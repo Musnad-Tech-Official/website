@@ -13,7 +13,7 @@ export function AdminShell({ children, locale }: AdminShellProps) {
   const [isMobileOpen, setIsMobileOpen] = React.useState(false);
 
   return (
-    <div className="flex min-h-screen bg-background text-foreground antialiased selection:bg-primary/20">
+    <div className="flex min-h-screen bg-background text-foreground antialiased selection:bg-primary/20 max-w-full overflow-x-hidden">
       {/* Sidebar */}
       <AdminSidebar
         locale={locale}
@@ -22,12 +22,12 @@ export function AdminShell({ children, locale }: AdminShellProps) {
       />
 
       {/* Main View Area */}
-      <div className="flex-1 flex flex-col min-w-0">
+      <div className="flex-1 flex flex-col min-w-0 max-w-full overflow-x-hidden">
         <AdminHeader
           locale={locale}
           onOpenMobileMenu={() => setIsMobileOpen(true)}
         />
-        <main className="flex-1 p-4 md:p-6 lg:p-8 overflow-y-auto">
+        <main className="flex-1 p-3.5 sm:p-5 md:p-6 lg:p-8 overflow-y-auto">
           <div className="max-w-7xl mx-auto w-full space-y-6">
             {children}
           </div>

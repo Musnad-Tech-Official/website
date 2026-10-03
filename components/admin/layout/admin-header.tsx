@@ -39,14 +39,14 @@ export function AdminHeader({ locale, onOpenMobileMenu }: AdminHeaderProps) {
       : currentSegment;
 
   return (
-    <header className="sticky top-0 z-30 flex items-center justify-between h-16 px-4 md:px-6 bg-card/85 backdrop-blur-md border-b border-border transition-all">
+    <header className="sticky top-0 z-30 flex items-center justify-between h-16 px-3 sm:px-4 md:px-6 bg-card/85 backdrop-blur-md border-b border-border transition-all max-w-full overflow-x-clip">
       {/* Left: Mobile Menu & Dynamic Breadcrumbs */}
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-2 sm:gap-3 min-w-0">
         {/* Mobile menu trigger */}
         <button
           type="button"
           onClick={onOpenMobileMenu}
-          className="p-2 -ms-1 text-muted-foreground hover:text-foreground rounded-lg lg:hidden hover:bg-muted focus:outline-hidden"
+          className="p-2 -ms-1 text-muted-foreground hover:text-foreground rounded-lg lg:hidden hover:bg-muted focus:outline-hidden shrink-0 cursor-pointer"
           aria-label="Open navigation menu"
         >
           <LuMenu className="w-5 h-5" />
@@ -55,16 +55,16 @@ export function AdminHeader({ locale, onOpenMobileMenu }: AdminHeaderProps) {
         {/* Breadcrumbs */}
         <nav
           aria-label="Breadcrumb"
-          className="hidden sm:flex items-center gap-2 text-sm"
+          className="hidden sm:flex items-center gap-2 text-sm min-w-0"
         >
           <Link
             href="/admin"
-            className="text-muted-foreground hover:text-foreground font-medium transition-colors"
+            className="text-muted-foreground hover:text-foreground font-medium transition-colors shrink-0"
           >
             Musnad
           </Link>
           <Chevron className="w-3.5 h-3.5 text-muted-foreground/60 shrink-0" />
-          <span className="font-semibold text-foreground capitalize">
+          <span className="font-semibold text-foreground capitalize truncate">
             {pageTitle}
           </span>
         </nav>
@@ -92,21 +92,25 @@ export function AdminHeader({ locale, onOpenMobileMenu }: AdminHeaderProps) {
       </div>
 
       {/* Right: Actions, Notifications, Utilities & Profile */}
-      <div className="flex items-center gap-2 sm:gap-3">
-        {/* Quick New Button */}
-        <Button
-          variant="primary"
-          size="sm"
-          className="hidden sm:inline-flex items-center gap-1.5 h-8 text-xs font-medium"
-        >
-          <LuPlus className="w-3.5 h-3.5" />
-          <span>{t("header.newAction")}</span>
-        </Button>
+      <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
+        {/* Quick New Button (Visible only on sm+ screens to prevent mobile overflow) */}
+        <div className="hidden sm:block">
+          <Link href="/admin/articles">
+            <Button
+              variant="primary"
+              size="sm"
+              className="items-center gap-1.5 h-8 text-xs font-medium cursor-pointer"
+            >
+              <LuPlus className="w-3.5 h-3.5" />
+              <span>{t("header.newAction")}</span>
+            </Button>
+          </Link>
+        </div>
 
         {/* Notifications Icon Button */}
         <button
           type="button"
-          className="relative p-2 text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-colors focus:outline-hidden"
+          className="relative p-2 text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-colors focus:outline-hidden cursor-pointer"
           title={t("header.notifications")}
           aria-label={t("header.notifications")}
         >
@@ -114,20 +118,33 @@ export function AdminHeader({ locale, onOpenMobileMenu }: AdminHeaderProps) {
           <span className="absolute top-1.5 end-1.5 w-2 h-2 bg-primary rounded-full ring-2 ring-card" />
         </button>
 
-        {/* Utilities: Language & Theme */}
-        <div className="h-5 w-px bg-border mx-0.5" />
-        <LanguageSwitcher variant="toggle" size="sm" />
+        {/* Divider */}
+        <div className="h-5 w-px bg-border mx-0.5 hidden sm:block" />
+
+        {/* Language Switcher: Icon-only on mobile, full label on sm+ */}
+        <div className="sm:hidden">
+          <LanguageSwitcher variant="toggle" size="sm" showLabel={false} />
+        </div>
+        <div className="hidden sm:block">
+          <LanguageSwitcher variant="toggle" size="sm" showLabel={true} />
+        </div>
+
+        {/* Theme Switcher */}
         <ThemeSwitcher variant="icon" size="sm" />
-        <div className="h-5 w-px bg-border mx-0.5" />
+
+        {/* Divider */}
+        <div className="h-5 w-px bg-border mx-0.5 hidden sm:block" />
 
         {/* Clerk User Profile */}
-        <UserButton
-          appearance={{
-            elements: {
-              avatarBox: "w-8 h-8 rounded-lg ring-1 ring-border shadow-xs",
-            },
-          }}
-        />
+        <div className="shrink-0 flex items-center">
+          <UserButton
+            appearance={{
+              elements: {
+                avatarBox: "w-8 h-8 rounded-lg ring-1 ring-border shadow-xs",
+              },
+            }}
+          />
+        </div>
       </div>
     </header>
   );
