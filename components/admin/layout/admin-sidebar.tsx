@@ -24,16 +24,22 @@ interface AdminSidebarProps {
   locale: string;
   isMobileOpen?: boolean;
   onMobileClose?: () => void;
+  isCollapsed?: boolean;
+  onToggleCollapse?: () => void;
 }
 
 export function AdminSidebar({
   locale,
   isMobileOpen = false,
   onMobileClose,
+  isCollapsed: propIsCollapsed,
+  onToggleCollapse,
 }: AdminSidebarProps) {
   const t = useTranslations("Admin");
   const pathname = usePathname();
-  const [isCollapsed, setIsCollapsed] = React.useState(false);
+  const [localCollapsed, setLocalCollapsed] = React.useState(false);
+  const isCollapsed = propIsCollapsed ?? localCollapsed;
+  const toggleCollapse = onToggleCollapse ?? (() => setLocalCollapsed(!localCollapsed));
 
   const isRtl = locale === "ar";
 
@@ -102,22 +108,20 @@ export function AdminSidebar({
         />
       )}
 
-      {/* Sidebar Shell */}
+      {/* Sidebar Shell - Fixed to viewport */}
       <aside
         className={cn(
-          "fixed top-0 bottom-0 z-40 flex flex-col bg-card border-e border-border transition-all duration-300 select-none",
-          // Desktop positioning
-          "lg:sticky lg:top-0 lg:h-screen lg:translate-x-0",
+          "fixed top-0 bottom-0 start-0 z-40 flex flex-col bg-card border-e border-border transition-all duration-300 select-none h-screen",
           // Width based on collapsed state
           isCollapsed ? "w-18" : "w-64",
-          // Mobile responsive slide-over
+          // Mobile responsive slide-over & desktop fixed positioning
           isRtl
             ? isMobileOpen
-              ? "right-0 translate-x-0"
-              : "right-0 translate-x-full lg:translate-x-0 invisible lg:visible pointer-events-none lg:pointer-events-auto"
+              ? "translate-x-0"
+              : "translate-x-full lg:translate-x-0"
             : isMobileOpen
-            ? "left-0 translate-x-0"
-            : "left-0 -translate-x-full lg:translate-x-0 invisible lg:visible pointer-events-none lg:pointer-events-auto"
+            ? "translate-x-0"
+            : "-translate-x-full lg:translate-x-0"
         )}
       >
         {/* Brand / Logo Header */}
@@ -211,8 +215,8 @@ export function AdminSidebar({
           {/* Desktop Collapse Toggle */}
           <button
             type="button"
-            onClick={() => setIsCollapsed(!isCollapsed)}
-            className="hidden lg:flex w-full items-center justify-center p-2 text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-colors"
+            onClick={toggleCollapse}
+            className="hidden lg:flex w-full items-center justify-center p-2 text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-colors cursor-pointer"
             title={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
             aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
           >

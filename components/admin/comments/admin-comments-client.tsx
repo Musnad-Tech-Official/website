@@ -386,16 +386,16 @@ export function AdminCommentsClient({
                       </Link>
 
                       {/* Moderation Action Buttons */}
-                      <div className="flex items-center gap-1.5 ms-auto">
+                      <div className="flex items-center gap-2 ms-auto">
                         {comment.status !== "approved" && (
                           <Button
                             variant="outline"
                             size="sm"
                             onClick={() => handleUpdateStatus(comment.id, "approved")}
                             disabled={updateStatusMutation.isPending}
-                            className="h-7 text-xs rounded-lg px-2.5 gap-1.5 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 border-emerald-300 dark:border-emerald-800 cursor-pointer"
+                            className="h-8 text-xs font-medium rounded-lg px-3 gap-1.5 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 border-emerald-300 dark:border-emerald-800 cursor-pointer shadow-2xs"
                           >
-                            <LuCircleCheck className="w-3.5 h-3.5" />
+                            <LuCircleCheck className="w-4 h-4" />
                             <span>{isRtl ? "اعتماد" : "Approve"}</span>
                           </Button>
                         )}
@@ -406,22 +406,22 @@ export function AdminCommentsClient({
                             size="sm"
                             onClick={() => handleUpdateStatus(comment.id, "flagged")}
                             disabled={updateStatusMutation.isPending}
-                            className="h-7 text-xs rounded-lg px-2.5 gap-1.5 text-amber-600 hover:text-amber-700 hover:bg-amber-50 dark:hover:bg-amber-950/40 border-amber-300 dark:border-amber-800 cursor-pointer"
+                            className="h-8 text-xs font-medium rounded-lg px-3 gap-1.5 text-amber-600 hover:text-amber-700 hover:bg-amber-50 dark:hover:bg-amber-950/40 border-amber-300 dark:border-amber-800 cursor-pointer shadow-2xs"
                           >
-                            <LuFlag className="w-3.5 h-3.5" />
+                            <LuFlag className="w-4 h-4" />
                             <span>{isRtl ? "مخالفة" : "Flag"}</span>
                           </Button>
                         )}
 
                         <Button
-                          variant="ghost"
+                          variant="outline"
                           size="sm"
                           onClick={() => handleDelete(comment.id)}
                           disabled={deleteMutation.isPending}
-                          title={isRtl ? "حذف نهائي" : "Delete permanently"}
-                          className="h-7 w-7 p-0 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-lg cursor-pointer"
+                          className="h-8 text-xs font-medium rounded-lg px-3 gap-1.5 text-destructive hover:text-destructive hover:bg-destructive/10 border-destructive/30 hover:border-destructive/60 transition-colors cursor-pointer shadow-2xs"
                         >
-                          <LuTrash2 className="w-3.5 h-3.5" />
+                          <LuTrash2 className="w-4 h-4" />
+                          <span>{isRtl ? "حذف" : "Delete"}</span>
                         </Button>
                       </div>
                     </div>

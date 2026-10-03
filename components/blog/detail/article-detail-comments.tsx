@@ -197,14 +197,14 @@ function CommentItem({
               onClick={handleDelete}
               disabled={deleteCommentMutation.isPending}
               aria-label={t("delete")}
-              className="inline-flex items-center gap-1 text-xs font-medium text-muted-foreground hover:text-destructive transition-colors cursor-pointer ms-auto"
+              className="inline-flex items-center gap-1.5 text-xs font-medium text-destructive hover:bg-destructive/10 border border-destructive/25 rounded-lg px-2 py-0.5 transition-colors cursor-pointer ms-auto"
             >
               {deleteCommentMutation.isPending ? (
                 <LuLoader className="h-3 w-3 animate-spin" />
               ) : (
                 <LuTrash2 className="h-3.5 w-3.5" aria-hidden="true" />
               )}
-              <span className="hidden sm:inline">{t("delete")}</span>
+              <span>{t("delete")}</span>
             </button>
           )}
         </div>
