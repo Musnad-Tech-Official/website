@@ -61,7 +61,7 @@ export function ArticleTableOfContents({
     <nav
       aria-label={headingText}
       className={cn(
-        "rounded-2xl border border-border/70 bg-card p-4 shadow-2xs space-y-2.5",
+        "rounded-2xl border border-border/70 bg-card p-4 shadow-2xs space-y-3",
         className
       )}
     >
@@ -70,7 +70,8 @@ export function ArticleTableOfContents({
         <span>{headingText}</span>
       </div>
 
-      <ul className="space-y-1 text-xs">
+      {/* Continuous vertical track line */}
+      <ul className="border-s border-border/50 ms-1 ps-3 space-y-2 text-xs">
         {items.map((item) => {
           const isActive = activeId === item.id;
           return (
@@ -79,19 +80,12 @@ export function ArticleTableOfContents({
                 href={`#${item.id}`}
                 onClick={(e) => handleItemClick(e, item.id)}
                 className={cn(
-                  "relative flex items-center py-1.5 px-3 rounded-lg leading-relaxed transition-all duration-150 select-none",
+                  "block -ms-[13px] ps-3 border-s-2 py-0.5 text-xs leading-relaxed transition-all duration-150 select-none truncate",
                   isActive
-                    ? "bg-primary/8 dark:bg-primary/12 text-primary font-semibold"
-                    : "text-muted-foreground hover:text-foreground hover:bg-muted/40"
+                    ? "border-primary text-primary font-medium"
+                    : "border-transparent text-muted-foreground hover:text-foreground hover:border-border"
                 )}
               >
-                {/* Clean, straight vertical indicator line on active */}
-                {isActive && (
-                  <span
-                    className="absolute start-0 top-1.5 bottom-1.5 w-1 rounded-e-full bg-primary"
-                    aria-hidden="true"
-                  />
-                )}
                 <span className="truncate">{item.label}</span>
               </a>
             </li>
