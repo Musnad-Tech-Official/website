@@ -226,3 +226,176 @@ export async function deleteArticleCommentAction(
     success: true,
   };
 }
+
+export interface AdminCommentFilters {
+  status?: string;
+  articleSlug?: string;
+  search?: string;
+}
+
+export interface AdminCommentsStats {
+  total: number;
+  approved: number;
+  pending: number;
+  flagged: number;
+}
+
+/**
+ * Retrieves all comments across all articles for admin moderation.
+ */
+export async function getAllCommentsAdminAction(
+  filters?: AdminCommentFilters
+): Promise<ArticleComment[]> {
+  const { userId } = await auth();
+  const user = await currentUser();
+  const isAdmin = (user?.publicMetadata?.role as string) === "admin";
+
+  if (!userId || !isAdmin) {
+    return [];
+  }
+
+  let comments: ArticleComment[] = [];
+
+  try {
+    const supabase = await createClient();
+    let query = supabase
+      .from("article_comments")
+      .select("*")
+      .order("created_at", { ascending: false });
+
+    if (filters?.status && filters.status !== "all") {
+      query = query.eq("status", filters.status);
+    }
+    if (filters?.articleSlug && filters.articleSlug !== "all") {
+      query = query.eq("article_slug", filters.articleSlug);
+    }
+
+    const { data, error } = await query;
+
+    if (!error && data) {
+      comments = (data as unknown as ArticleCommentDbRow[]).map(mapRowToComment);
+    }
+  } catch (err) {
+    console.error("getAllCommentsAdminAction exception:", err);
+  }
+
+  // Merge with fallback in-memory store if DB is empty or table pending
+  if (comments.length === 0) {
+    for (const [slug, list] of fallbackCommentsStore.entries()) {
+      if (filters?.articleSlug && filters.articleSlug !== "all" && slug !== filters.articleSlug) {
+        continue;
+      }
+      for (const item of list) {
+        if (!filters?.status || filters.status === "all" || item.status === filters.status) {
+          comments.push(item);
+        }
+      }
+    }
+    comments.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+  }
+
+  // Apply search query filter if provided
+  if (filters?.search && filters.search.trim()) {
+    const q = filters.search.trim().toLowerCase();
+    comments = comments.filter(
+      (c) =>
+        c.userName.toLowerCase().includes(q) ||
+        c.content.toLowerCase().includes(q) ||
+        c.articleSlug.toLowerCase().includes(q)
+    );
+  }
+
+  return comments;
+}
+
+/**
+ * Updates a comment's moderation status (e.g. approved, flagged, pending, deleted).
+ */
+export async function updateCommentStatusAction(
+  commentId: string,
+  status: ArticleComment["status"]
+): Promise<CommentActionResult> {
+  const { userId } = await auth();
+  const user = await currentUser();
+  const isAdmin = (user?.publicMetadata?.role as string) === "admin";
+
+  if (!userId || !isAdmin) {
+    return { success: false, error: "unauthorized" };
+  }
+
+  try {
+    const supabase = await createClient();
+    const { error } = await supabase
+      .from("article_comments")
+      .update({ status, updated_at: new Date().toISOString() })
+      .eq("id", commentId);
+
+    if (error) {
+      console.warn("Supabase updateCommentStatusAction notice:", error.message);
+    }
+  } catch (err) {
+    console.error("updateCommentStatusAction exception:", err);
+  }
+
+  // Update in fallback store
+  for (const [, list] of fallbackCommentsStore.entries()) {
+    const target = list.find((c) => c.id === commentId);
+    if (target) {
+      target.status = status;
+      target.updatedAt = new Date().toISOString();
+      break;
+    }
+  }
+
+  revalidatePath("/admin/comments");
+  revalidatePath("/blog");
+
+  return { success: true };
+}
+
+/**
+ * Returns comment statistics for the admin dashboard.
+ */
+export async function getCommentsStatsAdminAction(): Promise<AdminCommentsStats> {
+  const { userId } = await auth();
+  const user = await currentUser();
+  const isAdmin = (user?.publicMetadata?.role as string) === "admin";
+
+  if (!userId || !isAdmin) {
+    return { total: 0, approved: 0, pending: 0, flagged: 0 };
+  }
+
+  try {
+    const supabase = await createClient();
+    const { data, error } = await supabase.from("article_comments").select("status");
+
+    if (!error && data) {
+      const rows = data as { status: string }[];
+      return {
+        total: rows.length,
+        approved: rows.filter((r) => r.status === "approved").length,
+        pending: rows.filter((r) => r.status === "pending").length,
+        flagged: rows.filter((r) => r.status === "flagged").length,
+      };
+    }
+  } catch (err) {
+    console.error("getCommentsStatsAdminAction exception:", err);
+  }
+
+  // Fallback stats
+  let total = 0;
+  let approved = 0;
+  let pending = 0;
+  let flagged = 0;
+
+  for (const [, list] of fallbackCommentsStore.entries()) {
+    for (const item of list) {
+      total++;
+      if (item.status === "approved") approved++;
+      else if (item.status === "pending") pending++;
+      else if (item.status === "flagged") flagged++;
+    }
+  }
+
+  return { total, approved, pending, flagged };
+}

@@ -10,6 +10,7 @@ import {
   LuFolderGit2,
   LuFileText,
   LuMessageSquare,
+  LuMessagesSquare,
   LuUsers,
   LuSettings,
   LuGlobe,
@@ -59,6 +60,11 @@ export function AdminSidebar({
       href: "/admin/articles",
       icon: LuFileText,
       badge: "0",
+    },
+    {
+      title: t("nav.comments"),
+      href: "/admin/comments",
+      icon: LuMessagesSquare,
     },
     {
       title: t("nav.inquiries"),
