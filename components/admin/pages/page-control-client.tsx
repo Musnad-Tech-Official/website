@@ -4,10 +4,11 @@ import * as React from "react";
 import { LuCircleCheck } from "react-icons/lu";
 import type { PageControlItem, PageStatus } from "@/lib/page-control/types";
 import {
-  updatePageControlAction,
-  batchUpdatePageStatusAction,
-  resetPageControlsAction,
-} from "@/lib/page-control/actions";
+  usePageControlsQuery,
+  useUpdatePageControlMutation,
+  useBatchUpdatePageStatusMutation,
+  useResetPageControlsMutation,
+} from "@/lib/page-control/hooks";
 import { PageControlStats } from "./page-control-stats";
 import { PageControlFilters } from "./page-control-filters";
 import { PageControlTable } from "./page-control-table";
@@ -33,11 +34,17 @@ const DEFAULT_FILTERS: FilterState = {
 export function PageControlClient({ initialPages, locale }: PageControlClientProps) {
   const isRtl = locale === "ar";
 
-  // Core Data & Selection States (Consolidated from 11 separate states down to 6)
-  const [pages, setPages] = React.useState<PageControlItem[]>(initialPages);
+  // 1. TanStack Query for Page Controls state and cache
+  const { data: pages = initialPages } = usePageControlsQuery(initialPages);
+
+  // 2. Mutations
+  const updateMutation = useUpdatePageControlMutation();
+  const batchMutation = useBatchUpdatePageStatusMutation();
+  const resetMutation = useResetPageControlsMutation();
+
+  // Local selection and UI states
   const [filters, setFilters] = React.useState<FilterState>(DEFAULT_FILTERS);
   const [selectedIds, setSelectedIds] = React.useState<string[]>([]);
-  const [isUpdating, setIsUpdating] = React.useState<string | null>(null);
   const [notification, setNotification] = React.useState<string | null>(null);
   const [editingPage, setEditingPage] = React.useState<PageControlItem | null>(null);
 
@@ -61,8 +68,7 @@ export function PageControlClient({ initialPages, locale }: PageControlClientPro
         query === "" ||
         item.titleEn.toLowerCase().includes(query) ||
         item.titleAr.includes(query) ||
-        item.path.toLowerCase().includes(query) ||
-        item.id.toLowerCase().includes(query);
+        item.path.toLowerCase().includes(query);
 
       const matchesFamily = filters.family === "all" || item.family === filters.family;
       const matchesStatus = filters.status === "all" || item.status === filters.status;
@@ -71,136 +77,149 @@ export function PageControlClient({ initialPages, locale }: PageControlClientPro
     });
   }, [pages, filters]);
 
-  // Toast notification helper
-  const showToast = (msg: string) => {
-    setNotification(msg);
-    setTimeout(() => setNotification(null), 3500);
+  // Toast feedback
+  const showToast = (message: string) => {
+    setNotification(message);
+    setTimeout(() => setNotification(null), 3000);
   };
 
-  // Filter helpers
-  const handleSearchChange = (search: string) => setFilters((prev) => ({ ...prev, search }));
-  const handleStatusFilter = (status: string) => setFilters((prev) => ({ ...prev, status }));
-  const handleFamilyFilter = (family: string) => setFilters((prev) => ({ ...prev, family }));
+  // Filter handlers
+  const handleSearchChange = (val: string) => setFilters((prev) => ({ ...prev, search: val }));
+  const handleStatusFilter = (val: string) => setFilters((prev) => ({ ...prev, status: val }));
+  const handleFamilyFilter = (val: string) => setFilters((prev) => ({ ...prev, family: val }));
   const handleClearFilters = () => setFilters(DEFAULT_FILTERS);
 
-  // Update status handler
-  const handleStatusChange = async (id: string, newStatus: PageStatus) => {
-    setIsUpdating(id);
-    const prev = [...pages];
-
-    setPages((curr) =>
-      curr.map((p) => (p.id === id ? { ...p, status: newStatus } : p))
-    );
-
-    const res = await updatePageControlAction(id, { status: newStatus });
-    setIsUpdating(null);
-
-    if (res.success && res.item) {
-      showToast(
+  // Status Change via mutation
+  const handleStatusChange = (id: string, newStatus: PageStatus) => {
+    const page = pages.find((p) => p.id === id);
+    if (page?.isProtected && newStatus !== "live") {
+      alert(
         isRtl
-          ? `تم تحديث حالة "${res.item.titleAr}" إلى ${newStatus}`
-          : `Updated "${res.item.titleEn}" status to ${newStatus}`
+          ? "هذه الصفحة أساسية ومحمية للنظام ولا يمكن حجبها أو وضعها في وضع الصيانة."
+          : "This is a core system page and cannot be set to maintenance or hidden."
       );
-    } else {
-      setPages(prev);
-      alert(res.error || "Failed to update page status");
+      return;
     }
+
+    updateMutation.mutate(
+      { id, updates: { status: newStatus } },
+      {
+        onSuccess: (updated) => {
+          showToast(
+            isRtl
+              ? `تم تحديث حالة "${updated.titleAr}" إلى ${newStatus}`
+              : `Updated "${updated.titleEn}" status to ${newStatus}`
+          );
+        },
+        onError: (err: Error) => {
+          alert(err.message || "Failed to update page status");
+        },
+      }
+    );
   };
 
   // Toggle Navbar
-  const handleToggleNavbar = async (page: PageControlItem) => {
+  const handleToggleNavbar = (page: PageControlItem) => {
     const updatedVal = !page.showInNavbar;
-    setIsUpdating(page.id);
 
-    setPages((curr) =>
-      curr.map((p) => (p.id === page.id ? { ...p, showInNavbar: updatedVal } : p))
+    updateMutation.mutate(
+      { id: page.id, updates: { showInNavbar: updatedVal } },
+      {
+        onSuccess: () => {
+          showToast(
+            isRtl
+              ? `تم ${updatedVal ? "إظهار" : "إخفاء"} الصفحة في شريط التنقل العلوي`
+              : `${updatedVal ? "Enabled" : "Disabled"} in public Navbar`
+          );
+        },
+        onError: (err: Error) => {
+          alert(err.message || "Failed to update navbar setting");
+        },
+      }
     );
-
-    const res = await updatePageControlAction(page.id, { showInNavbar: updatedVal });
-    setIsUpdating(null);
-
-    if (res.success) {
-      showToast(
-        isRtl
-          ? `تم ${updatedVal ? "إظهار" : "إخفاء"} الصفحة في شريط التنقل العلوي`
-          : `${updatedVal ? "Enabled" : "Disabled"} in public Navbar`
-      );
-    }
   };
 
   // Toggle Footer
-  const handleToggleFooter = async (page: PageControlItem) => {
+  const handleToggleFooter = (page: PageControlItem) => {
     const updatedVal = !page.showInFooter;
-    setIsUpdating(page.id);
 
-    setPages((curr) =>
-      curr.map((p) => (p.id === page.id ? { ...p, showInFooter: updatedVal } : p))
+    updateMutation.mutate(
+      { id: page.id, updates: { showInFooter: updatedVal } },
+      {
+        onSuccess: () => {
+          showToast(
+            isRtl
+              ? `تم ${updatedVal ? "إظهار" : "إخفاء"} الصفحة في تذييل الموقع`
+              : `${updatedVal ? "Enabled" : "Disabled"} in public Footer`
+          );
+        },
+        onError: (err: Error) => {
+          alert(err.message || "Failed to update footer setting");
+        },
+      }
     );
-
-    const res = await updatePageControlAction(page.id, { showInFooter: updatedVal });
-    setIsUpdating(null);
-
-    if (res.success) {
-      showToast(
-        isRtl
-          ? `تم ${updatedVal ? "إظهار" : "إخفاء"} الصفحة في تذييل الموقع`
-          : `${updatedVal ? "Enabled" : "Disabled"} in public Footer`
-      );
-    }
   };
 
   // Save Modal Notice
   const handleSaveNotice = async (pageId: string, noticeEn: string, noticeAr: string) => {
-    const res = await updatePageControlAction(pageId, {
-      maintenanceNoticeEn: noticeEn,
-      maintenanceNoticeAr: noticeAr,
-    });
-
-    if (res.success && res.item) {
-      setPages((curr) =>
-        curr.map((p) => (p.id === pageId ? res.item! : p))
-      );
+    try {
+      await updateMutation.mutateAsync({
+        id: pageId,
+        updates: {
+          maintenanceNoticeEn: noticeEn,
+          maintenanceNoticeAr: noticeAr,
+        },
+      });
       showToast(isRtl ? "تم حفظ إشعار الصيانة بنجاح" : "Maintenance notices updated");
       return true;
-    } else {
-      alert(res.error || "Failed to save notice");
+    } catch (err: unknown) {
+      alert((err as Error).message || "Failed to save notice");
       return false;
     }
   };
 
   // Batch status change
-  const handleBatchStatus = async (status: PageStatus) => {
+  const handleBatchStatus = (status: PageStatus) => {
     if (selectedIds.length === 0) return;
 
-    const res = await batchUpdatePageStatusAction(selectedIds, status);
-    if (res.success) {
-      setPages((curr) =>
-        curr.map((p) => (selectedIds.includes(p.id) ? { ...p, status } : p))
-      );
-      setSelectedIds([]);
-      showToast(
-        isRtl
-          ? `تم تحديث ${res.count} صفحة إلى ${status}`
-          : `Updated ${res.count} pages to ${status}`
-      );
-    }
+    batchMutation.mutate(
+      { ids: selectedIds, status },
+      {
+        onSuccess: ({ ids, status: newStatus }) => {
+          setSelectedIds([]);
+          showToast(
+            isRtl
+              ? `تم تحديث ${ids.length} صفحة إلى ${newStatus}`
+              : `Updated ${ids.length} pages to ${newStatus}`
+          );
+        },
+        onError: (err: Error) => {
+          alert(err.message || "Failed to batch update pages");
+        },
+      }
+    );
   };
 
   // Reset to default
-  const handleReset = async () => {
+  const handleReset = () => {
     if (
       !confirm(
         isRtl
           ? "هل أنت متأكد من رغبتك في إعادة تعيين كافة إعدادات الصفحات إلى الوضع الافتراضي؟"
           : "Are you sure you want to reset all pages to original defaults?"
       )
-    )
+    ) {
       return;
-
-    const res = await resetPageControlsAction();
-    if (res.success) {
-      window.location.reload();
     }
+
+    resetMutation.mutate(undefined, {
+      onSuccess: () => {
+        showToast(isRtl ? "تمت إعادة تعيين الصفحات إلى الإعدادات الافتراضية" : "Pages reset to default");
+      },
+      onError: (err: Error) => {
+        alert(err.message || "Failed to reset page controls");
+      },
+    });
   };
 
   // Selection handlers
@@ -260,7 +279,7 @@ export function PageControlClient({ initialPages, locale }: PageControlClientPro
         selectedIds={selectedIds}
         onToggleSelect={handleToggleSelect}
         onToggleSelectAll={handleToggleSelectAll}
-        isUpdating={isUpdating}
+        isUpdating={updateMutation.isPending ? "loading" : null}
         onStatusChange={handleStatusChange}
         onToggleNavbar={handleToggleNavbar}
         onToggleFooter={handleToggleFooter}

@@ -150,6 +150,13 @@ body {
   color: var(--foreground);
   font-family: inherit;
   transition: background-color 0.2s ease, color 0.2s ease;
+  overflow-x: clip;
+}
+
+/* Guard: Ensure public site Navbar and Footer are NEVER shown when inside Admin Portal */
+body:has(.admin-portal-wrapper) > header[role="banner"],
+body:has(.admin-portal-wrapper) > footer[role="contentinfo"] {
+  display: none !important;
 }
 
 /* Horizontal Infinite Marquee Animations */

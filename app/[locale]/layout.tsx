@@ -14,6 +14,7 @@ import { ClerkProvider } from "@clerk/nextjs";
 import { auth } from "@clerk/nextjs/server";
 import { headers } from "next/headers";
 import { getPageControlsAction } from "@/lib/page-control/actions";
+import { QueryProvider } from "@/components/providers/query-provider";
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -89,26 +90,28 @@ export default async function LocaleLayout({
               disableTransitionOnChange
               scriptProps={{ async: true }}
             >
-              {isAdminRoute ? (
-                <div className="flex-1 flex flex-col min-h-screen">{children}</div>
-              ) : (
-                <>
-                  <Navbar
-                    locale={locale}
-                    direction={isRtl ? "rtl" : "ltr"}
-                    announcement={announcement}
-                    utilities={<NavbarUtilities />}
-                    pageSettings={pageSettings}
-                    isAdmin={isAdmin}
-                  />
-                  <main className="flex-1 flex flex-col">{children}</main>
-                  <Footer
-                    locale={locale}
-                    direction={isRtl ? "rtl" : "ltr"}
-                    pageSettings={pageSettings}
-                  />
-                </>
-              )}
+              <QueryProvider>
+                {isAdminRoute ? (
+                  <div className="flex-1 flex flex-col min-h-screen">{children}</div>
+                ) : (
+                  <>
+                    <Navbar
+                      locale={locale}
+                      direction={isRtl ? "rtl" : "ltr"}
+                      announcement={announcement}
+                      utilities={<NavbarUtilities />}
+                      pageSettings={pageSettings}
+                      isAdmin={isAdmin}
+                    />
+                    <main className="flex-1 flex flex-col">{children}</main>
+                    <Footer
+                      locale={locale}
+                      direction={isRtl ? "rtl" : "ltr"}
+                      pageSettings={pageSettings}
+                    />
+                  </>
+                )}
+              </QueryProvider>
             </ThemeProvider>
           </NextIntlClientProvider>
         </ClerkProvider>

@@ -1,3 +1,6 @@
+"use client";
+
+import { usePathname } from "@/i18n/routing";
 import { useTranslations } from "next-intl";
 import { FooterBrand } from "./footer-brand";
 import { FooterLinks } from "./footer-links";
@@ -23,8 +26,18 @@ export function Footer({
   className = "",
   pageSettings,
 }: FooterProps) {
+  const pathname = usePathname();
   const t = useTranslations("Footer");
   const tBrand = useTranslations("Brand");
+
+  // If we are currently anywhere inside the Admin Portal, do not render the public Footer
+  if (
+    pathname &&
+    (pathname === "/admin" || pathname.startsWith("/admin/") || pathname.includes("/admin"))
+  ) {
+    return null;
+  }
+
   const rawSections = getFooterSections(t);
   const sections = filterFooterSectionsByVisibility(rawSections, pageSettings);
 

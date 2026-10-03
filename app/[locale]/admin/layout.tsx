@@ -34,5 +34,9 @@ export default async function AdminLayout({
     notFound();
   }
 
-  return <AdminShell locale={locale}>{children}</AdminShell>;
+  return (
+    <div className="admin-portal-wrapper w-full flex-1 flex flex-col min-h-screen">
+      <AdminShell locale={locale}>{children}</AdminShell>
+    </div>
+  );
 }

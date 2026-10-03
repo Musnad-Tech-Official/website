@@ -1,4 +1,6 @@
-import { Link } from "@/i18n/routing";
+"use client";
+
+import { usePathname, Link } from "@/i18n/routing";
 import { Button } from "@/components/ui/button";
 import { NavbarUtilities } from "@/components/navbar-utilities";
 import { SignInButton, SignUpButton, Show, UserButton } from "@clerk/nextjs";
@@ -45,6 +47,15 @@ export function Navbar({
   showUtilities = true,
   className = "",
 }: NavbarProps) {
+  const pathname = usePathname();
+
+  // If we are currently anywhere inside the Admin Portal, do not render the public Navbar
+  if (
+    pathname &&
+    (pathname === "/admin" || pathname.startsWith("/admin/") || pathname.includes("/admin"))
+  ) {
+    return null;
+  }
   // Locale-aware default items and labels
   const rawNavItems = customItems || getLocalizedNavItems(locale);
   const navItems = filterNavItemsByVisibility(rawNavItems, pageSettings);

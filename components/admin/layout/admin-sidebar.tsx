@@ -108,10 +108,10 @@ export function AdminSidebar({
           isRtl
             ? isMobileOpen
               ? "right-0 translate-x-0"
-              : "right-0 translate-x-full lg:translate-x-0"
+              : "right-0 translate-x-full lg:translate-x-0 invisible lg:visible pointer-events-none lg:pointer-events-auto"
             : isMobileOpen
             ? "left-0 translate-x-0"
-            : "left-0 -translate-x-full lg:translate-x-0"
+            : "left-0 -translate-x-full lg:translate-x-0 invisible lg:visible pointer-events-none lg:pointer-events-auto"
         )}
       >
         {/* Brand / Logo Header */}

@@ -104,8 +104,8 @@ export default async function AdminDashboardPage({ params }: AdminPageProps) {
   return (
     <div className="space-y-8 animate-in fade-in-50 duration-300">
       {/* Welcome Banner */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-primary/10 via-card to-card border border-primary/20 p-6 md:p-8">
-        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-primary/10 via-card to-card border border-primary/20 p-5 sm:p-6 md:p-8">
+        <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="space-y-2">
             <div className="flex items-center gap-2">
               <Badge variant="accent" size="sm" className="font-medium gap-1">
@@ -116,17 +116,17 @@ export default async function AdminDashboardPage({ params }: AdminPageProps) {
                 v1.0.0
               </Badge>
             </div>
-            <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-foreground">
+            <h1 className="text-xl sm:text-2xl md:text-3xl font-bold tracking-tight text-foreground">
               {t("cockpit.title")}
             </h1>
-            <p className="text-sm md:text-base text-muted-foreground max-w-2xl">
+            <p className="text-xs sm:text-sm md:text-base text-muted-foreground max-w-2xl leading-relaxed">
               {t("cockpit.description")}
             </p>
           </div>
 
-          <div className="flex items-center gap-3 shrink-0">
-            <Link href="/admin/articles">
-              <Button variant="primary" size="md" className="gap-2">
+          <div className="flex items-center gap-3 shrink-0 w-full sm:w-auto">
+            <Link href="/admin/articles" className="w-full sm:w-auto">
+              <Button variant="primary" size="md" className="w-full sm:w-auto gap-2 justify-center">
                 <LuPlus className="w-4 h-4" />
                 <span>{t("cockpit.actions.createArticle")}</span>
               </Button>
