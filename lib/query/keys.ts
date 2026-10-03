@@ -17,3 +17,8 @@ export const pageControlKeys = {
   all: ["page-controls"] as const,
   lists: () => [...pageControlKeys.all, "list"] as const,
 };
+
+export const commentKeys = {
+  all: ["comments"] as const,
+  byArticle: (articleSlug: string) => [...commentKeys.all, "article", articleSlug] as const,
+};

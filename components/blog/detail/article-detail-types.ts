@@ -85,7 +85,13 @@ export interface ArticleDetailRelatedProps {
   className?: string;
 }
 
+import type { ArticleComment } from "@/lib/comments/types";
+
 export interface ArticleDetailCommentsProps {
+  articleId?: string;
+  articleSlug: string;
+  initialComments?: ArticleComment[];
+  authorName?: string;
   className?: string;
 }
 

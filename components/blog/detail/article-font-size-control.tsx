@@ -1,6 +1,5 @@
 "use client";
 
-import React from "react";
 import { useTranslations } from "next-intl";
 import { LuType } from "react-icons/lu";
 import type { ArticleFontSizeControlProps, ArticleFontSize } from "./article-detail-types";

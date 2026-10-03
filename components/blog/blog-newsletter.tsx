@@ -1,29 +1,48 @@
 "use client";
 
-import React, { useState } from "react";
-import { useTranslations } from "next-intl";
+import React, { useState, useTransition } from "react";
+import { useTranslations, useLocale } from "next-intl";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { LuMail, LuArrowUpRight, LuInfo } from "react-icons/lu";
+import { LuMail, LuArrowUpRight, LuCircleCheck, LuLoader } from "react-icons/lu";
 import type { BlogNewsletterProps } from "./blog-types";
+import { subscribeNewsletterAction } from "@/lib/newsletter/actions";
 import { cn } from "@/lib/utils";
 
-/**
- * ============================================================================
- * ARCHITECTURAL & INTEGRATION NOTE:
- * There is currently no backend newsletter service connected.
- * In accordance with frontend persistence guidelines, submitting an email
- * does NOT claim persistence or display a fabricated success state.
- * The subscribe action remains disabled until real email integration is wired.
- * ============================================================================
- */
 export function BlogNewsletter({ className = "" }: BlogNewsletterProps) {
   const t = useTranslations("Blog.newsletter");
+  const locale = useLocale();
+
   const [email, setEmail] = useState("");
+  const [isPending, startTransition] = useTransition();
+  const [isSubscribed, setIsSubscribed] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // No-op for frontend-only phase: no fake persistence, no fake success state
+    setErrorMessage(null);
+
+    const trimmed = email.trim();
+    if (!trimmed || !trimmed.includes("@")) {
+      setErrorMessage(t("invalidEmail"));
+      return;
+    }
+
+    startTransition(async () => {
+      try {
+        const result = await subscribeNewsletterAction(trimmed, locale, "blog_footer");
+        if (result.success) {
+          setIsSubscribed(true);
+          setEmail("");
+        } else {
+          setErrorMessage(
+            result.error === "invalid_email" ? t("invalidEmail") : t("errorGeneric")
+          );
+        }
+      } catch {
+        setErrorMessage(t("errorGeneric"));
+      }
+    });
   };
 
   return (
@@ -62,49 +81,88 @@ export function BlogNewsletter({ className = "" }: BlogNewsletterProps) {
           {t("description")}
         </p>
 
-        {/* Informational Integration Notice */}
-        <div
-          role="note"
-          className="mt-6 flex items-start gap-2.5 p-3.5 rounded-xl bg-muted/40 border border-border/70 text-xs text-muted-foreground"
-        >
-          <LuInfo className="h-4 w-4 text-primary shrink-0 mt-0.5" />
-          <span className="leading-relaxed">{t("integrationNotice")}</span>
-        </div>
+        {isSubscribed ? (
+          <div className="mt-8 p-6 rounded-2xl bg-card border border-primary/20 shadow-2xs space-y-3 animate-in fade-in zoom-in-95 duration-200">
+            <div className="inline-flex items-center justify-center h-12 w-12 rounded-full bg-primary/10 text-primary border border-primary/20">
+              <LuCircleCheck className="h-6 w-6" aria-hidden="true" />
+            </div>
+            <div>
+              <h3 className="text-base font-bold text-foreground">
+                {t("subscribedTitle")}
+              </h3>
+              <p className="text-sm text-muted-foreground mt-1 leading-relaxed">
+                {t("subscribedDescription")}
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => {
+                setIsSubscribed(false);
+                setErrorMessage(null);
+              }}
+              className="text-xs font-medium text-primary hover:underline underline-offset-2 transition-colors cursor-pointer"
+            >
+              {t("subscribeAnother")}
+            </button>
+          </div>
+        ) : (
+          <form onSubmit={handleSubmit} className="mt-8 space-y-3">
+            <div className="flex flex-col sm:flex-row items-stretch gap-3">
+              <div className="flex-1">
+                <Input
+                  type="email"
+                  required
+                  value={email}
+                  onChange={(e) => {
+                    setEmail(e.target.value);
+                    if (errorMessage) setErrorMessage(null);
+                  }}
+                  placeholder={t("emailPlaceholder")}
+                  leftIcon={<LuMail className="h-4 w-4" aria-hidden="true" />}
+                  disabled={isPending}
+                  aria-label={t("emailPlaceholder")}
+                  className={cn(
+                    "h-11 bg-background text-sm rounded-xl transition-colors",
+                    errorMessage && "border-destructive/80 focus-visible:ring-destructive/20"
+                  )}
+                />
+                {errorMessage && (
+                  <p className="mt-1 text-xs font-medium text-destructive">
+                    {errorMessage}
+                  </p>
+                )}
+              </div>
 
-        {/* Form Structure */}
-        <form onSubmit={handleSubmit} className="mt-6 space-y-3">
-          <div className="flex flex-col sm:flex-row items-stretch gap-3">
-            <div className="flex-1">
-              <Input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder={t("emailPlaceholder")}
-                leftIcon={<LuMail className="h-4 w-4" aria-hidden="true" />}
-                disabled
-                aria-disabled="true"
-                aria-label={t("emailPlaceholder")}
-                className="h-11 bg-background text-sm rounded-xl opacity-75 cursor-not-allowed"
-              />
+              <Button
+                type="submit"
+                variant="primary"
+                size="md"
+                disabled={isPending}
+                className="h-11 rounded-xl px-6 font-semibold gap-2 shrink-0 shadow-xs transition-all cursor-pointer"
+              >
+                {isPending ? (
+                  <>
+                    <LuLoader className="h-4 w-4 animate-spin" aria-hidden="true" />
+                    <span>{t("subscribing")}</span>
+                  </>
+                ) : (
+                  <>
+                    <span>{t("subscribeButton")}</span>
+                    <LuArrowUpRight
+                      className="h-4 w-4 rtl:-scale-x-100 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+                      aria-hidden="true"
+                    />
+                  </>
+                )}
+              </Button>
             </div>
 
-            <Button
-              type="submit"
-              variant="primary"
-              size="md"
-              disabled
-              aria-disabled="true"
-              className="h-11 rounded-xl px-6 font-semibold gap-2 shrink-0 opacity-60 cursor-not-allowed"
-            >
-              <span>{t("subscribeButton")}</span>
-              <LuArrowUpRight className="h-4 w-4 rtl:-scale-x-100" aria-hidden="true" />
-            </Button>
-          </div>
-
-          <p className="text-xs text-muted-foreground">
-            {t("privacyNotice")}
-          </p>
-        </form>
+            {/* Privacy note */}
+            <p className="text-xs text-muted-foreground/80 leading-normal">
+              {t("privacyNotice")}
+            </p>
+          </form>
+        )}
       </div>
     </section>
   );
