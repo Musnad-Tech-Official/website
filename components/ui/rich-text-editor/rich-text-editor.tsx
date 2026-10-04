@@ -11,6 +11,7 @@ import TextAlign from "@tiptap/extension-text-align";
 import CodeBlock from "@tiptap/extension-code-block";
 import { EditorToolbar } from "./editor-toolbar";
 import { uploadImageAction } from "@/lib/storage/actions";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { cn } from "@/lib/utils";
 
 import { ReactNodeViewRenderer } from "@tiptap/react";
@@ -86,12 +87,14 @@ export function RichTextEditor({
 }: RichTextEditorProps) {
   const isRtl = dir === "rtl";
   const [isUploading, setIsUploading] = React.useState(false);
+  const [uploadError, setUploadError] = React.useState<string | null>(null);
   const fileInputRef = React.useRef<HTMLInputElement | null>(null);
 
   // Upload helper for pasted, dropped, or selected images
   const handleUploadImage = React.useCallback(
     async (file: File): Promise<string | null> => {
       setIsUploading(true);
+      setUploadError(null);
       try {
         if (onUploadImage) {
           const customUrl = await onUploadImage(file);
@@ -105,11 +108,11 @@ export function RichTextEditor({
         if (res.success && res.url) {
           return res.url;
         } else {
-          alert(res.error || "Failed to upload image.");
+          setUploadError(res.error || "Failed to upload image.");
           return null;
         }
       } catch (err: unknown) {
-        alert((err as Error).message || "Error uploading image.");
+        setUploadError((err as Error).message || "Error uploading image.");
         return null;
       } finally {
         setIsUploading(false);
@@ -254,6 +257,17 @@ export function RichTextEditor({
           isUploadingImage={isUploading}
           isRtl={isRtl}
         />
+      )}
+
+      {/* Upload Error Alert */}
+      {uploadError && (
+        <div className="p-2 border-b border-border/60 bg-muted/20">
+          <Alert variant="destructive" onClose={() => setUploadError(null)} className="py-2 px-3 text-xs">
+            <AlertDescription className="text-xs font-medium">
+              {uploadError}
+            </AlertDescription>
+          </Alert>
+        </div>
       )}
 
       {/* Editor Content Area */}

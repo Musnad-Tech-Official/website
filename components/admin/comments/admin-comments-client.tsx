@@ -18,6 +18,8 @@ import { Avatar } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import type { ArticleComment } from "@/lib/comments/types";
 import {
   useAdminCommentsQuery,
@@ -48,11 +50,18 @@ export function AdminCommentsClient({
   const [search, setSearch] = React.useState("");
   const [selectedStatus, setSelectedStatus] = React.useState<string>("all");
   const [selectedArticle, setSelectedArticle] = React.useState<string>("all");
-  const [notification, setNotification] = React.useState<string | null>(null);
+  const [alertState, setAlertState] = React.useState<{
+    type: "success" | "destructive" | "warning";
+    message: string;
+  } | null>(null);
+  const [deleteTargetId, setDeleteTargetId] = React.useState<string | null>(null);
 
-  const showToast = (msg: string) => {
-    setNotification(msg);
-    setTimeout(() => setNotification(null), 3500);
+  const showAlert = (
+    message: string,
+    type: "success" | "destructive" | "warning" = "success"
+  ) => {
+    setAlertState({ type, message });
+    setTimeout(() => setAlertState(null), 4000);
   };
 
   // Queries
@@ -97,25 +106,20 @@ export function AdminCommentsClient({
           : isRtl
           ? "تم تصنيف التعليق كمزعج (Spam)"
           : "Comment flagged as spam";
-      showToast(msg);
+      showAlert(msg, "success");
     } catch {
-      alert(isRtl ? "حدث خطأ أثناء تعديل الحالة" : "Failed to update status");
+      showAlert(isRtl ? "حدث خطأ أثناء تعديل الحالة" : "Failed to update status", "destructive");
     }
   };
 
-  const handleDelete = async (commentId: string) => {
-    const confirmed = window.confirm(
-      isRtl
-        ? "هل أنت متأكد من رغبتك في حذف هذا التعليق نهائياً؟"
-        : "Are you sure you want to permanently delete this comment?"
-    );
-    if (!confirmed) return;
-
+  const handleDeleteConfirm = async () => {
+    if (!deleteTargetId) return;
     try {
-      await deleteMutation.mutateAsync(commentId);
-      showToast(isRtl ? "تم حذف التعليق بنجاح" : "Comment permanently deleted");
+      await deleteMutation.mutateAsync(deleteTargetId);
+      setDeleteTargetId(null);
+      showAlert(isRtl ? "تم حذف التعليق بنجاح" : "Comment permanently deleted", "success");
     } catch {
-      alert(isRtl ? "فشل حذف التعليق" : "Failed to delete comment");
+      showAlert(isRtl ? "فشل حذف التعليق" : "Failed to delete comment", "destructive");
     }
   };
 
@@ -145,15 +149,37 @@ export function AdminCommentsClient({
 
   return (
     <div className="space-y-6">
-      {/* Toast Notification */}
-      {notification && (
-        <div className="fixed bottom-6 end-6 z-50 animate-in fade-in slide-in-from-bottom-4 duration-300">
-          <div className="flex items-center gap-2.5 px-4 py-3 rounded-xl bg-foreground text-background shadow-xl text-xs font-semibold">
-            <LuCircleCheck className="w-4 h-4 text-emerald-400 shrink-0" />
-            <span>{notification}</span>
-          </div>
+      {/* UI Alert Notification */}
+      {alertState && (
+        <div className="fixed bottom-6 end-6 z-50 max-w-sm w-full animate-in fade-in slide-in-from-bottom-4 duration-300">
+          <Alert
+            variant={alertState.type}
+            onClose={() => setAlertState(null)}
+            className="shadow-xl"
+          >
+            <AlertDescription className="text-xs font-semibold">
+              {alertState.message}
+            </AlertDescription>
+          </Alert>
         </div>
       )}
+
+      {/* Confirmation Dialog for Comment Deletion */}
+      <ConfirmDialog
+        open={Boolean(deleteTargetId)}
+        onOpenChange={(open) => !open && setDeleteTargetId(null)}
+        title={isRtl ? "تأكيد حذف التعليق" : "Delete Comment"}
+        description={
+          isRtl
+            ? "هل أنت متأكد من رغبتك في حذف هذا التعليق نهائياً؟ لا يمكن التراجع عن هذا الإجراء."
+            : "Are you sure you want to permanently delete this comment? This action cannot be undone."
+        }
+        confirmLabel={isRtl ? "حذف نهائي" : "Delete"}
+        cancelLabel={isRtl ? "إلغاء" : "Cancel"}
+        variant="destructive"
+        isLoading={deleteMutation.isPending}
+        onConfirm={handleDeleteConfirm}
+      />
 
       {/* 1. Stat Cards Row */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
@@ -416,7 +442,7 @@ export function AdminCommentsClient({
                         <Button
                           variant="outline"
                           size="sm"
-                          onClick={() => handleDelete(comment.id)}
+                          onClick={() => setDeleteTargetId(comment.id)}
                           disabled={deleteMutation.isPending}
                           className="h-8 text-xs font-medium rounded-lg px-3 gap-1.5 text-destructive hover:text-destructive hover:bg-destructive/10 border-destructive/30 hover:border-destructive/60 transition-colors cursor-pointer shadow-2xs"
                         >

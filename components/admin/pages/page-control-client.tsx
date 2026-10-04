@@ -1,7 +1,6 @@
 "use client";
 
 import * as React from "react";
-import { LuCircleCheck } from "react-icons/lu";
 import type { PageControlItem, PageStatus } from "@/lib/page-control/types";
 import {
   usePageControlsQuery,
@@ -9,6 +8,8 @@ import {
   useBatchUpdatePageStatusMutation,
   useResetPageControlsMutation,
 } from "@/lib/page-control/hooks";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { PageControlStats } from "./page-control-stats";
 import { PageControlFilters } from "./page-control-filters";
 import { PageControlTable } from "./page-control-table";
@@ -45,8 +46,21 @@ export function PageControlClient({ initialPages, locale }: PageControlClientPro
   // Local selection and UI states
   const [filters, setFilters] = React.useState<FilterState>(DEFAULT_FILTERS);
   const [selectedIds, setSelectedIds] = React.useState<string[]>([]);
-  const [notification, setNotification] = React.useState<string | null>(null);
   const [editingPage, setEditingPage] = React.useState<PageControlItem | null>(null);
+  const [isResetConfirmOpen, setIsResetConfirmOpen] = React.useState(false);
+  const [alertNotification, setAlertNotification] = React.useState<{
+    type: "success" | "destructive" | "warning" | "info";
+    message: string;
+  } | null>(null);
+
+  // Show Alert notification
+  const showAlert = (
+    message: string,
+    type: "success" | "destructive" | "warning" | "info" = "success"
+  ) => {
+    setAlertNotification({ type, message });
+    setTimeout(() => setAlertNotification(null), 4000);
+  };
 
   // Computed stats
   const stats = React.useMemo(() => {
@@ -77,11 +91,6 @@ export function PageControlClient({ initialPages, locale }: PageControlClientPro
     });
   }, [pages, filters]);
 
-  // Toast feedback
-  const showToast = (message: string) => {
-    setNotification(message);
-    setTimeout(() => setNotification(null), 3000);
-  };
 
   // Filter handlers
   const handleSearchChange = (val: string) => setFilters((prev) => ({ ...prev, search: val }));
@@ -93,10 +102,11 @@ export function PageControlClient({ initialPages, locale }: PageControlClientPro
   const handleStatusChange = (id: string, newStatus: PageStatus) => {
     const page = pages.find((p) => p.id === id);
     if (page?.isProtected && newStatus !== "live") {
-      alert(
+      showAlert(
         isRtl
           ? "هذه الصفحة أساسية ومحمية للنظام ولا يمكن حجبها أو وضعها في وضع الصيانة."
-          : "This is a core system page and cannot be set to maintenance or hidden."
+          : "This is a core system page and cannot be set to maintenance or hidden.",
+        "warning"
       );
       return;
     }
@@ -105,14 +115,15 @@ export function PageControlClient({ initialPages, locale }: PageControlClientPro
       { id, updates: { status: newStatus } },
       {
         onSuccess: (updated) => {
-          showToast(
+          showAlert(
             isRtl
               ? `تم تحديث حالة "${updated.titleAr}" إلى ${newStatus}`
-              : `Updated "${updated.titleEn}" status to ${newStatus}`
+              : `Updated "${updated.titleEn}" status to ${newStatus}`,
+            "success"
           );
         },
         onError: (err: Error) => {
-          alert(err.message || "Failed to update page status");
+          showAlert(err.message || "Failed to update page status", "destructive");
         },
       }
     );
@@ -126,14 +137,15 @@ export function PageControlClient({ initialPages, locale }: PageControlClientPro
       { id: page.id, updates: { showInNavbar: updatedVal } },
       {
         onSuccess: () => {
-          showToast(
+          showAlert(
             isRtl
               ? `تم ${updatedVal ? "إظهار" : "إخفاء"} الصفحة في شريط التنقل العلوي`
-              : `${updatedVal ? "Enabled" : "Disabled"} in public Navbar`
+              : `${updatedVal ? "Enabled" : "Disabled"} in public Navbar`,
+            "success"
           );
         },
         onError: (err: Error) => {
-          alert(err.message || "Failed to update navbar setting");
+          showAlert(err.message || "Failed to update navbar setting", "destructive");
         },
       }
     );
@@ -147,14 +159,15 @@ export function PageControlClient({ initialPages, locale }: PageControlClientPro
       { id: page.id, updates: { showInFooter: updatedVal } },
       {
         onSuccess: () => {
-          showToast(
+          showAlert(
             isRtl
               ? `تم ${updatedVal ? "إظهار" : "إخفاء"} الصفحة في تذييل الموقع`
-              : `${updatedVal ? "Enabled" : "Disabled"} in public Footer`
+              : `${updatedVal ? "Enabled" : "Disabled"} in public Footer`,
+            "success"
           );
         },
         onError: (err: Error) => {
-          alert(err.message || "Failed to update footer setting");
+          showAlert(err.message || "Failed to update footer setting", "destructive");
         },
       }
     );
@@ -170,10 +183,10 @@ export function PageControlClient({ initialPages, locale }: PageControlClientPro
           maintenanceNoticeAr: noticeAr,
         },
       });
-      showToast(isRtl ? "تم حفظ إشعار الصيانة بنجاح" : "Maintenance notices updated");
+      showAlert(isRtl ? "تم حفظ إشعار الصيانة بنجاح" : "Maintenance notices updated", "success");
       return true;
     } catch (err: unknown) {
-      alert((err as Error).message || "Failed to save notice");
+      showAlert((err as Error).message || "Failed to save notice", "destructive");
       return false;
     }
   };
@@ -187,14 +200,15 @@ export function PageControlClient({ initialPages, locale }: PageControlClientPro
       {
         onSuccess: ({ ids, status: newStatus }) => {
           setSelectedIds([]);
-          showToast(
+          showAlert(
             isRtl
               ? `تم تحديث ${ids.length} صفحة إلى ${newStatus}`
-              : `Updated ${ids.length} pages to ${newStatus}`
+              : `Updated ${ids.length} pages to ${newStatus}`,
+            "success"
           );
         },
         onError: (err: Error) => {
-          alert(err.message || "Failed to batch update pages");
+          showAlert(err.message || "Failed to batch update pages", "destructive");
         },
       }
     );
@@ -202,22 +216,20 @@ export function PageControlClient({ initialPages, locale }: PageControlClientPro
 
   // Reset to default
   const handleReset = () => {
-    if (
-      !confirm(
-        isRtl
-          ? "هل أنت متأكد من رغبتك في إعادة تعيين كافة إعدادات الصفحات إلى الوضع الافتراضي؟"
-          : "Are you sure you want to reset all pages to original defaults?"
-      )
-    ) {
-      return;
-    }
+    setIsResetConfirmOpen(true);
+  };
 
+  const handleConfirmReset = () => {
+    setIsResetConfirmOpen(false);
     resetMutation.mutate(undefined, {
       onSuccess: () => {
-        showToast(isRtl ? "تمت إعادة تعيين الصفحات إلى الإعدادات الافتراضية" : "Pages reset to default");
+        showAlert(
+          isRtl ? "تمت إعادة تعيين الصفحات إلى الإعدادات الافتراضية" : "Pages reset to default",
+          "success"
+        );
       },
       onError: (err: Error) => {
-        alert(err.message || "Failed to reset page controls");
+        showAlert(err.message || "Failed to reset page controls", "destructive");
       },
     });
   };
@@ -239,11 +251,18 @@ export function PageControlClient({ initialPages, locale }: PageControlClientPro
 
   return (
     <div className="space-y-6">
-      {/* Toast Notification */}
-      {notification && (
-        <div className="fixed bottom-6 end-6 z-50 bg-foreground text-background px-4 py-2.5 rounded-xl shadow-2xl flex items-center gap-2 text-sm font-medium animate-in fade-in-50 slide-in-from-bottom-5">
-          <LuCircleCheck className="w-4 h-4 text-emerald-400" />
-          <span>{notification}</span>
+      {/* Alert Notification */}
+      {alertNotification && (
+        <div className="fixed bottom-6 end-6 z-50 max-w-md w-full shadow-2xl animate-in fade-in-50 slide-in-from-bottom-5">
+          <Alert
+            variant={alertNotification.type}
+            onClose={() => setAlertNotification(null)}
+            className="bg-card/95 backdrop-blur-md shadow-xl border"
+          >
+            <AlertDescription className="text-xs sm:text-sm font-medium">
+              {alertNotification.message}
+            </AlertDescription>
+          </Alert>
         </div>
       )}
 
@@ -299,6 +318,23 @@ export function PageControlClient({ initialPages, locale }: PageControlClientPro
           isRtl={isRtl}
         />
       )}
+
+      {/* Reset Confirmation Modal */}
+      <ConfirmDialog
+        open={isResetConfirmOpen}
+        onOpenChange={setIsResetConfirmOpen}
+        title={isRtl ? "إعادة تعيين الصفحات" : "Reset Pages to Default"}
+        description={
+          isRtl
+            ? "هل أنت متأكد من رغبتك في إعادة تعيين كافة إعدادات الصفحات إلى الوضع الافتراضي؟"
+            : "Are you sure you want to reset all pages to original defaults?"
+        }
+        confirmLabel={isRtl ? "إعادة تعيين" : "Reset to Defaults"}
+        cancelLabel={isRtl ? "إلغاء" : "Cancel"}
+        variant="warning"
+        isLoading={resetMutation.isPending}
+        onConfirm={handleConfirmReset}
+      />
     </div>
   );
 }

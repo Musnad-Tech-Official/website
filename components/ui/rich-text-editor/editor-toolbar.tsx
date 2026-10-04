@@ -1,6 +1,16 @@
 "use client";
 
+import * as React from "react";
 import type { Editor } from "@tiptap/react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import {
   LuBold,
   LuItalic,
@@ -42,19 +52,29 @@ export function EditorToolbar({
   isUploadingImage = false,
   isRtl = false,
 }: EditorToolbarProps) {
+  const [isLinkDialogOpen, setIsLinkDialogOpen] = React.useState(false);
+  const [linkUrl, setLinkUrl] = React.useState("");
+
   if (!editor) return null;
 
-  const setLink = () => {
-    const previousUrl = editor.getAttributes("link").href;
-    const url = window.prompt(isRtl ? "أدخل رابط URL:" : "Enter URL:", previousUrl);
+  const handleOpenLinkDialog = () => {
+    const previousUrl = (editor.getAttributes("link").href as string) || "";
+    setLinkUrl(previousUrl);
+    setIsLinkDialogOpen(true);
+  };
 
-    if (url === null) return;
-    if (url === "") {
+  const handleApplyLink = () => {
+    if (linkUrl.trim() === "") {
       editor.chain().focus().extendMarkRange("link").unsetLink().run();
-      return;
+    } else {
+      editor.chain().focus().extendMarkRange("link").setLink({ href: linkUrl.trim() }).run();
     }
+    setIsLinkDialogOpen(false);
+  };
 
-    editor.chain().focus().extendMarkRange("link").setLink({ href: url }).run();
+  const handleRemoveLink = () => {
+    editor.chain().focus().extendMarkRange("link").unsetLink().run();
+    setIsLinkDialogOpen(false);
   };
 
   const buttonClass = (isActive: boolean, disabled = false) =>
@@ -257,7 +277,7 @@ export function EditorToolbar({
       {/* 7. Links & Images */}
       <button
         type="button"
-        onClick={setLink}
+        onClick={handleOpenLinkDialog}
         className={buttonClass(editor.isActive("link"))}
         title={isRtl ? "إضافة رابط" : "Add Link"}
       >
@@ -266,7 +286,7 @@ export function EditorToolbar({
       {editor.isActive("link") && (
         <button
           type="button"
-          onClick={() => editor.chain().focus().unsetLink().run()}
+          onClick={handleRemoveLink}
           className={buttonClass(false)}
           title={isRtl ? "إزالة الرابط" : "Remove Link"}
         >
@@ -288,6 +308,56 @@ export function EditorToolbar({
           <LuImage className="w-3.5 h-3.5" />
         )}
       </button>
+
+      {/* Link Insertion / Editing Dialog */}
+      <Dialog open={isLinkDialogOpen} onOpenChange={setIsLinkDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-sm font-semibold">
+              {isRtl ? "إضافة / تعديل رابط" : "Insert / Edit Link"}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="py-2 space-y-2">
+            <label className="text-xs text-muted-foreground">
+              {isRtl ? "عنوان الرابط (URL)" : "Link URL"}
+            </label>
+            <Input
+              value={linkUrl}
+              onChange={(e) => setLinkUrl(e.target.value)}
+              placeholder="https://example.com"
+              className="text-xs h-9"
+              autoFocus
+            />
+          </div>
+          <DialogFooter className="gap-2">
+            {editor.isActive("link") && (
+              <Button
+                variant="destructive"
+                size="sm"
+                onClick={handleRemoveLink}
+                className="text-xs me-auto cursor-pointer"
+              >
+                {isRtl ? "إزالة الرابط" : "Remove Link"}
+              </Button>
+            )}
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setIsLinkDialogOpen(false)}
+              className="text-xs cursor-pointer"
+            >
+              {isRtl ? "إلغاء" : "Cancel"}
+            </Button>
+            <Button
+              size="sm"
+              onClick={handleApplyLink}
+              className="text-xs font-semibold cursor-pointer"
+            >
+              {isRtl ? "تطبيق" : "Apply"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

@@ -47,6 +47,13 @@ export function UIShowcase() {
   const [switchChecked, setSwitchChecked] = React.useState(true);
   const [checkboxChecked, setCheckboxChecked] = React.useState(true);
   const [dialogOpen, setDialogOpen] = React.useState(false);
+  const [deploymentStatus, setDeploymentStatus] = React.useState<string | null>(null);
+  const [demoTags, setDemoTags] = React.useState([
+    { id: "eng", label: "Engineering", variant: "secondary" as const },
+    { id: "tokens", label: "Design Tokens", variant: "outline" as const },
+    { id: "next", label: "Next.js 16", variant: "accent" as const },
+  ]);
+  const [dismissedAlerts, setDismissedAlerts] = React.useState<Record<string, boolean>>({});
 
   return (
     <main className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8 space-y-16">
@@ -326,15 +333,32 @@ export function UIShowcase() {
 
             <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-border">
               <span className="text-xs font-medium text-muted-foreground mr-2">Dismissible Tags:</span>
-              <Badge variant="secondary" onRemove={() => alert("Tag removed")}>
-                Engineering
-              </Badge>
-              <Badge variant="outline" onRemove={() => alert("Tag removed")}>
-                Design Tokens
-              </Badge>
-              <Badge variant="accent" onRemove={() => alert("Tag removed")}>
-                Next.js 16
-              </Badge>
+              {demoTags.map((tag) => (
+                <Badge
+                  key={tag.id}
+                  variant={tag.variant}
+                  onRemove={() =>
+                    setDemoTags((prev) => prev.filter((t) => t.id !== tag.id))
+                  }
+                >
+                  {tag.label}
+                </Badge>
+              ))}
+              {demoTags.length === 0 && (
+                <button
+                  type="button"
+                  onClick={() =>
+                    setDemoTags([
+                      { id: "eng", label: "Engineering", variant: "secondary" },
+                      { id: "tokens", label: "Design Tokens", variant: "outline" },
+                      { id: "next", label: "Next.js 16", variant: "accent" },
+                    ])
+                  }
+                  className="text-xs text-primary underline hover:text-primary/80 cursor-pointer"
+                >
+                  Reset tags
+                </button>
+              )}
             </div>
           </CardContent>
         </Card>
@@ -594,7 +618,7 @@ export function UIShowcase() {
                     variant="primary"
                     onClick={() => {
                       setDialogOpen(false);
-                      alert("Deployment scheduled!");
+                      setDeploymentStatus("Deployment successfully scheduled on the Musnad Edge network!");
                     }}
                   >
                     Confirm & Deploy
@@ -602,6 +626,17 @@ export function UIShowcase() {
                 </DialogFooter>
               </DialogContent>
             </Dialog>
+
+            {deploymentStatus && (
+              <Alert
+                variant="success"
+                onClose={() => setDeploymentStatus(null)}
+                className="mt-4"
+              >
+                <AlertTitle>Deployment Queued</AlertTitle>
+                <AlertDescription>{deploymentStatus}</AlertDescription>
+              </Alert>
+            )}
           </CardContent>
         </Card>
       </section>
@@ -697,33 +732,63 @@ export function UIShowcase() {
         </div>
 
         <div className="space-y-3">
-          <Alert variant="info" onClose={() => alert("Info alert dismissed")}>
-            <AlertTitle>System Notice</AlertTitle>
-            <AlertDescription>
-              A new minor version of the Musnad SDK is available for download.
-            </AlertDescription>
-          </Alert>
+          {!dismissedAlerts.info && (
+            <Alert
+              variant="info"
+              onClose={() => setDismissedAlerts((prev) => ({ ...prev, info: true }))}
+            >
+              <AlertTitle>System Notice</AlertTitle>
+              <AlertDescription>
+                A new minor version of the Musnad SDK is available for download.
+              </AlertDescription>
+            </Alert>
+          )}
 
-          <Alert variant="success" onClose={() => alert("Success alert dismissed")}>
-            <AlertTitle>Build Successful</AlertTitle>
-            <AlertDescription>
-              All 14 UI components compiled cleanly with zero TypeScript errors.
-            </AlertDescription>
-          </Alert>
+          {!dismissedAlerts.success && (
+            <Alert
+              variant="success"
+              onClose={() => setDismissedAlerts((prev) => ({ ...prev, success: true }))}
+            >
+              <AlertTitle>Build Successful</AlertTitle>
+              <AlertDescription>
+                All 14 UI components compiled cleanly with zero TypeScript errors.
+              </AlertDescription>
+            </Alert>
+          )}
 
-          <Alert variant="warning" onClose={() => alert("Warning alert dismissed")}>
-            <AlertTitle>Attention Required</AlertTitle>
-            <AlertDescription>
-              API rate limit threshold reached 80% of allotted monthly quota.
-            </AlertDescription>
-          </Alert>
+          {!dismissedAlerts.warning && (
+            <Alert
+              variant="warning"
+              onClose={() => setDismissedAlerts((prev) => ({ ...prev, warning: true }))}
+            >
+              <AlertTitle>Attention Required</AlertTitle>
+              <AlertDescription>
+                API rate limit threshold reached 80% of allotted monthly quota.
+              </AlertDescription>
+            </Alert>
+          )}
 
-          <Alert variant="destructive" onClose={() => alert("Destructive alert dismissed")}>
-            <AlertTitle>Authentication Failed</AlertTitle>
-            <AlertDescription>
-              Invalid credentials provided. Please verify your token and retry.
-            </AlertDescription>
-          </Alert>
+          {!dismissedAlerts.destructive && (
+            <Alert
+              variant="destructive"
+              onClose={() => setDismissedAlerts((prev) => ({ ...prev, destructive: true }))}
+            >
+              <AlertTitle>Authentication Failed</AlertTitle>
+              <AlertDescription>
+                Invalid credentials provided. Please verify your token and retry.
+              </AlertDescription>
+            </Alert>
+          )}
+
+          {Object.keys(dismissedAlerts).length > 0 && (
+            <button
+              type="button"
+              onClick={() => setDismissedAlerts({})}
+              className="text-xs text-primary underline hover:text-primary/80 cursor-pointer pt-1 block"
+            >
+              Restore dismissed alerts
+            </button>
+          )}
         </div>
       </section>
 

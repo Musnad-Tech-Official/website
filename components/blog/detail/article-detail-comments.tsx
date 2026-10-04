@@ -6,6 +6,7 @@ import { useUser, SignInButton, SignUpButton } from "@clerk/nextjs";
 import { Avatar } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import {
   LuMessageSquare,
   LuCornerDownRight,
@@ -117,16 +118,21 @@ function CommentItem({
     }
   };
 
-  const handleDelete = async () => {
-    if (window.confirm(t("confirmDelete"))) {
-      try {
-        await deleteCommentMutation.mutateAsync({
-          commentId: comment.id,
-          articleSlug,
-        });
-      } catch (err) {
-        console.error("Failed to delete comment:", err);
-      }
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+
+  const handleDelete = () => {
+    setShowDeleteConfirm(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    try {
+      await deleteCommentMutation.mutateAsync({
+        commentId: comment.id,
+        articleSlug,
+      });
+      setShowDeleteConfirm(false);
+    } catch (err) {
+      console.error("Failed to delete comment:", err);
     }
   };
 
@@ -278,6 +284,18 @@ function CommentItem({
           </div>
         )}
       </div>
+
+      <ConfirmDialog
+        open={showDeleteConfirm}
+        onOpenChange={setShowDeleteConfirm}
+        title={t("deleteComment") || (locale === "ar" ? "حذف التعليق" : "Delete Comment")}
+        description={t("confirmDelete") || (locale === "ar" ? "هل أنت متأكد من رغبتك في حذف هذا التعليق؟ لا يمكن التراجع عن هذا الإجراء." : "Are you sure you want to delete this comment? This action cannot be undone.")}
+        confirmLabel={t("delete") || (locale === "ar" ? "حذف" : "Delete")}
+        cancelLabel={t("cancel") || (locale === "ar" ? "إلغاء" : "Cancel")}
+        variant="destructive"
+        isLoading={deleteCommentMutation.isPending}
+        onConfirm={handleConfirmDelete}
+      />
     </div>
   );
 }

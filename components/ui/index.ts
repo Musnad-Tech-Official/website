@@ -10,6 +10,7 @@ export * from "./dialog";
 export * from "./tabs";
 export * from "./avatar";
 export * from "./alert";
+export * from "./confirm-dialog";
 export * from "./skeleton";
 export * from "./tooltip";
 export * from "./cta-section";

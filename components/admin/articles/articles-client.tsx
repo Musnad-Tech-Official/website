@@ -1,7 +1,6 @@
 "use client";
 
 import * as React from "react";
-import { LuCircleCheck } from "react-icons/lu";
 import type { Article, ArticleFormData, ArticleStatus } from "@/lib/articles/types";
 import {
   useArticlesQuery,
@@ -9,6 +8,8 @@ import {
   useToggleArticleStatusMutation,
   useDeleteArticleMutation,
 } from "@/lib/articles/hooks";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { ArticlesFilters, type ArticleFiltersState } from "./articles-filters";
 import { ArticlesTable } from "./articles-table";
 import { ArticleEditorModal } from "./article-editor-modal";
@@ -33,12 +34,19 @@ export function ArticlesClient({ initialArticles, locale }: ArticlesClientProps)
   });
   const [editingArticle, setEditingArticle] = React.useState<Article | null>(null);
   const [isEditorOpen, setIsEditorOpen] = React.useState(false);
-  const [notification, setNotification] = React.useState<string | null>(null);
+  const [deleteArticleId, setDeleteArticleId] = React.useState<string | null>(null);
+  const [alertNotification, setAlertNotification] = React.useState<{
+    type: "success" | "destructive" | "warning" | "info";
+    message: string;
+  } | null>(null);
 
-  // Show toast notification
-  const showToast = (msg: string) => {
-    setNotification(msg);
-    setTimeout(() => setNotification(null), 3500);
+  // Show Alert notification
+  const showAlert = (
+    message: string,
+    type: "success" | "destructive" | "warning" | "info" = "success"
+  ) => {
+    setAlertNotification({ type, message });
+    setTimeout(() => setAlertNotification(null), 4000);
   };
 
   // 2. Mutations
@@ -93,10 +101,10 @@ export function ArticlesClient({ initialArticles, locale }: ArticlesClientProps)
   const handleSave = async (data: ArticleFormData): Promise<boolean> => {
     try {
       await saveMutation.mutateAsync(data);
-      showToast(isRtl ? "تم حفظ المقال بنجاح" : "Article saved successfully");
+      showAlert(isRtl ? "تم حفظ المقال بنجاح" : "Article saved successfully", "success");
       return true;
     } catch (err: unknown) {
-      alert((err as Error).message || "Failed to save article");
+      showAlert((err as Error).message || "Failed to save article", "destructive");
       return false;
     }
   };
@@ -106,47 +114,50 @@ export function ArticlesClient({ initialArticles, locale }: ArticlesClientProps)
       { id, newStatus },
       {
         onSuccess: () => {
-          showToast(
+          showAlert(
             isRtl
               ? `تم تحويل حالة المقال إلى ${newStatus === "published" ? "منشور" : "مسودة"}`
-              : `Article status updated to ${newStatus}`
+              : `Article status updated to ${newStatus}`,
+            "success"
           );
         },
         onError: (err: Error) => {
-          alert(err.message || "Failed to update status");
+          showAlert(err.message || "Failed to update status", "destructive");
         },
       }
     );
   };
 
   const handleDelete = (id: string) => {
-    if (
-      !confirm(
-        isRtl
-          ? "هل أنت متأكد من رغبتك في حذف هذا المقال نهائياً؟"
-          : "Are you sure you want to permanently delete this article?"
-      )
-    ) {
-      return;
-    }
+    setDeleteArticleId(id);
+  };
 
-    deleteMutation.mutate(id, {
-      onSuccess: () => {
-        showToast(isRtl ? "تم حذف المقال بنجاح" : "Article deleted successfully");
-      },
-      onError: (err: Error) => {
-        alert(err.message || "Failed to delete article");
-      },
-    });
+  const handleConfirmDelete = async () => {
+    if (!deleteArticleId) return;
+    try {
+      await deleteMutation.mutateAsync(deleteArticleId);
+      showAlert(isRtl ? "تم حذف المقال بنجاح" : "Article deleted successfully", "success");
+    } catch (err: unknown) {
+      showAlert((err as Error).message || "Failed to delete article", "destructive");
+    } finally {
+      setDeleteArticleId(null);
+    }
   };
 
   return (
     <div className="space-y-6">
-      {/* Toast Notification */}
-      {notification && (
-        <div className="fixed bottom-6 end-6 z-50 bg-foreground text-background px-4 py-2.5 rounded-xl shadow-2xl flex items-center gap-2 text-sm font-medium animate-in fade-in-50 slide-in-from-bottom-5">
-          <LuCircleCheck className="w-4 h-4 text-emerald-400" />
-          <span>{notification}</span>
+      {/* Alert Notification */}
+      {alertNotification && (
+        <div className="fixed bottom-6 end-6 z-50 max-w-md w-full shadow-2xl animate-in fade-in-50 slide-in-from-bottom-5">
+          <Alert
+            variant={alertNotification.type}
+            onClose={() => setAlertNotification(null)}
+            className="bg-card/95 backdrop-blur-md shadow-xl border"
+          >
+            <AlertDescription className="text-xs sm:text-sm font-medium">
+              {alertNotification.message}
+            </AlertDescription>
+          </Alert>
         </div>
       )}
 
@@ -178,6 +189,25 @@ export function ArticlesClient({ initialArticles, locale }: ArticlesClientProps)
         onClose={() => setIsEditorOpen(false)}
         onSave={handleSave}
         isRtl={isRtl}
+      />
+
+      {/* Delete Confirmation Modal */}
+      <ConfirmDialog
+        open={Boolean(deleteArticleId)}
+        onOpenChange={(open) => {
+          if (!open) setDeleteArticleId(null);
+        }}
+        title={isRtl ? "حذف المقال" : "Delete Article"}
+        description={
+          isRtl
+            ? "هل أنت متأكد من رغبتك في حذف هذا المقال نهائياً؟ لا يمكن التراجع عن هذا الإجراء."
+            : "Are you sure you want to permanently delete this article? This action cannot be undone."
+        }
+        confirmLabel={isRtl ? "حذف نهائي" : "Delete Article"}
+        cancelLabel={isRtl ? "إلغاء" : "Cancel"}
+        variant="destructive"
+        isLoading={deleteMutation.isPending}
+        onConfirm={handleConfirmDelete}
       />
     </div>
   );

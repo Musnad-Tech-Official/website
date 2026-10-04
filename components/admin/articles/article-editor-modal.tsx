@@ -5,6 +5,7 @@ import * as React from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { RichTextEditor } from "@/components/ui/rich-text-editor";
 import { uploadImageAction } from "@/lib/storage/actions";
 import {
@@ -35,6 +36,7 @@ export function ArticleEditorModal({
   const [activeTab, setActiveTab] = React.useState<"en" | "ar">("en");
   const [isSaving, setIsSaving] = React.useState(false);
   const [isUploadingCover, setIsUploadingCover] = React.useState(false);
+  const [errorAlert, setErrorAlert] = React.useState<string | null>(null);
   const coverInputRef = React.useRef<HTMLInputElement | null>(null);
 
   // Form Fields State
@@ -74,6 +76,7 @@ export function ArticleEditorModal({
     if (!file) return;
 
     setIsUploadingCover(true);
+    setErrorAlert(null);
     try {
       const formData = new FormData();
       formData.append("file", file);
@@ -82,10 +85,10 @@ export function ArticleEditorModal({
       if (res.success && res.url) {
         setCoverImage(res.url);
       } else {
-        alert(res.error || "Failed to upload cover image.");
+        setErrorAlert(res.error || "Failed to upload cover image.");
       }
     } catch (err: unknown) {
-      alert((err as Error).message || "Upload error.");
+      setErrorAlert((err as Error).message || "Upload error.");
     } finally {
       setIsUploadingCover(false);
       e.target.value = "";
@@ -94,7 +97,7 @@ export function ArticleEditorModal({
 
   const handleSubmit = async (submitStatus?: Article["status"]) => {
     if (!titleEn && !titleAr) {
-      alert(isRtl ? "يرجى كتابة عنوان المقال على الأقل." : "Please enter an article title.");
+      setErrorAlert(isRtl ? "يرجى كتابة عنوان المقال على الأقل." : "Please enter an article title.");
       return;
     }
 
@@ -160,6 +163,17 @@ export function ArticleEditorModal({
             <LuX className="w-5 h-5" />
           </button>
         </div>
+
+        {/* Error Alert */}
+        {errorAlert && (
+          <div className="px-6 pt-4">
+            <Alert variant="destructive" onClose={() => setErrorAlert(null)}>
+              <AlertDescription className="text-xs font-medium">
+                {errorAlert}
+              </AlertDescription>
+            </Alert>
+          </div>
+        )}
 
         {/* Scrollable Form Body */}
         <div className="p-6 overflow-y-auto space-y-6 flex-1 text-xs">
