@@ -2,18 +2,29 @@ import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/routing";
 import { LuArrowRight } from "react-icons/lu";
 import { LATEST_ARTICLES } from "./home-data";
-import { FeaturedArticleCard } from "./featured-article-card";
+import { FeaturedArticleCard, type FeaturedArticleItem } from "./featured-article-card";
+import type { Article } from "@/lib/articles/types";
 import { cn } from "@/lib/utils";
 
 export interface LatestInsightsProps {
+  articles?: Article[];
   className?: string;
 }
 
-export function LatestInsights({ className = "" }: LatestInsightsProps) {
+export function LatestInsights({ articles, className = "" }: LatestInsightsProps) {
   const t = useTranslations("Home.latestInsights");
 
-  // Editorial layout: show exactly 2 prominent featured articles on large screens
-  const featuredArticles = LATEST_ARTICLES.slice(0, 2);
+  // Editorial layout: prioritize articles selected as 'featured' by admin, then recent published, fallback to fixtures
+  const featuredArticles: FeaturedArticleItem[] = (() => {
+    if (articles && articles.length > 0) {
+      const adminSelected = articles.filter((a) => a.layoutVariant === "featured");
+      const regularPublished = articles.filter((a) => a.layoutVariant !== "featured");
+
+      const combined = [...adminSelected, ...regularPublished];
+      return combined.slice(0, 2);
+    }
+    return LATEST_ARTICLES.slice(0, 2);
+  })();
 
   return (
     <section
@@ -53,8 +64,15 @@ export function LatestInsights({ className = "" }: LatestInsightsProps) {
           </div>
         </div>
 
-        {/* Exactly 2 Large Editorial Featured Cards */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-10">
+        {/* Editorial Featured Cards */}
+        <div
+          className={cn(
+            "grid gap-8 lg:gap-10",
+            featuredArticles.length === 1
+              ? "grid-cols-1 max-w-2xl mx-auto"
+              : "grid-cols-1 lg:grid-cols-2"
+          )}
+        >
           {featuredArticles.map((article) => (
             <FeaturedArticleCard key={article.id} article={article} />
           ))}
@@ -63,4 +81,3 @@ export function LatestInsights({ className = "" }: LatestInsightsProps) {
     </section>
   );
 }
-

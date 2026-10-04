@@ -216,6 +216,7 @@
       "viewAll": "View all",
       "readArticle": "Read article",
       "trending": "Trending",
+      "featuredBadge": "Featured",
       "minRead": "{count} min read",
       "timeAgo": "1y ago",
       "articles": {

@@ -11,6 +11,7 @@ import {
 } from "@/components/home";
 
 import { PageGuard } from "@/lib/page-control/guard";
+import { getArticlesAction } from "@/lib/articles/actions";
 
 interface HomePageProps {
   params: Promise<{ locale: string }>;
@@ -18,6 +19,7 @@ interface HomePageProps {
 
 export default async function Page({ params }: HomePageProps) {
   const { locale } = await params;
+  const articles = await getArticlesAction("published");
 
   return (
     <PageGuard slug="home" locale={locale}>
@@ -44,7 +46,7 @@ export default async function Page({ params }: HomePageProps) {
         <TestimonialsSection />
 
         {/* 7. Latest Insights */}
-        <LatestInsights />
+        <LatestInsights articles={articles} />
 
         {/* 8. Final CTA */}
         <FinalCta />
