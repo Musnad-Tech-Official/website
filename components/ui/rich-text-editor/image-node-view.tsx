@@ -12,15 +12,28 @@ import {
   LuPencil,
 } from "react-icons/lu";
 import { uploadImageAction } from "@/lib/storage/actions";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
 export function ImageNodeView(props: NodeViewProps) {
   const { node, updateAttributes, deleteNode, selected } = props;
   const [isUploading, setIsUploading] = React.useState(false);
+  const [errorMessage, setErrorMessage] = React.useState<string | null>(null);
+  const [isEditDialogOpen, setIsEditDialogOpen] = React.useState(false);
   const fileInputRef = React.useRef<HTMLInputElement | null>(null);
 
   const src = node.attrs.src as string;
   const alt = (node.attrs.alt as string) || "";
   const align = (node.attrs.align as "left" | "center" | "right") || "center";
+  const [editUrlValue, setEditUrlValue] = React.useState(src);
 
   // Handle replacing image via file picker
   const handleReplaceFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -28,6 +41,7 @@ export function ImageNodeView(props: NodeViewProps) {
     if (!file) return;
 
     setIsUploading(true);
+    setErrorMessage(null);
     try {
       const formData = new FormData();
       formData.append("file", file);
@@ -36,10 +50,10 @@ export function ImageNodeView(props: NodeViewProps) {
       if (res.success && res.url) {
         updateAttributes({ src: res.url });
       } else {
-        alert(res.error || "Failed to update image.");
+        setErrorMessage(res.error || "Failed to update image.");
       }
     } catch (err: unknown) {
-      alert((err as Error).message || "Upload error.");
+      setErrorMessage((err as Error).message || "Upload error.");
     } finally {
       setIsUploading(false);
       e.target.value = "";
@@ -48,10 +62,15 @@ export function ImageNodeView(props: NodeViewProps) {
 
   // Handle editing image URL or alt text directly
   const handleEditUrl = () => {
-    const newUrl = window.prompt("Enter new image URL:", src);
-    if (newUrl && newUrl.trim() !== "") {
-      updateAttributes({ src: newUrl.trim() });
+    setEditUrlValue(src);
+    setIsEditDialogOpen(true);
+  };
+
+  const handleSaveUrl = () => {
+    if (editUrlValue && editUrlValue.trim() !== "") {
+      updateAttributes({ src: editUrlValue.trim() });
     }
+    setIsEditDialogOpen(false);
   };
 
   const alignClasses = {
@@ -168,7 +187,56 @@ export function ImageNodeView(props: NodeViewProps) {
             <LuTrash2 className="w-3.5 h-3.5" />
           </button>
         </div>
+
+        {/* Error Notification */}
+        {errorMessage && (
+          <div className="absolute top-2 start-2 end-2 z-20">
+            <Alert
+              variant="destructive"
+              onClose={() => setErrorMessage(null)}
+              className="py-1 px-2.5 text-[11px] shadow-lg bg-destructive text-destructive-foreground"
+            >
+              <AlertDescription className="text-[11px]">{errorMessage}</AlertDescription>
+            </Alert>
+          </div>
+        )}
       </div>
+
+      {/* Edit URL Dialog */}
+      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-sm font-semibold">Edit Image URL</DialogTitle>
+          </DialogHeader>
+          <div className="py-2 space-y-2">
+            <label className="text-xs text-muted-foreground">Image Address</label>
+            <Input
+              value={editUrlValue}
+              onChange={(e) => setEditUrlValue(e.target.value)}
+              placeholder="https://example.com/image.png"
+              className="text-xs h-9"
+              autoFocus
+            />
+          </div>
+          <DialogFooter className="gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setIsEditDialogOpen(false)}
+              className="text-xs"
+            >
+              Cancel
+            </Button>
+            <Button
+              size="sm"
+              onClick={handleSaveUrl}
+              className="text-xs font-semibold"
+            >
+              Apply
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </NodeViewWrapper>
   );
 }
