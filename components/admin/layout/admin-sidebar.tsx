@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import Image from "next/image";
 import { usePathname, Link } from "@/i18n/routing";
 import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
@@ -16,8 +17,7 @@ import {
   LuGlobe,
   LuChevronLeft,
   LuChevronRight,
-  LuShieldCheck,
-  LuSparkles,
+  LuX,
 } from "react-icons/lu";
 
 interface AdminSidebarProps {
@@ -125,31 +125,76 @@ export function AdminSidebar({
         )}
       >
         {/* Brand / Logo Header */}
-        <div className="flex items-center justify-between h-16 px-4 border-b border-border">
-          <Link
-            href="/admin"
-            className={cn(
-              "flex items-center gap-3 overflow-hidden transition-all",
-              isCollapsed && "justify-center w-full"
-            )}
-            title="Musnad Tech Admin"
-          >
-            <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-primary/10 text-primary border border-primary/20 shrink-0">
-              <LuShieldCheck className="w-5 h-5 text-primary" />
-            </div>
+        <div
+          className={cn(
+            "flex items-center h-16 border-b border-border transition-all duration-300",
+            isCollapsed ? "justify-center px-2" : "justify-between px-4"
+          )}
+        >
+          {/* Real Brand Logo (shown only when NOT collapsed) */}
+          {!isCollapsed && (
+            <Link
+              href="/admin"
+              className="flex items-center gap-2 overflow-hidden transition-all select-none min-w-0"
+              title="Musnad Tech Admin"
+            >
+              {/* Light Mode Logo */}
+              <Image
+                src="/brand/logo-light.png"
+                alt="Musnad Tech Logo"
+                width={1024}
+                height={341}
+                priority
+                className="h-7 w-auto object-contain dark:hidden"
+              />
+              {/* Dark Mode Logo */}
+              <Image
+                src="/brand/logo-dark.png"
+                alt="Musnad Tech Logo"
+                width={1024}
+                height={341}
+                priority
+                className="h-7 w-auto object-contain hidden dark:block"
+              />
+            </Link>
+          )}
 
-            {!isCollapsed && (
-              <div className="flex flex-col min-w-0">
-                <span className="font-bold text-sm tracking-tight text-foreground truncate">
-                  Musnad Tech
-                </span>
-                <span className="text-[11px] font-medium text-muted-foreground flex items-center gap-1">
-                  <LuSparkles className="w-3 h-3 text-amber-500" />
-                  {t("nav.roleBadge")}
-                </span>
-              </div>
+          {/* Desktop Collapse Toggle Button (Top next to logo when expanded, centered alone when collapsed) */}
+          <button
+            type="button"
+            onClick={toggleCollapse}
+            className={cn(
+              "hidden lg:flex items-center justify-center rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/80 transition-colors cursor-pointer shrink-0",
+              isCollapsed ? "w-9 h-9" : "w-8 h-8"
             )}
-          </Link>
+            title={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+            aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+          >
+            {isCollapsed ? (
+              isRtl ? (
+                <LuChevronLeft className="w-5 h-5" />
+              ) : (
+                <LuChevronRight className="w-5 h-5" />
+              )
+            ) : isRtl ? (
+              <LuChevronRight className="w-5 h-5" />
+            ) : (
+              <LuChevronLeft className="w-5 h-5" />
+            )}
+          </button>
+
+          {/* Mobile Close Button */}
+          {onMobileClose && (
+            <button
+              type="button"
+              onClick={onMobileClose}
+              className="lg:hidden flex items-center justify-center w-8 h-8 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-pointer"
+              title="Close sidebar"
+              aria-label="Close sidebar"
+            >
+              <LuX className="w-4 h-4" />
+            </button>
+          )}
         </div>
 
         {/* Navigation Items */}
@@ -211,27 +256,6 @@ export function AdminSidebar({
             <LuGlobe className="w-4 h-4 shrink-0" />
             {!isCollapsed && <span className="truncate">{t("nav.viewSite")}</span>}
           </Link>
-
-          {/* Desktop Collapse Toggle */}
-          <button
-            type="button"
-            onClick={toggleCollapse}
-            className="hidden lg:flex w-full items-center justify-center p-2 text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-colors cursor-pointer"
-            title={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
-            aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
-          >
-            {isCollapsed ? (
-              isRtl ? (
-                <LuChevronLeft className="w-4 h-4" />
-              ) : (
-                <LuChevronRight className="w-4 h-4" />
-              )
-            ) : isRtl ? (
-              <LuChevronRight className="w-4 h-4" />
-            ) : (
-              <LuChevronLeft className="w-4 h-4" />
-            )}
-          </button>
         </div>
       </aside>
     </>

@@ -87,24 +87,24 @@ export function Alert({
     <div
       role="alert"
       className={cn(
-        "relative flex w-full gap-3 rounded-xl border p-4 transition-colors",
+        "relative flex w-full gap-3 rounded-xl border p-4 transition-colors text-start",
         config.container,
         className
       )}
       {...props}
     >
-      <div className={cn("mt-0.5", config.icon)} aria-hidden="true">
+      <div className={cn("mt-0.5 shrink-0", config.icon)} aria-hidden="true">
         {icons[variant]}
       </div>
 
-      <div className="flex-1 space-y-1">{children}</div>
+      <div className="flex-1 space-y-1 text-start">{children}</div>
 
       {onClose && (
         <button
           type="button"
           onClick={onClose}
           aria-label="Dismiss alert"
-          className="ml-auto -mr-1.5 -mt-1.5 inline-flex h-7 w-7 items-center justify-center rounded-lg p-1 text-muted-foreground hover:bg-black/5 hover:text-foreground dark:hover:bg-white/10 focus:outline-none"
+          className="ms-auto -me-1.5 -mt-1.5 inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-lg p-1 text-muted-foreground hover:bg-black/5 hover:text-foreground dark:hover:bg-white/10 focus:outline-none cursor-pointer"
         >
           <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
@@ -121,7 +121,7 @@ export function AlertTitle({
 }: React.HTMLAttributes<HTMLHeadingElement>) {
   return (
     <h5
-      className={cn("font-semibold text-sm leading-tight tracking-tight", className)}
+      className={cn("font-semibold text-sm leading-tight tracking-tight text-start", className)}
       {...props}
     />
   );
@@ -133,7 +133,7 @@ export function AlertDescription({
 }: React.HTMLAttributes<HTMLParagraphElement>) {
   return (
     <div
-      className={cn("text-xs opacity-90 leading-relaxed", className)}
+      className={cn("text-xs opacity-90 leading-relaxed text-start", className)}
       {...props}
     />
   );

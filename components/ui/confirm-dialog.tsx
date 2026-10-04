@@ -79,8 +79,8 @@ export function ConfirmDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
-        <div className="flex items-start gap-3.5 sm:gap-4">
+      <DialogContent className="sm:max-w-md text-start" showCloseButton={false}>
+        <div className="flex items-start gap-3.5 sm:gap-4 text-start">
           <div
             className={cn(
               "w-10 h-10 rounded-2xl flex items-center justify-center border shrink-0 mt-0.5 shadow-2xs",
@@ -89,12 +89,12 @@ export function ConfirmDialog({
           >
             {getIcon()}
           </div>
-          <div className="flex-1 min-w-0 space-y-1">
-            <DialogHeader className="text-start space-y-1 p-0">
-              <DialogTitle className="text-base font-bold text-foreground">
+          <div className="flex-1 min-w-0 space-y-1 text-start">
+            <DialogHeader className="text-start space-y-1 p-0 mb-0">
+              <DialogTitle className="text-base font-bold text-foreground text-start">
                 {title}
               </DialogTitle>
-              <DialogDescription className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
+              <DialogDescription className="text-xs sm:text-sm text-muted-foreground leading-relaxed text-start">
                 {description}
               </DialogDescription>
             </DialogHeader>

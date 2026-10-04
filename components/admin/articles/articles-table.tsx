@@ -165,37 +165,37 @@ export function ArticlesTable({
 
                   {/* Action Buttons */}
                   <td className="py-3.5 px-4 text-end">
-                    <div className="flex items-center justify-end gap-1">
+                    <div className="flex items-center justify-end gap-1.5">
                       {/* View live article */}
                       <Link
                         href={`/blog/${article.slug}`}
                         target="_blank"
-                        className="inline-flex items-center justify-center h-8 w-8 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
+                        className="inline-flex items-center justify-center h-9 w-9 rounded-xl border border-border/80 bg-background text-muted-foreground hover:text-foreground hover:bg-muted hover:border-border transition-all shadow-2xs"
                         title={isRtl ? "معاينة على الموقع" : "Preview on Live Site"}
                       >
-                        <LuExternalLink className="w-3.5 h-3.5" />
+                        <LuExternalLink className="w-4 h-4" />
                       </Link>
 
                       {/* Edit article button */}
                       <Button
-                        variant="ghost"
+                        variant="outline"
                         size="sm"
                         onClick={() => onEdit(article)}
-                        className="h-8 w-8 p-0 text-muted-foreground hover:text-foreground cursor-pointer rounded-lg"
+                        className="h-9 w-9 p-0 text-muted-foreground hover:text-foreground hover:bg-muted border-border/80 rounded-xl cursor-pointer shadow-2xs"
                         title={isRtl ? "تعديل المقال" : "Edit Article"}
                       >
-                        <LuPencil className="w-3.5 h-3.5" />
+                        <LuPencil className="w-4 h-4" />
                       </Button>
 
                       {/* Delete article button */}
                       <Button
-                        variant="ghost"
+                        variant="outline"
                         size="sm"
                         onClick={() => onDelete(article.id)}
-                        className="h-8 w-8 p-0 text-muted-foreground hover:text-rose-500 cursor-pointer rounded-lg"
+                        className="h-9 w-9 p-0 text-destructive hover:bg-destructive/10 border-destructive/25 hover:border-destructive/50 rounded-xl cursor-pointer shadow-2xs"
                         title={isRtl ? "حذف المقال" : "Delete Article"}
                       >
-                        <LuTrash2 className="w-3.5 h-3.5" />
+                        <LuTrash2 className="w-4 h-4" />
                       </Button>
                     </div>
                   </td>

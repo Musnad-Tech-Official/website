@@ -216,6 +216,7 @@
       "viewAll": "عرض الكل",
       "readArticle": "قراءة المقال",
       "trending": "شائع",
+      "featuredBadge": "مقال مميز",
       "minRead": "{count} دقائق قراءة",
       "timeAgo": "منذ عام",
       "articles": {

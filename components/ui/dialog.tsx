@@ -138,10 +138,13 @@ export const DialogContent = React.forwardRef<
 
   if (!isMounted || !open) return null;
 
+  const dir = typeof document !== "undefined" ? document.documentElement.dir || undefined : undefined;
+
   return createPortal(
     <div
       role="dialog"
       aria-modal="true"
+      dir={dir}
       className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6"
     >
       {/* Backdrop */}
@@ -159,7 +162,7 @@ export const DialogContent = React.forwardRef<
           else if (ref) ref.current = node;
         }}
         className={cn(
-          "relative z-50 w-full max-w-lg rounded-xl border border-border bg-card p-6 text-card-foreground shadow-2xl",
+          "relative z-50 w-full max-w-lg rounded-xl border border-border bg-card p-6 text-card-foreground shadow-2xl text-start",
           "animate-in fade-in-0 zoom-in-95 duration-200",
           className
         )}
@@ -173,7 +176,7 @@ export const DialogContent = React.forwardRef<
             type="button"
             onClick={() => onOpenChange(false)}
             aria-label="Close dialog"
-            className="absolute right-4 top-4 rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+            className="absolute end-4 top-4 rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus:outline-none focus:ring-2 focus:ring-ring cursor-pointer"
           >
             <svg
               className="h-4 w-4"
@@ -203,7 +206,7 @@ export function DialogHeader({
   return (
     <div
       className={cn(
-        "flex flex-col space-y-1.5 text-center sm:text-left mb-4",
+        "flex flex-col space-y-1.5 text-start sm:text-start mb-4",
         className
       )}
       {...props}
@@ -218,7 +221,7 @@ export function DialogTitle({
   return (
     <h2
       className={cn(
-        "text-lg font-semibold leading-none tracking-tight text-foreground",
+        "text-lg font-semibold leading-none tracking-tight text-foreground text-start",
         className
       )}
       {...props}
@@ -232,7 +235,7 @@ export function DialogDescription({
 }: React.HTMLAttributes<HTMLParagraphElement>) {
   return (
     <p
-      className={cn("text-sm text-muted-foreground mt-1", className)}
+      className={cn("text-sm text-muted-foreground mt-1 text-start", className)}
       {...props}
     />
   );
@@ -245,7 +248,7 @@ export function DialogFooter({
   return (
     <div
       className={cn(
-        "flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 mt-6 gap-2 sm:gap-0",
+        "flex flex-col-reverse sm:flex-row sm:justify-end gap-2 mt-6",
         className
       )}
       {...props}
