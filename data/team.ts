@@ -1,5 +1,6 @@
 export interface TeamMember {
   id: string;
+  slug?: string;
   name: string;
   role: string;
   bio: string;
@@ -10,6 +11,7 @@ export interface TeamMember {
     github?: string;
     linkedin?: string;
     x?: string;
+    website?: string;
   };
 }
 

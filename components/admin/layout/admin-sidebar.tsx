@@ -13,6 +13,7 @@ import {
   LuMessageSquare,
   LuMessagesSquare,
   LuUsers,
+  LuShieldCheck,
   LuSettings,
   LuGlobe,
   LuChevronLeft,
@@ -79,9 +80,14 @@ export function AdminSidebar({
       badge: "0",
     },
     {
+      title: t("nav.team"),
+      href: "/admin/team",
+      icon: LuUsers,
+    },
+    {
       title: t("nav.users"),
       href: "/admin/users",
-      icon: LuUsers,
+      icon: LuShieldCheck,
     },
     {
       title: t("nav.settings"),

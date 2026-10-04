@@ -5,6 +5,7 @@ import { Link } from "@/i18n/routing";
 import { Badge } from "@/components/ui/badge";
 import { LuChevronRight } from "react-icons/lu";
 import { formatArticleDate } from "@/lib/utils/date";
+import { getAuthorSlug } from "@/lib/team/utils";
 import { ArticleHeaderActions } from "./article-header-actions";
 import type { ArticleDetailHeaderProps } from "./article-detail-types";
 import { cn } from "@/lib/utils";
@@ -104,23 +105,26 @@ export function ArticleDetailHeader({
         {hasMetadata ? (
           <div className="flex items-center flex-wrap gap-3 sm:gap-4 text-xs sm:text-sm text-muted-foreground">
             {author && (
-              <div className="flex items-center gap-2.5">
+              <Link
+                href={`/team/${getAuthorSlug(author.name, (author as { slug?: string; id?: string }).slug || (author as { slug?: string; id?: string }).id)}`}
+                className="flex items-center gap-2.5 group/author hover:opacity-90 transition-opacity"
+              >
                 {author.avatar ? (
                   <img
                     src={author.avatar}
                     alt={author.name}
-                    className="h-8 w-8 rounded-full object-cover border border-border/80 shrink-0"
+                    className="h-8 w-8 rounded-full object-cover border border-border/80 shrink-0 group-hover/author:border-primary/50 transition-colors"
                   />
                 ) : (
                   <div
                     aria-hidden="true"
-                    className="h-8 w-8 rounded-full bg-primary/10 text-primary font-bold text-xs flex items-center justify-center border border-primary/20 shrink-0"
+                    className="h-8 w-8 rounded-full bg-primary/10 text-primary font-bold text-xs flex items-center justify-center border border-primary/20 shrink-0 group-hover/author:border-primary transition-colors"
                   >
                     {author.initials || author.name.charAt(0)}
                   </div>
                 )}
                 <div className="flex flex-col sm:flex-row sm:items-center gap-0.5 sm:gap-1.5">
-                  <span className="font-semibold text-foreground">
+                  <span className="font-semibold text-foreground group-hover/author:text-primary transition-colors">
                     {author.name}
                   </span>
                   {author.role && (
@@ -129,7 +133,7 @@ export function ArticleDetailHeader({
                     </span>
                   )}
                 </div>
-              </div>
+              </Link>
             )}
 
             {publishedAt && (
