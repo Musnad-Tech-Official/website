@@ -80,11 +80,19 @@ ON CONFLICT (id) DO UPDATE SET
   file_size_limit = 10485760,
   allowed_mime_types = ARRAY['image/png', 'image/jpeg', 'image/gif', 'image/webp', 'image/svg+xml'];
 
--- Storage RLS: Public read access for images
+-- Storage RLS: Admins can view and list article media
+-- (Public image downloads via URL work automatically because bucket is marked 'public')
 DROP POLICY IF EXISTS "Public can view article media" ON storage.objects;
-CREATE POLICY "Public can view article media"
+DROP POLICY IF EXISTS "Admins can view and list article media" ON storage.objects;
+CREATE POLICY "Admins can view and list article media"
   ON storage.objects FOR SELECT
-  USING (bucket_id = 'article-media');
+  TO authenticated
+  USING (
+    bucket_id = 'article-media' AND (
+      (auth.jwt() -> 'metadata' ->> 'role') = 'admin' OR
+      (auth.jwt() ->> 'role') = 'admin'
+    )
+  );
 
 -- Storage RLS: Admins can upload images
 DROP POLICY IF EXISTS "Admins can upload article media" ON storage.objects;
