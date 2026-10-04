@@ -40,7 +40,6 @@ export async function subscribeNewsletterAction(
         source,
         locale,
         status: "subscribed",
-        updated_at: new Date().toISOString(),
       },
       { onConflict: "email" }
     );

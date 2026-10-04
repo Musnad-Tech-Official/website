@@ -53,6 +53,21 @@ CREATE POLICY "Admins can update page settings"
     (auth.jwt() ->> 'role') = 'admin'
   );
 
+-- 3. Automatic updated_at Trigger
+CREATE OR REPLACE FUNCTION public.handle_updated_at()
+RETURNS TRIGGER AS $$
+BEGIN
+  NEW.updated_at = NOW();
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS set_page_settings_updated_at ON public.page_settings;
+CREATE TRIGGER set_page_settings_updated_at
+  BEFORE UPDATE ON public.page_settings
+  FOR EACH ROW
+  EXECUTE FUNCTION public.handle_updated_at();
+
 -- ==============================================================================
 -- Initial Seed Data: Populating from Master Page Inventory
 -- ==============================================================================

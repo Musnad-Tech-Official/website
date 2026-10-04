@@ -122,7 +122,70 @@ export async function addArticleCommentAction(
   const userAvatar = user.imageUrl || undefined;
   const role = (user.publicMetadata?.role as string) === "admin" ? "admin" : "member";
 
-  const newComment: ArticleComment = {
+  try {
+    const supabase = await createClient();
+    const { data, error } = await supabase
+      .from("article_comments")
+      .insert({
+        article_id: params.articleId || null,
+        article_slug: params.articleSlug,
+        user_id: userId,
+        user_name: userName,
+        user_avatar: userAvatar || null,
+        user_role: role,
+        content: text,
+        status: "approved",
+        parent_id: params.parentId || null,
+        // No id, created_at, or updated_at passed; Supabase generates them!
+      })
+      .select()
+      .single();
+
+    if (!error && data) {
+      const row = data as {
+        id: string;
+        article_id: string;
+        article_slug: string;
+        user_id: string;
+        user_name: string;
+        user_avatar: string | null;
+        user_role: string;
+        content: string;
+        status: "approved" | "pending" | "flagged" | "deleted";
+        parent_id: string | null;
+        created_at: string;
+        updated_at: string;
+      };
+
+      const createdComment: ArticleComment = {
+        id: row.id,
+        articleId: row.article_id,
+        articleSlug: row.article_slug,
+        userId: row.user_id,
+        userName: row.user_name,
+        userAvatar: row.user_avatar || undefined,
+        userRole: (row.user_role as ArticleComment["userRole"]) || role,
+        content: row.content,
+        status: row.status,
+        parentId: row.parent_id || null,
+        createdAt: row.created_at,
+        updatedAt: row.updated_at,
+        replies: [],
+      };
+
+      revalidatePath(`/[locale]/blog/${params.articleSlug}`, "page");
+      return { success: true, comment: createdComment };
+    }
+
+    if (error) {
+      console.warn("Supabase insert comment notice:", error.message);
+    }
+  } catch (err) {
+    console.error("addArticleCommentAction exception:", err);
+  }
+
+  // Fallback in-memory persistence only if Supabase is offline
+  const fallbackComment: ArticleComment = {
     id: crypto.randomUUID(),
     articleId: params.articleId,
     articleSlug: params.articleSlug,
@@ -138,43 +201,15 @@ export async function addArticleCommentAction(
     replies: [],
   };
 
-  try {
-    const supabase = await createClient();
-    const { error } = await supabase.from("article_comments").insert({
-      id: newComment.id,
-      article_id: newComment.articleId,
-      article_slug: newComment.articleSlug,
-      user_id: newComment.userId,
-      user_name: newComment.userName,
-      user_avatar: newComment.userAvatar,
-      user_role: newComment.userRole,
-      content: newComment.content,
-      status: newComment.status,
-      parent_id: newComment.parentId,
-      created_at: newComment.createdAt,
-      updated_at: newComment.updatedAt,
-    });
+  const currentList = fallbackCommentsStore.get(params.articleSlug) || [];
+  currentList.push(fallbackComment);
+  fallbackCommentsStore.set(params.articleSlug, currentList);
 
-    if (error) {
-      console.warn("Supabase insert comment notice:", error.message);
-      // Fallback in-memory persistence
-      const currentList = fallbackCommentsStore.get(params.articleSlug) || [];
-      currentList.push(newComment);
-      fallbackCommentsStore.set(params.articleSlug, currentList);
-    }
-  } catch (err) {
-    console.error("addArticleCommentAction exception:", err);
-    // Fallback in-memory persistence
-    const currentList = fallbackCommentsStore.get(params.articleSlug) || [];
-    currentList.push(newComment);
-    fallbackCommentsStore.set(params.articleSlug, currentList);
-  }
-
-  revalidatePath(`/blog/${params.articleSlug}`);
+  revalidatePath(`/[locale]/blog/${params.articleSlug}`, "page");
 
   return {
     success: true,
-    comment: newComment,
+    comment: fallbackComment,
   };
 }
 
@@ -327,7 +362,7 @@ export async function updateCommentStatusAction(
     const supabase = await createClient();
     const { error } = await supabase
       .from("article_comments")
-      .update({ status, updated_at: new Date().toISOString() })
+      .update({ status })
       .eq("id", commentId);
 
     if (error) {

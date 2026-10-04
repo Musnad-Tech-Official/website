@@ -43,6 +43,22 @@ CREATE INDEX IF NOT EXISTS idx_articles_published_at ON public.articles(publishe
 -- Enable Row Level Security (RLS)
 ALTER TABLE public.articles ENABLE ROW LEVEL SECURITY;
 
+-- 2. Automatic updated_at Trigger
+-- Ensures updated_at is automatically updated on every UPDATE in Supabase
+CREATE OR REPLACE FUNCTION public.handle_updated_at()
+RETURNS TRIGGER AS $$
+BEGIN
+  NEW.updated_at = NOW();
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS set_articles_updated_at ON public.articles;
+CREATE TRIGGER set_articles_updated_at
+  BEFORE UPDATE ON public.articles
+  FOR EACH ROW
+  EXECUTE FUNCTION public.handle_updated_at();
+
 -- 2. RLS Policies for Articles Table
 DROP POLICY IF EXISTS "Public can view published articles" ON public.articles;
 CREATE POLICY "Public can view published articles" 

@@ -148,7 +148,6 @@ export async function updatePageControlAction(
           maintenance_notice_en: updated.maintenanceNoticeEn || null,
           maintenance_notice_ar: updated.maintenanceNoticeAr || null,
           is_protected: updated.isProtected ?? false,
-          updated_at: updated.updatedAt,
           updated_by: adminId,
         });
     } catch {
@@ -198,7 +197,6 @@ export async function batchUpdatePageStatusAction(
         .from("page_settings")
         .update({
           status,
-          updated_at: now,
           updated_by: adminId,
         })
         .in("id", ids);

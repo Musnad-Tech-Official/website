@@ -106,3 +106,27 @@ DROP POLICY IF EXISTS "Allow delete comments" ON public.article_comments;
 CREATE POLICY "Allow delete comments"
   ON public.article_comments FOR DELETE
   USING (true);
+
+-- ==============================================================================
+-- 3. Automatic updated_at Triggers
+-- ==============================================================================
+CREATE OR REPLACE FUNCTION public.handle_updated_at()
+RETURNS TRIGGER AS $$
+BEGIN
+  NEW.updated_at = NOW();
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS set_newsletter_subscribers_updated_at ON public.newsletter_subscribers;
+CREATE TRIGGER set_newsletter_subscribers_updated_at
+  BEFORE UPDATE ON public.newsletter_subscribers
+  FOR EACH ROW
+  EXECUTE FUNCTION public.handle_updated_at();
+
+DROP TRIGGER IF EXISTS set_article_comments_updated_at ON public.article_comments;
+CREATE TRIGGER set_article_comments_updated_at
+  BEFORE UPDATE ON public.article_comments
+  FOR EACH ROW
+  EXECUTE FUNCTION public.handle_updated_at();
+
