@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
-import { getTeamMembers, getTeamStats } from "@/data/team";
+import { getTeamStats } from "@/data/team";
+import { getTeamMembersAction } from "@/lib/team/actions";
 import {
   TeamHeader,
   TeamGrid,
@@ -29,7 +30,19 @@ export default async function TeamPage({ params }: TeamPageProps) {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "Team" });
 
-  const members = getTeamMembers(locale);
+  const isAr = locale === "ar";
+  const dbMembers = await getTeamMembersAction(true);
+  const members = dbMembers.map((m) => ({
+    id: m.slug || m.id,
+    slug: m.slug,
+    name: isAr ? m.nameAr : m.nameEn,
+    role: isAr ? m.roleAr : m.roleEn,
+    bio: isAr ? m.bioAr : m.bioEn,
+    initials: m.initials,
+    image: m.image,
+    skills: m.skills,
+    socialLinks: m.socialLinks,
+  }));
   const stats = getTeamStats(locale);
 
   return (

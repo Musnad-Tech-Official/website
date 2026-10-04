@@ -1,20 +1,24 @@
 import React from "react";
 import Image from "next/image";
+import { Link } from "@/i18n/routing";
 import { Card } from "@/components/ui/card";
 import type { TeamMemberCardProps } from "./team-types";
 import { cn } from "@/lib/utils";
 
 export function TeamMemberCard({ member, className = "" }: TeamMemberCardProps) {
+  const profileHref = `/team/${member.slug || member.id}`;
+
   return (
-    <Card
-      variant="interactive"
-      aria-labelledby={`team-member-${member.id}`}
-      className={cn(
-        "group relative flex flex-col p-3 sm:p-4 rounded-2xl sm:rounded-3xl border-border/80 shadow-2xs transition-all duration-200",
-        "hover:border-border hover:shadow-md hover:-translate-y-1",
-        className
-      )}
-    >
+    <Link href={profileHref} className="block group focus:outline-none">
+      <Card
+        variant="interactive"
+        aria-labelledby={`team-member-${member.id}`}
+        className={cn(
+          "relative flex flex-col p-3 sm:p-4 rounded-2xl sm:rounded-3xl border-border/80 shadow-2xs transition-all duration-200 cursor-pointer",
+          "hover:border-border hover:shadow-md hover:-translate-y-1",
+          className
+        )}
+      >
       {/* Portrait Photo Container */}
       <div
         className={cn(
@@ -52,6 +56,7 @@ export function TeamMemberCard({ member, className = "" }: TeamMemberCardProps) 
         </p>
       </div>
     </Card>
+  </Link>
   );
 }
 

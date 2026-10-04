@@ -5,6 +5,8 @@ import type { ArticleDetailData } from "@/data/article-details";
 import type { BlogArticle } from "@/data/blog";
 import { getArticleBySlugAction, getArticlesAction } from "@/lib/articles/actions";
 import { getArticleCommentsAction } from "@/lib/comments/actions";
+import { getTeamMemberBySlugAction } from "@/lib/team/actions";
+import { getAuthorSlug } from "@/lib/team/utils";
 import {
   ArticleDetailHeader,
   ArticleDetailBody,
@@ -84,6 +86,9 @@ export default async function ArticleDetailPage({
 
   const { processedHtml, tocItems } = processHtmlHeadings(rawHtml);
 
+  const authorSlug = getAuthorSlug(dbArticle.authorName);
+  const teamMember = await getTeamMemberBySlugAction(authorSlug);
+
   const article: ArticleDetailData = {
     id: dbArticle.id,
     slug: dbArticle.slug,
@@ -96,9 +101,14 @@ export default async function ArticleDetailPage({
     publishedAt: dbArticle.publishedAt,
     readTime: isAr ? dbArticle.readTimeAr : dbArticle.readTimeEn,
     author: {
+      id: authorSlug,
+      slug: authorSlug,
       name: dbArticle.authorName,
-      role: dbArticle.authorRole,
-      avatar: dbArticle.authorAvatar,
+      role: dbArticle.authorRole || (teamMember ? (isAr ? teamMember.roleAr : teamMember.roleEn) : undefined),
+      avatar: dbArticle.authorAvatar || teamMember?.image,
+      initials: teamMember?.initials,
+      bio: teamMember ? (isAr ? teamMember.bioAr : teamMember.bioEn) : undefined,
+      topics: teamMember?.skills,
     },
     contentHtml: processedHtml,
     tableOfContents: tocItems.length > 0 ? tocItems : undefined,
