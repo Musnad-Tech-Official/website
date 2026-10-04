@@ -79,28 +79,30 @@ CREATE INDEX IF NOT EXISTS idx_article_comments_status
 -- Enable RLS for article comments
 ALTER TABLE public.article_comments ENABLE ROW LEVEL SECURITY;
 
--- Comments RLS: Public can view approved comments
+-- Comments RLS: Public can view comments (admin dashboard views all, public components filter by approved)
 DROP POLICY IF EXISTS "Public can view approved comments" ON public.article_comments;
-CREATE POLICY "Public can view approved comments"
+DROP POLICY IF EXISTS "Allow select comments" ON public.article_comments;
+CREATE POLICY "Allow select comments"
   ON public.article_comments FOR SELECT
-  USING (status = 'approved');
+  USING (true);
 
--- Comments RLS: Authenticated users can post comments
+-- Comments RLS: Anyone authenticated or via server action can post comments
 DROP POLICY IF EXISTS "Authenticated users can post comments" ON public.article_comments;
-CREATE POLICY "Authenticated users can post comments"
+DROP POLICY IF EXISTS "Allow insert comments" ON public.article_comments;
+CREATE POLICY "Allow insert comments"
   ON public.article_comments FOR INSERT
-  TO authenticated
-  WITH CHECK (
-    auth.jwt() IS NOT NULL
-  );
+  WITH CHECK (true);
 
--- Comments RLS: Users can delete/update their own comments or admins can manage all
+-- Comments RLS: Allow update on comments (status, content)
 DROP POLICY IF EXISTS "Users can delete their own comments" ON public.article_comments;
-CREATE POLICY "Users can delete their own comments"
+DROP POLICY IF EXISTS "Allow update comments" ON public.article_comments;
+CREATE POLICY "Allow update comments"
   ON public.article_comments FOR UPDATE
-  TO authenticated
-  USING (
-    user_id = (auth.jwt() ->> 'sub') OR
-    (auth.jwt() -> 'metadata' ->> 'role') = 'admin' OR
-    (auth.jwt() ->> 'role') = 'admin'
-  );
+  USING (true)
+  WITH CHECK (true);
+
+-- Comments RLS: Allow delete on comments
+DROP POLICY IF EXISTS "Allow delete comments" ON public.article_comments;
+CREATE POLICY "Allow delete comments"
+  ON public.article_comments FOR DELETE
+  USING (true);
