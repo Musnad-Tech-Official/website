@@ -39,6 +39,13 @@ export interface ProjectDetailHeaderProps {
   homeLabel: string;
   projectsLabel: string;
   breadcrumbLabel?: string;
+  image?: string;
+  gradient?: string;
+  category?: string;
+  clientName?: string;
+  year?: string;
+  liveDemoUrl?: string;
+  githubUrl?: string;
   className?: string;
 }
 

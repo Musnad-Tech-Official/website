@@ -18,6 +18,15 @@ export const pageControlKeys = {
   lists: () => [...pageControlKeys.all, "list"] as const,
 };
 
+export const projectKeys = {
+  all: ["projects"] as const,
+  lists: () => [...projectKeys.all, "list"] as const,
+  list: (filters?: { status?: string; search?: string; category?: string }) =>
+    [...projectKeys.lists(), filters ?? {}] as const,
+  details: () => [...projectKeys.all, "detail"] as const,
+  detail: (slugOrId: string) => [...projectKeys.details(), slugOrId] as const,
+};
+
 export const commentKeys = {
   all: ["comments"] as const,
   byArticle: (articleSlug: string) => [...commentKeys.all, "article", articleSlug] as const,
@@ -26,3 +35,4 @@ export const commentKeys = {
     [...commentKeys.admin(), "list", filters ?? {}] as const,
   adminStats: () => [...commentKeys.admin(), "stats"] as const,
 };
+
