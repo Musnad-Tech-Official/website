@@ -1,4 +1,3 @@
-import React from "react";
 import {
   SiVite,
   SiNextdotjs,
@@ -21,16 +20,23 @@ import {
   SiSpringboot,
   SiElectron,
   SiClerk,
+  SiGo,
+  SiPython,
+  SiRust,
+  SiRedis,
+  SiClickhouse,
+  SiFastapi,
 } from "react-icons/si";
 import { FaJava } from "react-icons/fa6";
+import { LuCode } from "react-icons/lu";
 import type { TechId } from "./tech-data";
 
 export interface TechIconProps {
-  id: TechId;
+  id: string;
   className?: string;
 }
 
-const ICON_MAP: Record<TechId, React.ComponentType<{ className?: string }>> = {
+const ICON_MAP: Record<string, React.ComponentType<{ className?: string }>> = {
   vite: SiVite,
   nextjs: SiNextdotjs,
   react: SiReact,
@@ -54,6 +60,12 @@ const ICON_MAP: Record<TechId, React.ComponentType<{ className?: string }>> = {
   mongodb: SiMongodb,
   php: SiPhp,
   docker: SiDocker,
+  go: SiGo,
+  python: SiPython,
+  rust: SiRust,
+  redis: SiRedis,
+  clickhouse: SiClickhouse,
+  fastapi: SiFastapi,
 };
 
 export function TechIcon({ id, className = "w-4.5 h-4.5" }: TechIconProps) {
@@ -66,7 +78,11 @@ export function TechIcon({ id, className = "w-4.5 h-4.5" }: TechIconProps) {
         isSquareBadge ? "rounded-lg" : "rounded-full"
       } bg-neutral-900 text-white dark:bg-black/90 dark:text-white shadow-xs ring-1 ring-border/50 dark:ring-white/15`}
     >
-      {IconComponent && <IconComponent className={className} />}
+      {IconComponent ? (
+        <IconComponent className={className} />
+      ) : (
+        <LuCode className={className} />
+      )}
     </span>
   );
 }

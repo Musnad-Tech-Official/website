@@ -13,6 +13,8 @@ import {
 import { PageGuard } from "@/lib/page-control/guard";
 import { getArticlesAction } from "@/lib/articles/actions";
 import { getTeamMembersAction } from "@/lib/team/actions";
+import { getProjectsAction } from "@/lib/projects/actions";
+import { getHomeTechnologiesAction } from "@/lib/technologies/actions";
 
 interface HomePageProps {
   params: Promise<{ locale: string }>;
@@ -22,9 +24,11 @@ export default async function Page({ params }: HomePageProps) {
   const { locale } = await params;
   const isAr = locale === "ar";
 
-  const [articles, dbTeamMembers] = await Promise.all([
+  const [articles, dbTeamMembers, dbProjects, dbTechnologies] = await Promise.all([
     getArticlesAction("published"),
     getTeamMembersAction(true),
+    getProjectsAction("published"),
+    getHomeTechnologiesAction(),
   ]);
 
   const teamMembers = dbTeamMembers.map((m) => ({
@@ -37,6 +41,33 @@ export default async function Page({ params }: HomePageProps) {
     image: m.image,
     skills: m.skills,
     socialLinks: m.socialLinks,
+  }));
+
+  const projects = dbProjects.map((p) => ({
+    id: p.id,
+    slug: p.slug,
+    title: isAr ? p.titleAr || p.titleEn : p.titleEn || p.titleAr,
+    description: isAr ? p.descriptionAr || p.descriptionEn : p.descriptionEn || p.descriptionAr,
+    category: p.category,
+    year: p.year,
+    featured: p.featured,
+    liveDemo: Boolean(p.liveDemoUrl),
+    technologies: p.technologies,
+    rating: p.rating,
+    reviewCount: p.reviewCount,
+    gradient: p.gradient,
+    completed: true,
+    image: p.image || p.coverImage || undefined,
+    clientName: p.clientName || undefined,
+    keyMetric: p.metrics && p.metrics.length > 0 ? {
+      label: isAr ? p.metrics[0].labelAr || p.metrics[0].labelEn || p.metrics[0].label : p.metrics[0].labelEn || p.metrics[0].labelAr || p.metrics[0].label,
+      value: p.metrics[0].value,
+    } : undefined,
+    metrics: p.metrics?.map((m) => ({
+      label: isAr ? m.labelAr || m.labelEn || m.label : m.labelEn || m.labelAr || m.label,
+      value: m.value,
+      description: isAr ? m.descriptionAr || m.descriptionEn || m.description : m.descriptionEn || m.descriptionAr || m.description,
+    })),
   }));
 
   return (
@@ -52,13 +83,13 @@ export default async function Page({ params }: HomePageProps) {
         <CapabilitiesSection />
 
         {/* 3. Selected Projects */}
-        <SelectedProjects />
+        <SelectedProjects projects={projects} />
 
         {/* 4. Team Preview */}
         <TeamPreview members={teamMembers} />
 
         {/* 5. Technologies */}
-        <TechnologiesSection />
+        <TechnologiesSection technologies={dbTechnologies} />
 
         {/* 6. Testimonials */}
         <TestimonialsSection />

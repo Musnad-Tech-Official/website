@@ -14,56 +14,61 @@ export function ProjectDetailOverview({
   return (
     <section
       aria-labelledby="detail-overview-heading"
-      className={cn("py-12 sm:py-16 border-b border-border/60", className)}
+      className={cn("py-12 sm:py-16 border-b border-border/50", className)}
     >
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
-        {/* Left Column: Narrative */}
-        <div
-          className={cn(
-            "space-y-4 sm:space-y-6",
-            hasMetrics ? "lg:col-span-7" : "lg:col-span-12 max-w-4xl"
-          )}
-        >
-          <h2
-            id="detail-overview-heading"
-            className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground"
-          >
-            {title}
-          </h2>
-          <div className="space-y-4 text-base sm:text-lg text-muted-foreground leading-relaxed">
-            {paragraphs.map((p, idx) => (
-              <p key={idx}>{p}</p>
-            ))}
-          </div>
-        </div>
-
-        {/* Right Column: Key Metrics Stack (if present) */}
-        {hasMetrics && (
-          <div className="lg:col-span-5 flex flex-col gap-4">
-            {metrics.map((metric) => (
+      {/* 1. Highlight Metrics Grid (Linear / Stripe Outcome-Driven Focus) */}
+      {hasMetrics && (
+        <div className="mb-12 sm:mb-16">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+            {metrics.map((metric, idx) => (
               <Card
-                key={metric.id}
+                key={metric.id || idx}
                 variant="default"
-                className="p-5 sm:p-6 border border-border/70 bg-card hover:border-primary/40 transition-colors"
+                className="relative overflow-hidden p-6 sm:p-7 border border-border/70 bg-card/80 backdrop-blur-xs hover:border-primary/50 transition-all duration-300 group hover:shadow-lg hover:shadow-primary/5"
               >
-                <div className="flex items-baseline justify-between gap-4">
-                  <span className="text-3xl sm:text-4xl font-extrabold tracking-tight text-foreground">
-                    {metric.value}
-                  </span>
+                {/* Glowing subtle top accent line */}
+                <div className="absolute top-0 inset-x-0 h-1 bg-linear-to-r from-primary/80 via-primary/40 to-transparent" />
+
+                <div className="flex flex-col justify-between h-full">
+                  <div>
+                    <span className="text-3xl sm:text-5xl font-black tracking-tight text-foreground group-hover:text-primary transition-colors">
+                      {metric.value}
+                    </span>
+                    <h3 className="font-bold text-sm sm:text-base text-foreground mt-3 tracking-tight">
+                      {metric.label}
+                    </h3>
+                  </div>
+                  {metric.description && (
+                    <p className="text-xs sm:text-sm text-muted-foreground mt-2 leading-relaxed">
+                      {metric.description}
+                    </p>
+                  )}
                 </div>
-                <h3 className="font-semibold text-sm sm:text-base text-foreground mt-2">
-                  {metric.label}
-                </h3>
-                {metric.description && (
-                  <p className="text-xs text-muted-foreground mt-1">
-                    {metric.description}
-                  </p>
-                )}
               </Card>
             ))}
           </div>
-        )}
+        </div>
+      )}
+
+      {/* 2. Executive Overview Narrative */}
+      <div className="max-w-4xl">
+        <span className="text-xs font-mono uppercase tracking-wider text-primary font-bold">
+          OVERVIEW // CONTEXT
+        </span>
+        <h2
+          id="detail-overview-heading"
+          className="text-2xl sm:text-4xl font-extrabold tracking-tight text-foreground mt-2"
+        >
+          {title}
+        </h2>
+        <div className="mt-6 space-y-4 text-base sm:text-lg text-muted-foreground leading-relaxed">
+          {paragraphs.map((p, idx) => (
+            <p key={idx}>{p}</p>
+          ))}
+        </div>
       </div>
     </section>
   );
 }
+
+export default ProjectDetailOverview;

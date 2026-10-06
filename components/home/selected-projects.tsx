@@ -5,14 +5,17 @@ import { ProjectCard } from "@/components/projects/project-card";
 import { getProjects } from "@/data/projects";
 import { cn } from "@/lib/utils";
 
+import type { Project } from "@/data/projects";
+
 export interface SelectedProjectsProps {
+  projects?: Project[];
   className?: string;
 }
 
-export function SelectedProjects({ className = "" }: SelectedProjectsProps) {
+export function SelectedProjects({ projects, className = "" }: SelectedProjectsProps) {
   const t = useTranslations("Home.projects");
   const locale = useLocale();
-  const allProjects = getProjects(locale);
+  const allProjects = projects && projects.length > 0 ? projects : getProjects(locale);
   // Pick featured projects, fallback to first 3
   const featuredProjects = allProjects.filter((p) => p.featured).slice(0, 3);
   const displayProjects = featuredProjects.length >= 3 ? featuredProjects : allProjects.slice(0, 3);

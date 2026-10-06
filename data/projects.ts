@@ -12,6 +12,10 @@ export interface Project {
   reviewCount?: number;
   gradient?: string;
   completed?: boolean;
+  image?: string;
+  clientName?: string;
+  keyMetric?: { label: string; value: string };
+  metrics?: { label: string; value: string; description?: string }[];
 }
 
 export const PROJECTS_EN: Project[] = [

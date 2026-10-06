@@ -16,6 +16,7 @@ import {
   LuShieldCheck,
   LuSettings,
   LuGlobe,
+  LuCpu,
   LuChevronLeft,
   LuChevronRight,
   LuX,
@@ -61,6 +62,11 @@ export function AdminSidebar({
       href: "/admin/projects",
       icon: LuFolderGit2,
       badge: "0",
+    },
+    {
+      title: t("nav.technologies"),
+      href: "/admin/technologies",
+      icon: LuCpu,
     },
     {
       title: t("nav.articles"),
