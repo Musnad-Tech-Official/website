@@ -24,6 +24,8 @@ import {
   LuClock,
 } from "react-icons/lu";
 
+import { getInquiriesAction } from "@/lib/inquiries/actions";
+
 interface AdminPageProps {
   params: Promise<{ locale: string }>;
 }
@@ -31,6 +33,8 @@ interface AdminPageProps {
 export default async function AdminDashboardPage({ params }: AdminPageProps) {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "Admin" });
+  const inquiries = await getInquiriesAction();
+  const newInquiriesCount = inquiries.filter((i) => i.status === "new").length;
 
   const kpis = [
     {
@@ -52,8 +56,8 @@ export default async function AdminDashboardPage({ params }: AdminPageProps) {
     {
       title: t("cockpit.kpi.inquiries"),
       sub: t("cockpit.kpi.inquiriesSub"),
-      value: "19",
-      delta: "+8.2%",
+      value: String(newInquiriesCount || inquiries.length),
+      delta: newInquiriesCount > 0 ? `+${newInquiriesCount} new` : "0 new",
       icon: LuMessageSquare,
       color: "text-amber-500 bg-amber-500/10 border-amber-500/20",
     },

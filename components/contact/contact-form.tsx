@@ -8,31 +8,30 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select } from "@/components/ui/select";
 import { Card } from "@/components/ui/card";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { submitInquiryAction } from "@/lib/inquiries/actions";
+import { uploadImageAction } from "@/lib/storage/actions";
 import {
   LuSend,
   LuSparkles,
   LuPaperclip,
   LuFileCheck,
   LuTrash2,
-  LuInfo,
+  LuCircleCheck,
+  LuLoader,
+  LuTriangleAlert,
 } from "react-icons/lu";
 import type { ContactFormProps } from "./contact-types";
 
 /**
- * ContactForm renders the full contact submission form matching the Page 28 structural reference.
- *
- * FRONTEND-ONLY ARCHITECTURE NOTE:
- * In compliance with project guidelines, this component provides a realistic, accessible
- * client form experience without backend mutations or fake submission success.
- * - Users can enter details and upload attachments locally in temporary client state.
- * - Submission remains safely disabled with an explicit localized integration notice banner.
- * - The privacy notice uses non-linked text because no dedicated /privacy route exists yet.
+ * ContactForm renders the full contact submission form matching the Page 28 structural reference,
+ * now connected to the real inquiries engine and admin lead queue.
  */
 export function ContactForm({ className }: ContactFormProps) {
   const t = useTranslations("Contact.form");
 
-  // Form State (temporary client component state only)
-  const [inquiryType, setInquiryType] = React.useState<string>("");
+  // Form State
+  const [inquiryType, setInquiryType] = React.useState<string>("project");
   const [name, setName] = React.useState<string>("");
   const [email, setEmail] = React.useState<string>("");
   const [company, setCompany] = React.useState<string>("");
@@ -44,14 +43,20 @@ export function ContactForm({ className }: ContactFormProps) {
   const [attachment, setAttachment] = React.useState<File | null>(null);
   const [message, setMessage] = React.useState<string>("");
 
+  const [isSubmitting, setIsSubmitting] = React.useState(false);
+  const [submissionSuccess, setSubmissionSuccess] = React.useState<{ inquiryId: string } | null>(null);
+  const [errorAlert, setErrorAlert] = React.useState<string | null>(null);
+
   const fileInputRef = React.useRef<HTMLInputElement>(null);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      // 10MB limit guard (client-side only, no upload/persistence)
       if (file.size <= 10 * 1024 * 1024) {
         setAttachment(file);
+        setErrorAlert(null);
+      } else {
+        setErrorAlert("File exceeds 10MB limit. Please upload a smaller document.");
       }
     }
   };
@@ -70,6 +75,99 @@ export function ContactForm({ className }: ContactFormProps) {
     return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
   };
 
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!name.trim() || !email.trim() || !message.trim()) {
+      setErrorAlert("Please enter your name, email address, and message.");
+      return;
+    }
+
+    setIsSubmitting(true);
+    setErrorAlert(null);
+
+    let attachmentUrl: string | undefined;
+    if (attachment) {
+      try {
+        const formData = new FormData();
+        formData.append("file", attachment);
+        const uploadRes = await uploadImageAction(formData, "inquiry-attachments");
+        if (uploadRes.success && uploadRes.url) {
+          attachmentUrl = uploadRes.url;
+        }
+      } catch {
+        // Non-blocking attachment upload
+      }
+    }
+
+    const res = await submitInquiryAction({
+      name,
+      email,
+      company,
+      phone,
+      inquiryType: inquiryType || "project",
+      projectType,
+      budget,
+      timeline,
+      currentProduct,
+      message,
+      attachmentUrl,
+      attachmentName: attachment?.name,
+      attachmentSize: attachment?.size,
+    });
+
+    setIsSubmitting(false);
+
+    if (res.success && res.inquiryId) {
+      setSubmissionSuccess({ inquiryId: res.inquiryId });
+    } else {
+      setErrorAlert(res.error || "An error occurred while submitting your inquiry.");
+    }
+  };
+
+  const handleResetForm = () => {
+    setSubmissionSuccess(null);
+    setName("");
+    setEmail("");
+    setCompany("");
+    setPhone("");
+    setProjectType("");
+    setBudget("");
+    setTimeline("");
+    setCurrentProduct("");
+    setMessage("");
+    setAttachment(null);
+    setErrorAlert(null);
+  };
+
+  if (submissionSuccess) {
+    return (
+      <Card
+        variant="default"
+        className={cn(
+          "rounded-2xl p-8 sm:p-12 text-center bg-card border-border shadow-xs animate-in fade-in zoom-in-95 duration-300",
+          className
+        )}
+      >
+        <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 mx-auto mb-5 shadow-xs">
+          <LuCircleCheck className="h-8 w-8" />
+        </div>
+        <h3 className="text-xl sm:text-2xl font-bold text-foreground">
+          {t("submit")} — {name || "Success"}
+        </h3>
+        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-muted font-mono text-xs text-muted-foreground my-3">
+          <span>Ref ID:</span>
+          <span className="font-bold text-foreground">#{submissionSuccess.inquiryId}</span>
+        </div>
+        <p className="text-sm text-muted-foreground max-w-lg mx-auto leading-relaxed mt-2 mb-8">
+          We have received your project inquiry and forwarded it directly to our technical architecture lead. Our team reviews all submissions and will follow up with you within two business days.
+        </p>
+        <Button onClick={handleResetForm} variant="outline" size="sm">
+          Send another inquiry
+        </Button>
+      </Card>
+    );
+  }
+
   return (
     <Card
       variant="default"
@@ -79,11 +177,18 @@ export function ContactForm({ className }: ContactFormProps) {
       )}
     >
       <form
-        onSubmit={(e) => e.preventDefault()}
+        onSubmit={handleSubmit}
         noValidate
         className="space-y-6"
         aria-label={t("inquiryType.label")}
       >
+        {errorAlert && (
+          <Alert variant="destructive" className="py-3">
+            <LuTriangleAlert className="h-4 w-4" />
+            <AlertDescription className="text-xs">{errorAlert}</AlertDescription>
+          </Alert>
+        )}
+
         {/* Inquiry Type */}
         <div>
           <Select
@@ -91,6 +196,7 @@ export function ContactForm({ className }: ContactFormProps) {
             label={t("inquiryType.label")}
             value={inquiryType}
             onChange={(e) => setInquiryType(e.target.value)}
+            required
           >
             <option value="" disabled>
               {t("inquiryType.placeholder")}
@@ -102,8 +208,8 @@ export function ContactForm({ className }: ContactFormProps) {
           </Select>
         </div>
 
-        {/* Row: Name & Email */}
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        {/* Contact Info (2 columns) */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
           <Input
             id="contact-name"
             label={t("name.label")}
@@ -113,7 +219,6 @@ export function ContactForm({ className }: ContactFormProps) {
             required
             autoComplete="name"
           />
-
           <Input
             id="contact-email"
             type="email"
@@ -122,14 +227,12 @@ export function ContactForm({ className }: ContactFormProps) {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
-            dir="ltr"
-            className="text-start"
             autoComplete="email"
           />
         </div>
 
-        {/* Row: Company & Phone */}
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        {/* Company and Phone */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
           <Input
             id="contact-company"
             label={t("company.label")}
@@ -138,7 +241,6 @@ export function ContactForm({ className }: ContactFormProps) {
             onChange={(e) => setCompany(e.target.value)}
             autoComplete="organization"
           />
-
           <Input
             id="contact-phone"
             type="tel"
@@ -146,124 +248,115 @@ export function ContactForm({ className }: ContactFormProps) {
             placeholder={t("phone.placeholder")}
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
-            dir="ltr"
-            className="text-start"
             autoComplete="tel"
           />
         </div>
 
-        {/* Project Details Nested Card */}
-        <div className="rounded-xl border border-border/80 bg-muted/20 p-5 sm:p-6 space-y-4">
-          <div className="flex items-center gap-2 text-foreground font-semibold text-sm sm:text-base">
-            <LuSparkles className="h-4 w-4 text-primary shrink-0" aria-hidden="true" />
-            <span>{t("projectDetails.title")}</span>
+        {/* Project Details (only for project inquiry or general) */}
+        {inquiryType !== "careers" && (
+          <div className="space-y-6 pt-2 border-t border-border/50">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+              <Select
+                id="contact-project-type"
+                label={t("projectType.label")}
+                value={projectType}
+                onChange={(e) => setProjectType(e.target.value)}
+              >
+                <option value="" disabled>
+                  {t("projectType.placeholder")}
+                </option>
+                <option value="productEngineering">{t("projectType.options.productEngineering")}</option>
+                <option value="platformInfrastructure">{t("projectType.options.platformInfrastructure")}</option>
+                <option value="dataEngineering">{t("projectType.options.dataEngineering")}</option>
+                <option value="developerTools">{t("projectType.options.developerTools")}</option>
+                <option value="aiIntegration">{t("projectType.options.aiIntegration")}</option>
+                <option value="designEngineering">{t("projectType.options.designEngineering")}</option>
+              </Select>
+
+              <Select
+                id="contact-budget"
+                label={t("budget.label")}
+                value={budget}
+                onChange={(e) => setBudget(e.target.value)}
+              >
+                <option value="" disabled>
+                  {t("budget.placeholder")}
+                </option>
+                <option value="under25k">{t("budget.options.under25k")}</option>
+                <option value="25k-50k">{t("budget.options.25k-50k")}</option>
+                <option value="50k-100k">{t("budget.options.50k-100k")}</option>
+                <option value="over100k">{t("budget.options.over100k")}</option>
+                <option value="undisclosed">{t("budget.options.undisclosed")}</option>
+              </Select>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+              <Select
+                id="contact-timeline"
+                label={t("timeline.label")}
+                value={timeline}
+                onChange={(e) => setTimeline(e.target.value)}
+              >
+                <option value="" disabled>
+                  {t("timeline.placeholder")}
+                </option>
+                <option value="immediate">{t("timeline.options.immediate")}</option>
+                <option value="oneToThreeMonths">{t("timeline.options.oneToThreeMonths")}</option>
+                <option value="threeToSixMonths">{t("timeline.options.threeToSixMonths")}</option>
+                <option value="flexible">{t("timeline.options.flexible")}</option>
+              </Select>
+
+              <Input
+                id="contact-current-product"
+                label={t("currentProduct.label")}
+                placeholder={t("currentProduct.placeholder")}
+                value={currentProduct}
+                onChange={(e) => setCurrentProduct(e.target.value)}
+              />
+            </div>
           </div>
+        )}
 
-          {/* Sub-grid 1: Project Type & Budget */}
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <Select
-              id="project-type"
-              label={t("projectDetails.projectType.label")}
-              value={projectType}
-              onChange={(e) => setProjectType(e.target.value)}
-            >
-              <option value="">{t("projectDetails.projectType.placeholder")}</option>
-              <option value="web">{t("projectDetails.projectType.options.web")}</option>
-              <option value="mobile">{t("projectDetails.projectType.options.mobile")}</option>
-              <option value="enterprise">{t("projectDetails.projectType.options.enterprise")}</option>
-              <option value="ai">{t("projectDetails.projectType.options.ai")}</option>
-              <option value="design">{t("projectDetails.projectType.options.design")}</option>
-              <option value="tools">{t("projectDetails.projectType.options.tools")}</option>
-            </Select>
-
-            <Select
-              id="project-budget"
-              label={t("projectDetails.budget.label")}
-              value={budget}
-              onChange={(e) => setBudget(e.target.value)}
-            >
-              <option value="">{t("projectDetails.budget.placeholder")}</option>
-              <option value="tier1">{t("projectDetails.budget.options.tier1")}</option>
-              <option value="tier2">{t("projectDetails.budget.options.tier2")}</option>
-              <option value="tier3">{t("projectDetails.budget.options.tier3")}</option>
-              <option value="tier4">{t("projectDetails.budget.options.tier4")}</option>
-              <option value="undisclosed">{t("projectDetails.budget.options.undisclosed")}</option>
-            </Select>
-          </div>
-
-          {/* Sub-grid 2: Timeline & Current Website */}
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <Select
-              id="project-timeline"
-              label={t("projectDetails.timeline.label")}
-              value={timeline}
-              onChange={(e) => setTimeline(e.target.value)}
-            >
-              <option value="">{t("projectDetails.timeline.placeholder")}</option>
-              <option value="urgent">{t("projectDetails.timeline.options.urgent")}</option>
-              <option value="standard">{t("projectDetails.timeline.options.standard")}</option>
-              <option value="extended">{t("projectDetails.timeline.options.extended")}</option>
-              <option value="flexible">{t("projectDetails.timeline.options.flexible")}</option>
-            </Select>
-
-            <Input
-              id="project-product"
-              label={t("projectDetails.currentProduct.label")}
-              placeholder={t("projectDetails.currentProduct.placeholder")}
-              value={currentProduct}
-              onChange={(e) => setCurrentProduct(e.target.value)}
-              dir="ltr"
-              className="text-start"
-            />
-          </div>
-
-          {/* Attachment Upload Dropzone */}
-          <div className="space-y-1.5 pt-1">
-            <span className="block text-sm font-medium text-foreground">
-              {t("projectDetails.attachment.label")}
-            </span>
-
+        {/* Attachment Upload Field */}
+        <div>
+          <label className="block text-xs font-semibold text-foreground mb-2">
+            {t("attachment.label")}
+          </label>
+          <div
+            onClick={() => fileInputRef.current?.click()}
+            className="flex flex-col items-center justify-center border-2 border-dashed border-border/80 hover:border-primary/50 bg-muted/20 hover:bg-muted/30 rounded-xl p-5 cursor-pointer transition-colors"
+          >
             <input
               ref={fileInputRef}
               type="file"
-              id="project-attachment"
-              accept=".pdf,.doc,.docx,.zip"
-              className="sr-only"
               onChange={handleFileChange}
+              accept=".pdf,.doc,.docx,.zip,image/*"
+              className="hidden"
             />
-
-            {!attachment ? (
-              <label
-                htmlFor="project-attachment"
-                className={cn(
-                  "flex items-center justify-center gap-2.5 rounded-xl border border-dashed border-border/80 bg-background/50 p-4 text-center cursor-pointer transition-all duration-150",
-                  "hover:border-primary/50 hover:bg-muted/30 focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2"
-                )}
-              >
-                <LuPaperclip className="h-4 w-4 text-muted-foreground shrink-0" aria-hidden="true" />
-                <span className="text-xs sm:text-sm text-muted-foreground font-normal">
-                  {t("projectDetails.attachment.hint")}
-                </span>
-              </label>
-            ) : (
-              <div className="flex items-center justify-between rounded-xl border border-border bg-background p-3.5 transition-all">
-                <div className="flex items-center gap-2.5 overflow-hidden">
-                  <LuFileCheck className="h-4 w-4 text-primary shrink-0" aria-hidden="true" />
-                  <span className="text-xs sm:text-sm text-foreground font-medium truncate">
-                    {attachment.name}
-                  </span>
-                  <span className="text-xs text-muted-foreground shrink-0 font-mono">
+            {attachment ? (
+              <div className="flex items-center gap-3 w-full justify-between px-2">
+                <div className="flex items-center gap-2.5 truncate">
+                  <LuFileCheck className="h-5 w-5 text-emerald-600 shrink-0" />
+                  <span className="text-xs font-medium text-foreground truncate">{attachment.name}</span>
+                  <span className="text-[11px] text-muted-foreground font-mono">
                     ({formatFileSize(attachment.size)})
                   </span>
                 </div>
                 <button
                   type="button"
                   onClick={handleRemoveFile}
-                  aria-label={t("projectDetails.attachment.remove")}
-                  className="rounded p-1 text-muted-foreground hover:text-foreground hover:bg-muted transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                  className="text-muted-foreground hover:text-destructive p-1 rounded-md transition-colors"
                 >
                   <LuTrash2 className="h-4 w-4" />
                 </button>
+              </div>
+            ) : (
+              <div className="flex flex-col items-center gap-1.5 text-center">
+                <LuPaperclip className="h-5 w-5 text-muted-foreground mb-1" />
+                <span className="text-xs font-medium text-foreground">
+                  {t("attachment.hint") || "Click to upload project brief or document"}
+                </span>
+                <span className="text-[10px] text-muted-foreground">PDF, DOC, ZIP up to 10MB</span>
               </div>
             )}
           </div>
@@ -282,31 +375,26 @@ export function ContactForm({ className }: ContactFormProps) {
           />
         </div>
 
-        {/* Clear Localized Integration Notice */}
-        <div
-          role="status"
-          className="flex items-start gap-3 rounded-xl border border-border bg-muted/40 p-4 text-xs sm:text-sm text-muted-foreground leading-relaxed"
-        >
-          <LuInfo className="h-5 w-5 text-primary shrink-0 mt-0.5" aria-hidden="true" />
-          <span>{t("integrationNotice")}</span>
-        </div>
-
-        {/* Submit Action & Privacy Note (Non-linked text because /privacy route does not exist) */}
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 pt-2">
+        {/* Submit Action */}
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 pt-2">
           <Button
-            type="button"
+            type="submit"
             variant="primary"
             size="lg"
-            disabled
-            aria-disabled="true"
-            title={t("integrationNotice")}
-            leftIcon={<LuSend className="h-4 w-4 rtl:-scale-x-100" aria-hidden="true" />}
-            className="w-full sm:w-auto"
+            disabled={isSubmitting}
+            leftIcon={
+              isSubmitting ? (
+                <LuLoader className="h-4 w-4 animate-spin" />
+              ) : (
+                <LuSend className="h-4 w-4 rtl:-scale-x-100" aria-hidden="true" />
+              )
+            }
+            className="w-full sm:w-auto shadow-xs min-w-36"
           >
-            {t("submit")}
+            {isSubmitting ? "Sending..." : t("submit")}
           </Button>
 
-          <p className="text-xs text-muted-foreground leading-relaxed">
+          <p className="text-xs text-muted-foreground leading-relaxed text-center sm:text-start">
             {t("privacyNotice.prefix")}{" "}
             <span className="font-medium text-foreground">
               {t("privacyNotice.privacyLink")}
