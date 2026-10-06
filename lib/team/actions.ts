@@ -4,7 +4,6 @@ import { auth } from "@clerk/nextjs/server";
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/utils/supabase/server";
 import type { TeamMember, TeamMemberFormData } from "./types";
-import { DEFAULT_TEAM_MEMBERS } from "./fixtures";
 import { getArticlesAction } from "@/lib/articles/actions";
 import type { Article } from "@/lib/articles/types";
 
@@ -69,7 +68,7 @@ function mapRowToTeamMember(row: TeamMemberDbRow): TeamMember {
 }
 
 /**
- * Retrieves team members from Supabase, with automatic fallback to defaults.
+ * Retrieves team members directly from Supabase.
  */
 export async function getTeamMembersAction(activeOnly: boolean = false): Promise<TeamMember[]> {
   try {
@@ -85,21 +84,21 @@ export async function getTeamMembersAction(activeOnly: boolean = false): Promise
 
     const { data, error } = await query;
 
-    if (!error && data && data.length > 0) {
+    if (!error && data) {
       return (data as unknown as TeamMemberDbRow[]).map(mapRowToTeamMember);
     }
+    if (error) {
+      console.error("Supabase getTeamMembersAction error:", error.message);
+    }
   } catch (err) {
-    console.warn("getTeamMembersAction fallback used:", err);
+    console.error("getTeamMembersAction exception:", err);
   }
 
-  // Graceful fallback to default seed members
-  return activeOnly
-    ? DEFAULT_TEAM_MEMBERS.filter((m) => m.isActive)
-    : DEFAULT_TEAM_MEMBERS;
+  return [];
 }
 
 /**
- * Retrieves a single team member by permanent URL slug.
+ * Retrieves a single team member by permanent URL slug directly from Supabase.
  */
 export async function getTeamMemberBySlugAction(slug: string): Promise<TeamMember | null> {
   const cleanSlug = slug.toLowerCase().trim();
@@ -115,13 +114,14 @@ export async function getTeamMemberBySlugAction(slug: string): Promise<TeamMembe
     if (!error && data) {
       return mapRowToTeamMember(data as unknown as TeamMemberDbRow);
     }
+    if (error) {
+      console.error("Supabase getTeamMemberBySlugAction error:", error.message);
+    }
   } catch (err) {
-    console.warn("getTeamMemberBySlugAction exception:", err);
+    console.error("getTeamMemberBySlugAction exception:", err);
   }
 
-  // Fallback lookup
-  const fallback = DEFAULT_TEAM_MEMBERS.find((m) => m.slug === cleanSlug);
-  return fallback || null;
+  return null;
 }
 
 /**

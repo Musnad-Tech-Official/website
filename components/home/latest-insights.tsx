@@ -1,7 +1,6 @@
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/routing";
 import { LuArrowRight } from "react-icons/lu";
-import { LATEST_ARTICLES } from "./home-data";
 import { FeaturedArticleCard, type FeaturedArticleItem } from "./featured-article-card";
 import type { Article } from "@/lib/articles/types";
 import { cn } from "@/lib/utils";
@@ -14,7 +13,7 @@ export interface LatestInsightsProps {
 export function LatestInsights({ articles, className = "" }: LatestInsightsProps) {
   const t = useTranslations("Home.latestInsights");
 
-  // Editorial layout: prioritize articles selected as 'featured' by admin, then recent published, fallback to fixtures
+  // Editorial layout: prioritize articles selected as 'featured' by admin, then recent published
   const featuredArticles: FeaturedArticleItem[] = (() => {
     if (articles && articles.length > 0) {
       const adminSelected = articles.filter((a) => a.layoutVariant === "featured");
@@ -23,8 +22,12 @@ export function LatestInsights({ articles, className = "" }: LatestInsightsProps
       const combined = [...adminSelected, ...regularPublished];
       return combined.slice(0, 2);
     }
-    return LATEST_ARTICLES.slice(0, 2);
+    return [];
   })();
+
+  if (featuredArticles.length === 0) {
+    return null;
+  }
 
   return (
     <section

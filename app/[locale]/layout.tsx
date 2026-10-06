@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Poppins, Tajawal } from "next/font/google";
 import "../globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
@@ -35,6 +35,13 @@ const tajawal = Tajawal({
 export const metadata: Metadata = {
   title: "Musnad Tech",
   description: "Empowering Next-Generation Digital Experiences",
+};
+
+export const viewport: Viewport = {
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#c22c22" },
+    { media: "(prefers-color-scheme: dark)", color: "#c22c22" },
+  ],
 };
 
 export function generateStaticParams() {
