@@ -18,6 +18,8 @@ import {
   LuGlobe,
   LuCpu,
   LuBuilding2,
+  LuMegaphone,
+  LuQuote,
   LuChevronLeft,
   LuChevronRight,
   LuX,
@@ -73,6 +75,16 @@ export function AdminSidebar({
       title: t("nav.companies"),
       href: "/admin/companies",
       icon: LuBuilding2,
+    },
+    {
+      title: t("nav.announcements"),
+      href: "/admin/announcements",
+      icon: LuMegaphone,
+    },
+    {
+      title: t("nav.testimonials"),
+      href: "/admin/testimonials",
+      icon: LuQuote,
     },
     {
       title: t("nav.articles"),

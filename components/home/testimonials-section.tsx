@@ -3,44 +3,58 @@ import { LuQuote } from "react-icons/lu";
 import { Card } from "@/components/ui/card";
 import { Avatar } from "@/components/ui/avatar";
 import { TESTIMONIALS } from "./home-data";
+import type { TestimonialItem } from "@/lib/testimonials/types";
 import { cn } from "@/lib/utils";
 
 export interface TestimonialsSectionProps {
   className?: string;
+  testimonials?: TestimonialItem[];
 }
 
-export function TestimonialsSection({ className = "" }: TestimonialsSectionProps) {
+export function TestimonialsSection({
+  className = "",
+  testimonials,
+}: TestimonialsSectionProps) {
   const t = useTranslations("Home.testimonials");
   const locale = useLocale();
   const isRtl = locale === "ar";
 
+  const hasDynamic = testimonials && testimonials.length > 0;
+
+  // Base list of items
+  const baseItems: Array<TestimonialItem | (typeof TESTIMONIALS)[number]> =
+    hasDynamic ? testimonials : TESTIMONIALS;
+
   // Prepare full-width duplicated card sets for seamless infinite tracks
-  // Row 1 starts with Ahmed, Reem, Faisal, Tariq, Mona, Khalid
-  const row1Base = [...TESTIMONIALS, ...TESTIMONIALS];
-  // Row 2 starts with Tariq, Mona, Khalid, Ahmed, Reem, Faisal for visual variety
-  const row2Base = [
-    TESTIMONIALS[3],
-    TESTIMONIALS[4],
-    TESTIMONIALS[5],
-    TESTIMONIALS[0],
-    TESTIMONIALS[1],
-    TESTIMONIALS[2],
-    TESTIMONIALS[3],
-    TESTIMONIALS[4],
-    TESTIMONIALS[5],
-    TESTIMONIALS[0],
-    TESTIMONIALS[1],
-    TESTIMONIALS[2],
-  ];
+  const row1Base = [...baseItems, ...baseItems];
+  const row2Base =
+    baseItems.length > 3
+      ? [...baseItems.slice(3), ...baseItems.slice(0, 3), ...baseItems]
+      : [...baseItems, ...baseItems];
 
   const renderCard = (
-    item: (typeof TESTIMONIALS)[number],
+    item: TestimonialItem | (typeof TESTIMONIALS)[number],
     keyPrefix: string,
     idx: number
   ) => {
-    const quote = t(`items.${item.itemKey}.quote`);
-    const author = t(`items.${item.itemKey}.author`);
-    const role = t(`items.${item.itemKey}.role`);
+    let quote: string;
+    let author: string;
+    let role: string;
+    let initial: string;
+
+    if ("quoteAr" in item && "authorNameAr" in item) {
+      const dynamicItem = item as TestimonialItem;
+      quote = isRtl ? dynamicItem.quoteAr || dynamicItem.quoteEn : dynamicItem.quoteEn || dynamicItem.quoteAr;
+      author = isRtl ? dynamicItem.authorNameAr || dynamicItem.authorNameEn : dynamicItem.authorNameEn || dynamicItem.authorNameAr;
+      role = isRtl ? dynamicItem.roleAr || dynamicItem.roleEn : dynamicItem.roleEn || dynamicItem.roleAr;
+      initial = dynamicItem.initial || author.charAt(0).toUpperCase();
+    } else {
+      const legacyItem = item as (typeof TESTIMONIALS)[number];
+      quote = t(`items.${legacyItem.itemKey}.quote`);
+      author = t(`items.${legacyItem.itemKey}.author`);
+      role = t(`items.${legacyItem.itemKey}.role`);
+      initial = legacyItem.initial;
+    }
 
     return (
       <Card
@@ -74,7 +88,7 @@ export function TestimonialsSection({ className = "" }: TestimonialsSectionProps
         {/* Author Metadata with fully rounded Design System Avatar */}
         <div className="mt-6 pt-5 border-t border-border/60 flex items-center gap-3.5">
           <Avatar
-            fallback={item.initial}
+            fallback={initial}
             size="md"
             shape="circle"
             className="rounded-full border border-primary/20 bg-primary/10 text-primary font-bold shrink-0"
@@ -97,74 +111,48 @@ export function TestimonialsSection({ className = "" }: TestimonialsSectionProps
       id="testimonials"
       aria-labelledby="testimonials-heading"
       className={cn(
-        "w-full pt-16 sm:pt-20 lg:pt-24 pb-16 sm:pb-20 border-t border-border/40 overflow-hidden relative",
+        "relative w-full py-16 sm:py-20 lg:py-28 overflow-hidden",
+        "bg-background/90 dark:bg-background/40 transition-colors",
         className
       )}
     >
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 mb-10 sm:mb-14">
-        {/* Section Header */}
-        <div className="max-w-2xl text-start">
-          <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+      {/* Section Header */}
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 mb-12 sm:mb-16 text-center">
+        <div className="flex flex-col items-center">
+          <span className="text-xs sm:text-sm font-semibold uppercase tracking-wider text-primary mb-2">
             {t("eyebrow")}
           </span>
           <h2
             id="testimonials-heading"
-            className="mt-2 text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-foreground leading-[1.15]"
+            className="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight text-foreground"
           >
             {t("heading")}
           </h2>
         </div>
       </div>
 
-      {/* Marquee Container with dual-edge fade masks & soft fog blur */}
-      <div className="relative w-full overflow-hidden flex flex-col gap-6 py-2 mask-[linear-gradient(to_right,transparent,black_48px,black_calc(100%-48px),transparent)] sm:mask-[linear-gradient(to_right,transparent,black_128px,black_calc(100%-128px),transparent)] [-webkit-mask-image:linear-gradient(to_right,transparent,black_48px,black_calc(100%-48px),transparent)] sm:[-webkit-mask-image:linear-gradient(to_right,transparent,black_128px,black_calc(100%-128px),transparent)]">
-        {/* Soft edge blur layers for subtle fog effect */}
+      {/* Infinite Carousels Container with Edge Fade Mask */}
+      <div className="relative w-full flex flex-col gap-6 sm:gap-8 overflow-hidden">
+        {/* Left & Right Gradient Shadows for seamless viewport integration */}
         <div
-          className="pointer-events-none absolute inset-y-0 left-0 w-16 sm:w-32 z-10 backdrop-blur-[2px] mask-[linear-gradient(to_right,black,transparent)] [-webkit-mask-image:linear-gradient(to_right,black,transparent)]"
           aria-hidden="true"
+          className="pointer-events-none absolute inset-y-0 start-0 z-10 w-16 sm:w-32 bg-linear-to-r rtl:bg-linear-to-l from-background to-transparent"
         />
         <div
-          className="pointer-events-none absolute inset-y-0 right-0 w-16 sm:w-32 z-10 backdrop-blur-[2px] mask-[linear-gradient(to_left,black,transparent)] [-webkit-mask-image:linear-gradient(to_left,black,transparent)]"
           aria-hidden="true"
+          className="pointer-events-none absolute inset-y-0 end-0 z-10 w-16 sm:w-32 bg-linear-to-l rtl:bg-linear-to-r from-background to-transparent"
         />
 
-        {/* Row 1: Continuous horizontal marquee from right to left (no pause on hover) */}
-        <div
-          dir="ltr"
-          className="flex overflow-hidden w-full select-none"
-        >
-          {/* Track 1 */}
-          <div className="flex shrink-0 items-stretch gap-6 pr-6 animate-marquee-left">
-            {row1Base.map((item, idx) => renderCard(item, "r1-t1", idx))}
-          </div>
-          {/* Track 2 (Clone for infinite seamless loop) */}
-          <div
-            aria-hidden="true"
-            className="flex shrink-0 items-stretch gap-6 pr-6 animate-marquee-left"
-          >
-            {row1Base.map((item, idx) => renderCard(item, "r1-t2", idx))}
-          </div>
+        {/* Track 1: Normal Direction */}
+        <div className="group flex w-max gap-6 sm:gap-8 animate-marquee-ltr rtl:animate-marquee-rtl hover:[animation-play-state:paused]">
+          {row1Base.map((item, idx) => renderCard(item, "r1", idx))}
         </div>
 
-        {/* Row 2: Continuous horizontal marquee from left to right (no pause on hover) */}
-        <div
-          dir="ltr"
-          className="flex overflow-hidden w-full select-none"
-        >
-          {/* Track 1 */}
-          <div className="flex shrink-0 items-stretch gap-6 pr-6 animate-marquee-right">
-            {row2Base.map((item, idx) => renderCard(item, "r2-t1", idx))}
-          </div>
-          {/* Track 2 (Clone for infinite seamless loop) */}
-          <div
-            aria-hidden="true"
-            className="flex shrink-0 items-stretch gap-6 pr-6 animate-marquee-right"
-          >
-            {row2Base.map((item, idx) => renderCard(item, "r2-t2", idx))}
-          </div>
+        {/* Track 2: Reverse Direction for Dynamic Contrast */}
+        <div className="group flex w-max gap-6 sm:gap-8 animate-marquee-rtl rtl:animate-marquee-ltr hover:[animation-play-state:paused]">
+          {row2Base.map((item, idx) => renderCard(item, "r2", idx))}
         </div>
       </div>
     </section>
   );
 }
-
