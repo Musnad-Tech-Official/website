@@ -32,7 +32,7 @@ export type {
 
 export interface ProjectDetailHeaderProps {
   title: string;
-  subtitle: string;
+  subtitle?: string;
   eyebrowBadges?: ProjectDetailBadge[];
   actions?: ProjectDetailAction[];
   metaBar?: ProjectDetailMetaItem[];
