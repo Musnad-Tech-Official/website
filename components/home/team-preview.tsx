@@ -1,18 +1,21 @@
-import { useLocale, useTranslations } from "next-intl";
+import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/routing";
 import { LuArrowRight } from "react-icons/lu";
 import { TeamMemberCard } from "@/components/team";
-import { getTeamMembers } from "@/data/team";
+import type { TeamMember } from "@/data/team";
 import { cn } from "@/lib/utils";
 
 export interface TeamPreviewProps {
+  members?: TeamMember[];
   className?: string;
 }
 
-export function TeamPreview({ className = "" }: TeamPreviewProps) {
+export function TeamPreview({ members = [], className = "" }: TeamPreviewProps) {
   const t = useTranslations("Home.team");
-  const locale = useLocale();
-  const members = getTeamMembers(locale);
+
+  if (!members || members.length === 0) {
+    return null;
+  }
 
   return (
     <section

@@ -14,7 +14,6 @@ import type {
   TrustedCompany,
   CapabilityCardData,
   TestimonialData,
-  InsightArticleData,
 } from "./home-types";
 
 export const TRUSTED_COMPANIES: TrustedCompany[] = [
@@ -104,42 +103,4 @@ export const TESTIMONIALS: TestimonialData[] = [
   { id: "khalid", itemKey: "khalid", initial: "K" },
 ];
 
-export const LATEST_ARTICLES: InsightArticleData[] = [
-  {
-    id: "rag",
-    slug: "eval-first-ship-second-building-rag-you-can-trust",
-    articleKey: "rag",
-    readTime: 9,
-    isTrending: true,
-    tags: ["#rag", "#evaluation", "#llm"],
-    timeAgo: "1y ago",
-    date: "Oct 2024",
-    authorInitials: "SA",
-    previewGradient: "from-zinc-800/80 via-zinc-900/60 to-zinc-950",
-    href: "/blog",
-  },
-  {
-    id: "bilingual",
-    slug: "bilingual-rtl-done-right-lessons-from-rakeen-portal",
-    articleKey: "bilingual",
-    readTime: 11,
-    isTrending: true,
-    tags: ["#i18n", "#rtl", "#accessibility"],
-    date: "Aug 2024",
-    authorInitials: "NA",
-    previewGradient: "from-neutral-800/80 via-zinc-900/60 to-stone-950",
-    href: "/blog",
-  },
-  {
-    id: "naft",
-    slug: "why-we-built-naft-small-teams-shouldnt-need-kubernetes",
-    articleKey: "naft",
-    readTime: 7,
-    isTrending: true,
-    tags: ["#deploy", "#open-source", "#go"],
-    date: "Jun 2024",
-    authorInitials: "OF",
-    previewGradient: "from-stone-800/80 via-zinc-900/60 to-neutral-950",
-    href: "/blog",
-  },
-];
+
