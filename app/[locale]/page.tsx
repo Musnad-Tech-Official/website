@@ -14,6 +14,7 @@ import { PageGuard } from "@/lib/page-control/guard";
 import { getArticlesAction } from "@/lib/articles/actions";
 import { getTeamMembersAction } from "@/lib/team/actions";
 import { getProjectsAction } from "@/lib/projects/actions";
+import { getHomeTechnologiesAction } from "@/lib/technologies/actions";
 
 interface HomePageProps {
   params: Promise<{ locale: string }>;
@@ -23,10 +24,11 @@ export default async function Page({ params }: HomePageProps) {
   const { locale } = await params;
   const isAr = locale === "ar";
 
-  const [articles, dbTeamMembers, dbProjects] = await Promise.all([
+  const [articles, dbTeamMembers, dbProjects, dbTechnologies] = await Promise.all([
     getArticlesAction("published"),
     getTeamMembersAction(true),
     getProjectsAction("published"),
+    getHomeTechnologiesAction(),
   ]);
 
   const teamMembers = dbTeamMembers.map((m) => ({
@@ -87,7 +89,7 @@ export default async function Page({ params }: HomePageProps) {
         <TeamPreview members={teamMembers} />
 
         {/* 5. Technologies */}
-        <TechnologiesSection />
+        <TechnologiesSection technologies={dbTechnologies} />
 
         {/* 6. Testimonials */}
         <TestimonialsSection />

@@ -17,6 +17,7 @@ import {
 } from "react-icons/lu";
 import { FaGithub } from "react-icons/fa6";
 import type { ProjectDetailHeaderProps } from "./project-detail-types";
+import { TechnologyBadge } from "@/components/ui/technology-badge";
 import { cn } from "@/lib/utils";
 
 function renderMetaIcon(iconType: string) {
@@ -52,6 +53,7 @@ export function ProjectDetailHeader({
   year,
   liveDemoUrl,
   githubUrl,
+  technologies,
   className = "",
 }: ProjectDetailHeaderProps) {
   return (
@@ -207,8 +209,8 @@ export function ProjectDetailHeader({
             })}
       </div>
 
-      {/* 6. Cinematic Device / Browser Window Showcase */}
-      <div className="mt-10 sm:mt-14 relative w-full">
+      {/* 6. Cinematic Project Cover Showcase */}
+      <div className="mt-8 sm:mt-12 relative w-full">
         {/* Ambient Color Glow behind container */}
         <div
           aria-hidden="true"
@@ -218,74 +220,72 @@ export function ProjectDetailHeader({
           )}
         />
 
-        {/* Browser Frame */}
-        <div className="relative rounded-2xl sm:rounded-3xl border border-border/80 bg-card/90 shadow-2xl overflow-hidden backdrop-blur-md">
-          {/* Browser Chrome Header */}
-          <div className="flex items-center justify-between px-4 sm:px-6 py-3 border-b border-border/60 bg-muted/40 text-muted-foreground select-none">
-            <div className="flex items-center gap-2">
-              <span className="h-3 w-3 rounded-full bg-red-500/80 inline-block" />
-              <span className="h-3 w-3 rounded-full bg-amber-500/80 inline-block" />
-              <span className="h-3 w-3 rounded-full bg-emerald-500/80 inline-block" />
-            </div>
-
-            {/* URL Bar Capsule */}
-            <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-background/80 border border-border/60 text-[11px] sm:text-xs font-mono text-muted-foreground max-w-xs sm:max-w-md truncate shadow-inner">
-              <LuLock className="h-3 w-3 text-emerald-500 shrink-0" />
-              <span className="truncate">
-                {liveDemoUrl ? liveDemoUrl.replace(/^https?:\/\//, "") : `musnad.tech/projects/${title.toLowerCase().replace(/\s+/g, "-")}`}
-              </span>
-            </div>
-
-            <div className="flex items-center gap-2 text-xs font-mono text-muted-foreground/60 hidden sm:flex">
-              <span>PROD</span>
-            </div>
-          </div>
-
-          {/* Media Content Showcase */}
-          <div className="relative aspect-16/9 sm:aspect-21/9 w-full overflow-hidden bg-black/60 flex items-center justify-center">
+        {/* Cinematic Cover Frame */}
+        <div className="relative rounded-2xl sm:rounded-3xl border border-border/70 dark:border-white/10 bg-card dark:bg-zinc-950 shadow-2xl overflow-hidden backdrop-blur-md">
+          <div className="relative aspect-16/9 sm:aspect-21/9 w-full overflow-hidden bg-zinc-950 flex items-center justify-center">
             {image ? (
-              <img
-                src={image}
-                alt={title}
-                className="w-full h-full object-cover object-top"
-              />
+              <div className="relative w-full h-full">
+                <img
+                  src={image}
+                  alt={title}
+                  className="w-full h-full object-cover object-center"
+                />
+                {/* Subtle vignette gradient overlay */}
+                <div className="absolute inset-0 bg-linear-to-t from-black/60 via-transparent to-transparent pointer-events-none" />
+
+                {/* Overlay Badge */}
+                <div className="absolute bottom-4 start-4 sm:bottom-6 sm:start-6 flex items-center gap-2">
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-black/70 text-white backdrop-blur-md border border-white/20">
+                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                    <span>{category || "Verified Case Study"}</span>
+                  </span>
+                  {year && (
+                    <span className="hidden sm:inline-flex items-center px-2.5 py-1 rounded-full text-xs font-mono bg-black/60 text-white/80 backdrop-blur-md border border-white/10">
+                      {year}
+                    </span>
+                  )}
+                </div>
+              </div>
             ) : (
               <div className="relative w-full h-full flex flex-col items-center justify-center p-6 text-center overflow-hidden">
-                {/* Gradient background */}
-                <div
-                  className={cn(
-                    "absolute inset-0 bg-linear-to-br opacity-70",
-                    gradient
-                  )}
-                />
-
-                {/* Grid Overlay */}
+                <div className={cn("absolute inset-0 bg-linear-to-br opacity-80", gradient)} />
                 <div
                   aria-hidden="true"
-                  className="absolute inset-0 opacity-[0.15]"
+                  className="absolute inset-0 opacity-[0.12]"
                   style={{
-                    backgroundImage:
-                      "radial-gradient(circle at 1px 1px, #ffffff 1.5px, transparent 0)",
+                    backgroundImage: "radial-gradient(circle at 1px 1px, #ffffff 1.5px, transparent 0)",
                     backgroundSize: "28px 28px",
                   }}
                 />
-
-                {/* Central System Architecture Graphic */}
                 <div className="relative z-10 max-w-lg p-6 sm:p-8 rounded-2xl border border-white/20 bg-black/50 backdrop-blur-xl shadow-2xl flex flex-col items-center gap-3">
-                  <div className="p-3 rounded-xl bg-white/10 border border-white/20 text-white shadow-inner">
-                    <LuSparkles className="h-8 w-8 text-primary" />
+                  <div className="p-3.5 rounded-2xl bg-white/10 border border-white/20 text-white shadow-inner font-extrabold text-2xl font-mono">
+                    {title.split(/\s+/).slice(0, 2).map((w: string) => w[0]).join("").toUpperCase()}
                   </div>
                   <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
                     {title}
                   </h2>
-                  <p className="text-xs sm:text-sm text-white/70 max-w-sm">
-                    High-performance production architecture engineered by Musnad Tech
-                  </p>
+                  <span className="text-xs font-mono text-white/70 uppercase tracking-widest">
+                    {category || "Engineering Architecture"}
+                  </span>
                 </div>
               </div>
             )}
           </div>
         </div>
+
+        {/* 7. Technologies Strip using identical Home Page design (TechnologyBadge) */}
+        {technologies && technologies.length > 0 && (
+          <div className="mt-6 sm:mt-8 flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 p-4 sm:p-5 rounded-2xl border border-border/70 bg-card/60 backdrop-blur-sm">
+            <span className="text-xs font-mono font-bold uppercase tracking-wider text-muted-foreground shrink-0">
+              Stack & Tools //
+            </span>
+            <div className="flex flex-wrap items-center gap-2.5">
+              {technologies.map((tech, idx) => (
+                <TechnologyBadge key={idx} name={tech} size="sm" />
+              ))}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* 7. Meta Bar (4-item grid) */}

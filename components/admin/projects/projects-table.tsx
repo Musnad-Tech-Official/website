@@ -9,7 +9,6 @@ import {
   LuTrash2,
   LuExternalLink,
   LuSparkles,
-  LuStar,
   LuFolderGit2,
   LuGlobe,
 } from "react-icons/lu";
@@ -68,7 +67,6 @@ export function ProjectsTable({
               <th className="py-3 px-4 text-start font-medium">{isRtl ? "المشروع" : "Project"}</th>
               <th className="py-3 px-3 text-start font-medium">{isRtl ? "التصنيف والسنة" : "Category & Year"}</th>
               <th className="py-3 px-3 text-start font-medium">{isRtl ? "التقنيات" : "Technologies"}</th>
-              <th className="py-3 px-3 text-start font-medium">{isRtl ? "التقييم" : "Rating"}</th>
               <th className="py-3 px-3 text-start font-medium">{isRtl ? "مميز بالموقع" : "Featured"}</th>
               <th className="py-3 px-3 text-start font-medium">{isRtl ? "الحالة" : "Status"}</th>
               <th className="py-3 px-4 text-end font-medium">{isRtl ? "الإجراءات" : "Actions"}</th>
@@ -163,14 +161,7 @@ export function ProjectsTable({
                     </div>
                   </td>
 
-                  {/* Rating */}
-                  <td className="py-3.5 px-3">
-                    <div className="flex items-center gap-1">
-                      <LuStar className="w-3.5 h-3.5 text-amber-500 fill-amber-400" />
-                      <span className="font-semibold text-foreground">{proj.rating}</span>
-                      <span className="text-[10px] text-muted-foreground">({proj.reviewCount})</span>
-                    </div>
-                  </td>
+
 
                   {/* Featured Toggle */}
                   <td className="py-3.5 px-3">

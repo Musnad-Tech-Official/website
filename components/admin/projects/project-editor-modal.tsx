@@ -18,9 +18,14 @@ import {
   LuPlus,
   LuTrash2,
   LuLayers,
+  LuCheck,
+  LuSearch,
 } from "react-icons/lu";
 import { FaGithub } from "react-icons/fa6";
 import type { Project, ProjectFormData, ProjectMetric } from "@/lib/projects/types";
+import { ALL_TECH_ITEMS } from "@/components/hero/tech-data";
+import { TechIcon } from "@/components/hero/tech-icon";
+import { cn } from "@/lib/utils";
 
 interface ProjectEditorModalProps {
   project: Project | null; // null if creating new
@@ -64,15 +69,17 @@ export function ProjectEditorModal({
   const [descriptionAr, setDescriptionAr] = React.useState(project?.descriptionAr || "");
   const [category, setCategory] = React.useState(project?.category || "Fintech Platform");
   const [year, setYear] = React.useState(project?.year || "2024");
-  const [technologiesInput, setTechnologiesInput] = React.useState(
-    project?.technologies.join(", ") || "TypeScript, Next.js, PostgreSQL"
+  const [selectedTechs, setSelectedTechs] = React.useState<string[]>(
+    project?.technologies && project.technologies.length > 0
+      ? project.technologies
+      : ["TypeScript", "Next.js", "PostgreSQL"]
   );
+  const [techSearch, setTechSearch] = React.useState("");
+  const [customTechInput, setCustomTechInput] = React.useState("");
   const [coverImage, setCoverImage] = React.useState(project?.coverImage || "");
   const [featured, setFeatured] = React.useState(project?.featured ?? false);
   const [liveDemoUrl, setLiveDemoUrl] = React.useState(project?.liveDemoUrl || "");
   const [githubUrl, setGithubUrl] = React.useState(project?.githubUrl || "");
-  const [rating, setRating] = React.useState(project?.rating ?? 4.8);
-  const [reviewCount, setReviewCount] = React.useState(project?.reviewCount ?? 12);
   const [status, setStatus] = React.useState<Project["status"]>(project?.status || "published");
   const [contentHtmlEn, setContentHtmlEn] = React.useState(project?.contentHtmlEn || "");
   const [contentHtmlAr, setContentHtmlAr] = React.useState(project?.contentHtmlAr || "");
@@ -158,11 +165,6 @@ export function ProjectEditorModal({
       return;
     }
 
-    const techArray = technologiesInput
-      .split(/[,،]+/)
-      .map((t) => t.trim())
-      .filter(Boolean);
-
     const formData: ProjectFormData = {
       id: project?.id,
       slug: slug.trim(),
@@ -178,12 +180,12 @@ export function ProjectEditorModal({
       category: category.trim(),
       categorySlug: category.toLowerCase().replace(/[^\w\s-]/g, "").replace(/[\s_-]+/g, "-"),
       year: year.trim(),
-      technologies: techArray,
+      technologies: selectedTechs,
       featured,
       liveDemoUrl: liveDemoUrl.trim() || undefined,
       githubUrl: githubUrl.trim() || undefined,
-      rating: Number(rating) || 4.8,
-      reviewCount: Number(reviewCount) || 0,
+      rating: 5.0,
+      reviewCount: 0,
       metrics: metrics.filter((m) => m.label.trim() && m.value.trim()),
       status,
       displayOrder: project?.displayOrder ?? 0,
@@ -451,17 +453,123 @@ export function ProjectEditorModal({
               </div>
             </div>
 
-            {/* Technologies */}
-            <div className="space-y-1">
-              <label className="text-xs font-semibold text-foreground">
-                Technologies (comma separated)
-              </label>
-              <Input
-                value={technologiesInput}
-                onChange={(e) => setTechnologiesInput(e.target.value)}
-                placeholder="TypeScript, Go, PostgreSQL, Redis, Docker"
-                className="text-xs h-9 rounded-xl"
-              />
+            {/* Technologies Selector from Official Tech Catalog */}
+            <div className="space-y-2.5 p-3.5 rounded-xl border border-border/70 bg-muted/20">
+              <div className="flex items-center justify-between">
+                <label className="text-xs font-semibold text-foreground flex items-center gap-1.5">
+                  <LuLayers className="w-3.5 h-3.5 text-primary" />
+                  <span>{isRtl ? "التقنيات البرمجية المستخدمة" : "Technologies & Architecture Stack"}</span>
+                  <span className="text-[10px] font-mono px-1.5 py-0.5 rounded-full bg-primary/10 text-primary font-bold">
+                    {selectedTechs.length}
+                  </span>
+                </label>
+                <span className="text-[11px] text-muted-foreground hidden sm:inline">
+                  {isRtl ? "اختر من التقنيات الرسمية أو أضف جديدة" : "Click to toggle or type custom"}
+                </span>
+              </div>
+
+              {/* Selected Techs Chips */}
+              {selectedTechs.length > 0 ? (
+                <div className="flex flex-wrap gap-1.5 p-2 rounded-lg bg-background border border-border/50 max-h-24 overflow-y-auto">
+                  {selectedTechs.map((tech) => (
+                    <span
+                      key={tech}
+                      className="inline-flex items-center gap-1.5 pl-2.5 pr-1.5 py-0.5 rounded-full text-xs font-semibold bg-primary/15 text-primary border border-primary/30"
+                    >
+                      <span>{tech}</span>
+                      <button
+                        type="button"
+                        onClick={() => setSelectedTechs(selectedTechs.filter((t) => t !== tech))}
+                        className="hover:bg-primary/20 rounded-full p-0.5 cursor-pointer"
+                        title={isRtl ? "إزالة" : "Remove"}
+                      >
+                        <LuX className="w-3 h-3" />
+                      </button>
+                    </span>
+                  ))}
+                </div>
+              ) : (
+                <div className="p-2 text-center text-xs text-muted-foreground italic rounded-lg bg-background/50 border border-border/40">
+                  {isRtl ? "لم يتم تحديد أي تقنيات بعد" : "No technologies selected yet"}
+                </div>
+              )}
+
+              {/* Search & Custom Add Input */}
+              <div className="flex items-center gap-2">
+                <div className="relative flex-1">
+                  <LuSearch className="absolute start-2.5 top-2.5 w-3.5 h-3.5 text-muted-foreground" />
+                  <Input
+                    value={techSearch}
+                    onChange={(e) => setTechSearch(e.target.value)}
+                    placeholder={isRtl ? "ابحث في التقنيات (e.g. Next.js, Go, Redis)..." : "Filter catalog (e.g. Next.js, Go, Redis)..."}
+                    className="text-xs h-8 ps-8 rounded-lg"
+                  />
+                </div>
+                <div className="flex items-center gap-1 shrink-0">
+                  <Input
+                    value={customTechInput}
+                    onChange={(e) => setCustomTechInput(e.target.value)}
+                    placeholder={isRtl ? "تقنية مخصصة..." : "Custom tech..."}
+                    className="text-xs h-8 w-28 sm:w-36 rounded-lg"
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        e.preventDefault();
+                        if (customTechInput.trim() && !selectedTechs.includes(customTechInput.trim())) {
+                          setSelectedTechs([...selectedTechs, customTechInput.trim()]);
+                          setCustomTechInput("");
+                        }
+                      }
+                    }}
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="h-8 px-2.5 text-xs rounded-lg cursor-pointer"
+                    onClick={() => {
+                      if (customTechInput.trim() && !selectedTechs.includes(customTechInput.trim())) {
+                        setSelectedTechs([...selectedTechs, customTechInput.trim()]);
+                        setCustomTechInput("");
+                      }
+                    }}
+                  >
+                    <LuPlus className="w-3.5 h-3.5" />
+                    <span className="hidden sm:inline ms-1">{isRtl ? "إضافة" : "Add"}</span>
+                  </Button>
+                </div>
+              </div>
+
+              {/* Catalog Badges Grid to Click & Toggle */}
+              <div className="flex flex-wrap gap-1.5 max-h-36 overflow-y-auto p-2 rounded-lg border border-border/40 bg-card/60">
+                {ALL_TECH_ITEMS.filter((t) =>
+                  !techSearch || t.name.toLowerCase().includes(techSearch.toLowerCase()) || t.id.toLowerCase().includes(techSearch.toLowerCase())
+                ).map((tech) => {
+                  const isSelected = selectedTechs.some((st) => st.toLowerCase() === tech.name.toLowerCase() || st.toLowerCase() === tech.id.toLowerCase());
+                  return (
+                    <button
+                      key={tech.id}
+                      type="button"
+                      onClick={() => {
+                        if (isSelected) {
+                          setSelectedTechs(selectedTechs.filter((st) => st.toLowerCase() !== tech.name.toLowerCase() && st.toLowerCase() !== tech.id.toLowerCase()));
+                        } else {
+                          setSelectedTechs([...selectedTechs, tech.name]);
+                        }
+                      }}
+                      className={cn(
+                        "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium cursor-pointer transition-all border select-none",
+                        isSelected
+                          ? "bg-primary text-primary-foreground border-primary shadow-xs font-semibold"
+                          : "bg-background text-foreground/80 hover:bg-muted hover:text-foreground border-border/60"
+                      )}
+                    >
+                      <TechIcon id={tech.id} className="w-3.5 h-3.5 shrink-0" />
+                      <span>{tech.name}</span>
+                      {isSelected && <LuCheck className="w-3 h-3 ms-0.5 shrink-0" />}
+                    </button>
+                  );
+                })}
+              </div>
             </div>
 
             {/* URLs */}
@@ -601,7 +709,7 @@ export function ProjectEditorModal({
             </div>
 
             {/* Status & Featured Controls */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-3 border-t border-border/60">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-3 border-t border-border/60">
               <div className="space-y-1">
                 <label className="text-xs font-semibold text-foreground">Publication Status</label>
                 <select
@@ -613,19 +721,6 @@ export function ProjectEditorModal({
                   <option value="draft">Draft (Hidden)</option>
                   <option value="archived">Archived</option>
                 </select>
-              </div>
-
-              <div className="space-y-1">
-                <label className="text-xs font-semibold text-foreground">Client Rating</label>
-                <Input
-                  type="number"
-                  step="0.1"
-                  min="1"
-                  max="5"
-                  value={rating}
-                  onChange={(e) => setRating(Number(e.target.value))}
-                  className="text-xs h-9 rounded-xl font-mono"
-                />
               </div>
 
               <div className="flex items-center gap-3 pt-5">

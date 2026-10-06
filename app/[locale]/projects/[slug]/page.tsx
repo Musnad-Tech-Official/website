@@ -11,11 +11,13 @@ import {
   ProjectDetailSolution,
   ProjectDetailGallery,
   ProjectDetailRelated,
+  ProjectDetailComments,
 } from "@/components/projects/detail";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { CTA } from "@/components/ui";
-import { LuArrowUpRight, LuStar, LuCheck } from "react-icons/lu";
+import { TechnologyBadge } from "@/components/ui/technology-badge";
+import { LuArrowUpRight, LuCheck } from "react-icons/lu";
 
 interface ProjectDetailPageProps {
   params: Promise<{ locale: string; slug: string }>;
@@ -87,8 +89,6 @@ export default async function ProjectDetailPage({
   const category = dbProject?.category || fallbackProject?.metaBar?.find(m => m.id === "category")?.value || "Case Study";
   const clientName = dbProject?.clientName || fallbackProject?.metaBar?.find(m => m.id === "user")?.value || "Musnad Tech";
   const year = dbProject?.year || fallbackProject?.metaBar?.find(m => m.id === "year")?.value || "2025";
-  const rating = dbProject?.rating ?? 4.9;
-  const reviewCount = dbProject?.reviewCount ?? 32;
   const gradient = dbProject?.gradient || "from-blue-600 via-indigo-600 to-violet-700";
   const projectImage = dbProject?.image || dbProject?.coverImage || undefined;
   const liveDemoUrl = dbProject?.liveDemoUrl || undefined;
@@ -152,7 +152,7 @@ export default async function ProjectDetailPage({
 
   return (
     <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 w-full flex-1">
-      {/* 1. Cinematic Hero Header with Browser Showcase */}
+      {/* 1. Cinematic Hero Header with Prominent Cover and Technologies */}
       <ProjectDetailHeader
         title={projectTitle}
         subtitle={projectSubtitle}
@@ -163,6 +163,7 @@ export default async function ProjectDetailPage({
         gradient={gradient}
         liveDemoUrl={liveDemoUrl}
         githubUrl={githubUrl}
+        technologies={technologies}
         actions={projectActions}
         homeLabel={t("breadcrumb.home")}
         projectsLabel={t("breadcrumb.projects")}
@@ -273,6 +274,25 @@ export default async function ProjectDetailPage({
               />
             </div>
           )}
+
+          {/* Section D: User Reviews & Comments */}
+          <div className="border-t border-border/50 pt-10">
+            <ProjectDetailComments
+              title={fallbackProject?.commentsConfig?.title || (isAr ? "مراجعات ونقاشات المشروع" : "Project Reviews & Discussion")}
+              placeholder={fallbackProject?.commentsConfig?.placeholder || (isAr ? "اكتب تعليقك أو مراجعتك الهندسية حول هذا المشروع..." : "Write your review or comment on this project...")}
+              submitLabel={fallbackProject?.commentsConfig?.submitLabel || (isAr ? "نشر المراجعة" : "Post Review")}
+              replyLabel={fallbackProject?.commentsConfig?.replyLabel || (isAr ? "رد" : "Reply")}
+              emptyMessage={fallbackProject?.commentsConfig?.emptyMessage || (isAr ? "لا توجد مراجعات حتى الآن. شارك برأيك الأول!" : "No reviews yet. Be the first to share your thoughts!")}
+              items={fallbackProject?.commentsConfig?.items || []}
+              eligibility={{
+                isAuthenticated: true,
+                hasVerifiedExperience: true,
+                canRate: false,
+                canComment: true,
+                reason: "eligible",
+              }}
+            />
+          </div>
         </div>
 
         {/* Sticky Project Specs Sidebar (4 cols) */}
@@ -307,30 +327,23 @@ export default async function ProjectDetailPage({
                 </dd>
               </div>
               <div className="flex justify-between items-center">
-                <dt className="text-muted-foreground">{isAr ? "التقييم المعتمد" : "Verified Rating"}</dt>
-                <dd className="font-semibold text-foreground flex items-center gap-1">
-                  <LuStar className="h-3.5 w-3.5 fill-amber-400 text-amber-500" />
-                  <span>{rating} / 5.0</span>
-                  <span className="text-muted-foreground font-normal">({reviewCount})</span>
+                <dt className="text-muted-foreground">{isAr ? "معمارية النظام" : "Architecture"}</dt>
+                <dd className="font-mono text-xs font-semibold text-foreground">
+                  {technologies.length > 0 ? `${technologies.length} Stack Modules` : "Production Stack"}
                 </dd>
               </div>
             </dl>
           </Card>
 
-          {/* Card 2: Technologies & Architecture */}
+          {/* Card 2: Technologies & Architecture with Home-Style Badges */}
           {technologies.length > 0 && (
             <Card className="p-6 border border-border/70 bg-card/80 backdrop-blur-xs rounded-2xl shadow-xs">
               <h3 className="font-bold text-base text-foreground mb-4 pb-3 border-b border-border/50">
                 {isAr ? "التقنيات والأدوات المستخدمة" : "Technologies & Infrastructure"}
               </h3>
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap gap-2.5">
                 {technologies.map((tech, idx) => (
-                  <span
-                    key={idx}
-                    className="inline-flex items-center text-xs font-mono font-medium text-foreground bg-muted/70 px-2.5 py-1 rounded-lg border border-border/50"
-                  >
-                    {tech}
-                  </span>
+                  <TechnologyBadge key={idx} name={tech} size="sm" />
                 ))}
               </div>
             </Card>

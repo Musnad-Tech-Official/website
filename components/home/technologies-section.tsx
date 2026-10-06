@@ -5,10 +5,15 @@ import { cn } from "@/lib/utils";
 
 export interface TechnologiesSectionProps {
   className?: string;
+  technologies?: { id: string; name: string }[];
 }
 
-export function TechnologiesSection({ className = "" }: TechnologiesSectionProps) {
+export function TechnologiesSection({
+  className = "",
+  technologies,
+}: TechnologiesSectionProps) {
   const t = useTranslations("Home.technologies");
+  const techList = technologies && technologies.length > 0 ? technologies : ALL_TECH_ITEMS;
 
   return (
     <section
@@ -38,7 +43,7 @@ export function TechnologiesSection({ className = "" }: TechnologiesSectionProps
           className="mt-10 sm:mt-12 flex flex-wrap items-center gap-3 sm:gap-3.5"
           aria-label="Technologies list"
         >
-          {ALL_TECH_ITEMS.map((tech) => (
+          {techList.map((tech) => (
             <div
               key={tech.id}
               dir="ltr"

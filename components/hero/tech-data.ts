@@ -21,7 +21,13 @@ export type TechId =
   | "mysql"
   | "mongodb"
   | "php"
-  | "docker";
+  | "docker"
+  | "python"
+  | "go"
+  | "rust"
+  | "redis"
+  | "clickhouse"
+  | "fastapi";
 
 export interface TechItem {
   id: TechId;
@@ -93,7 +99,35 @@ export const TECH_ROWS: TechRow[] = [
       { id: "docker", name: "Docker", rotation: 3 },
     ],
   },
+  {
+    id: "row-8",
+    items: [
+      { id: "python", name: "Python", rotation: -2 },
+      { id: "go", name: "Go", rotation: 1 },
+      { id: "rust", name: "Rust", rotation: -1 },
+      { id: "redis", name: "Redis", rotation: 2 },
+      { id: "clickhouse", name: "ClickHouse", rotation: -2 },
+      { id: "fastapi", name: "FastAPI", rotation: 1 },
+    ],
+  },
 ];
 
 export const ALL_TECH_ITEMS: TechItem[] = TECH_ROWS.flatMap((row) => row.items);
+
+export function findTechItem(nameOrId: string): TechItem {
+  const normalized = nameOrId.trim().toLowerCase().replace(/[^a-z0-9]/g, "");
+  const found = ALL_TECH_ITEMS.find((t) => {
+    const idNorm = t.id.toLowerCase().replace(/[^a-z0-9]/g, "");
+    const nameNorm = t.name.toLowerCase().replace(/[^a-z0-9]/g, "");
+    return idNorm === normalized || nameNorm === normalized || normalized.includes(idNorm) || idNorm.includes(normalized);
+  });
+
+  if (found) return found;
+
+  return {
+    id: (normalized as TechId) || "docker",
+    name: nameOrId.trim(),
+    rotation: 0,
+  };
+}
 
