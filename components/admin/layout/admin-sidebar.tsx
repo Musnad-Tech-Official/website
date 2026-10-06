@@ -17,6 +17,7 @@ import {
   LuSettings,
   LuGlobe,
   LuCpu,
+  LuBuilding2,
   LuChevronLeft,
   LuChevronRight,
   LuX,
@@ -67,6 +68,11 @@ export function AdminSidebar({
       title: t("nav.technologies"),
       href: "/admin/technologies",
       icon: LuCpu,
+    },
+    {
+      title: t("nav.companies"),
+      href: "/admin/companies",
+      icon: LuBuilding2,
     },
     {
       title: t("nav.articles"),

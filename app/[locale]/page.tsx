@@ -15,6 +15,7 @@ import { getArticlesAction } from "@/lib/articles/actions";
 import { getTeamMembersAction } from "@/lib/team/actions";
 import { getProjectsAction } from "@/lib/projects/actions";
 import { getHomeTechnologiesAction } from "@/lib/technologies/actions";
+import { getTrustedCompaniesAction } from "@/lib/companies/actions";
 
 interface HomePageProps {
   params: Promise<{ locale: string }>;
@@ -24,11 +25,12 @@ export default async function Page({ params }: HomePageProps) {
   const { locale } = await params;
   const isAr = locale === "ar";
 
-  const [articles, dbTeamMembers, dbProjects, dbTechnologies] = await Promise.all([
+  const [articles, dbTeamMembers, dbProjects, dbTechnologies, dbCompanies] = await Promise.all([
     getArticlesAction("published"),
     getTeamMembersAction(true),
     getProjectsAction("published"),
     getHomeTechnologiesAction(),
+    getTrustedCompaniesAction(false),
   ]);
 
   const teamMembers = dbTeamMembers.map((m) => ({
@@ -77,7 +79,7 @@ export default async function Page({ params }: HomePageProps) {
         <HeroSection />
 
         {/* 1. Trusted Companies strip */}
-        <TrustedCompanies />
+        <TrustedCompanies companies={dbCompanies} />
 
         {/* 2. Capabilities / Services */}
         <CapabilitiesSection />
