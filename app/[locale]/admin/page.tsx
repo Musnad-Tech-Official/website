@@ -22,9 +22,14 @@ import {
   LuShieldCheck,
   LuPlus,
   LuClock,
+  LuLayers,
 } from "react-icons/lu";
 
 import { getInquiriesAction } from "@/lib/inquiries/actions";
+import { getProjectsAction } from "@/lib/projects/actions";
+import { getArticlesAction } from "@/lib/articles/actions";
+import { getTeamMembersAction } from "@/lib/team/actions";
+import { getServicesAction } from "@/lib/services/actions";
 
 interface AdminPageProps {
   params: Promise<{ locale: string }>;
@@ -33,23 +38,31 @@ interface AdminPageProps {
 export default async function AdminDashboardPage({ params }: AdminPageProps) {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "Admin" });
-  const inquiries = await getInquiriesAction();
+
+  const [inquiries, projects, articles, teamMembers, services] = await Promise.all([
+    getInquiriesAction(),
+    getProjectsAction(),
+    getArticlesAction(),
+    getTeamMembersAction(true),
+    getServicesAction(true),
+  ]);
+
   const newInquiriesCount = inquiries.filter((i) => i.status === "new").length;
 
   const kpis = [
     {
       title: t("cockpit.kpi.projects"),
       sub: t("cockpit.kpi.projectsSub"),
-      value: "12",
-      delta: "+16.5%",
+      value: String(projects.length),
+      delta: `${projects.filter((p) => p.status === "published").length} active`,
       icon: LuFolderGit2,
       color: "text-blue-500 bg-blue-500/10 border-blue-500/20",
     },
     {
       title: t("cockpit.kpi.articles"),
       sub: t("cockpit.kpi.articlesSub"),
-      value: "8",
-      delta: "+25.0%",
+      value: String(articles.length),
+      delta: `${articles.filter((a) => a.status === "published").length} published`,
       icon: LuFileText,
       color: "text-emerald-500 bg-emerald-500/10 border-emerald-500/20",
     },
@@ -62,11 +75,11 @@ export default async function AdminDashboardPage({ params }: AdminPageProps) {
       color: "text-amber-500 bg-amber-500/10 border-amber-500/20",
     },
     {
-      title: t("cockpit.kpi.users"),
-      sub: t("cockpit.kpi.usersSub"),
-      value: "4",
-      delta: "+0.0%",
-      icon: LuUsers,
+      title: t("nav.services"),
+      sub: `${services.filter((s) => s.enabledHome).length} on Home page`,
+      value: String(services.length),
+      delta: `${services.filter((s) => s.isActive).length} active`,
+      icon: LuLayers,
       color: "text-purple-500 bg-purple-500/10 border-purple-500/20",
     },
   ];
@@ -91,9 +104,9 @@ export default async function AdminDashboardPage({ params }: AdminPageProps) {
       color: "hover:border-amber-500/40",
     },
     {
-      label: t("cockpit.actions.manageTeam"),
-      href: "/admin/users",
-      icon: LuUsers,
+      label: t("nav.services"),
+      href: "/admin/services",
+      icon: LuLayers,
       color: "hover:border-purple-500/40",
     },
   ];
