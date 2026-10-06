@@ -20,6 +20,7 @@ import {
   LuBuilding2,
   LuMegaphone,
   LuQuote,
+  LuLayers,
   LuChevronLeft,
   LuChevronRight,
   LuX,
@@ -59,6 +60,11 @@ export function AdminSidebar({
       title: t("nav.pages"),
       href: "/admin/pages",
       icon: LuGlobe,
+    },
+    {
+      title: t("nav.services"),
+      href: "/admin/services",
+      icon: LuLayers,
     },
     {
       title: t("nav.projects"),

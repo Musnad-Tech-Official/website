@@ -48,11 +48,14 @@ export interface ServiceCardProps {
   className?: string;
 }
 
+import type { ServiceItem } from "@/lib/services/types";
+
 /**
  * Props for ServicesGrid section.
  */
 export interface ServicesGridProps {
   className?: string;
+  services?: ServiceItem[];
 }
 
 /**

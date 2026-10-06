@@ -17,6 +17,7 @@ import { getProjectsAction } from "@/lib/projects/actions";
 import { getHomeTechnologiesAction } from "@/lib/technologies/actions";
 import { getTrustedCompaniesAction } from "@/lib/companies/actions";
 import { getTestimonialsAction } from "@/lib/testimonials/actions";
+import { getHomeServicesAction } from "@/lib/services/actions";
 
 interface HomePageProps {
   params: Promise<{ locale: string }>;
@@ -26,13 +27,14 @@ export default async function Page({ params }: HomePageProps) {
   const { locale } = await params;
   const isAr = locale === "ar";
 
-  const [articles, dbTeamMembers, dbProjects, dbTechnologies, dbCompanies, dbTestimonials] = await Promise.all([
+  const [articles, dbTeamMembers, dbProjects, dbTechnologies, dbCompanies, dbTestimonials, dbServices] = await Promise.all([
     getArticlesAction("published"),
     getTeamMembersAction(true),
     getProjectsAction("published"),
     getHomeTechnologiesAction(),
     getTrustedCompaniesAction(false),
     getTestimonialsAction(false),
+    getHomeServicesAction(),
   ]);
 
   const teamMembers = dbTeamMembers.map((m) => ({
@@ -84,7 +86,7 @@ export default async function Page({ params }: HomePageProps) {
         <TrustedCompanies companies={dbCompanies} />
 
         {/* 2. Capabilities / Services */}
-        <CapabilitiesSection />
+        <CapabilitiesSection services={dbServices} />
 
         {/* 3. Selected Projects */}
         <SelectedProjects projects={projects} />
