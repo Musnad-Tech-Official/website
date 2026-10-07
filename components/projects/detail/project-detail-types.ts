@@ -96,6 +96,24 @@ export interface ProjectDetailRelatedProps {
   className?: string;
 }
 
+export interface ProjectTableOfContentsItem {
+  id: string;
+  label: string;
+  level?: 2 | 3;
+}
+
+export interface ProjectTableOfContentsProps {
+  items: ProjectTableOfContentsItem[];
+  title?: string;
+  onThisPageText?: string;
+  sectionsCountLabel?: string;
+  toggleOpenLabel?: string;
+  toggleCloseLabel?: string;
+  className?: string;
+  isCollapsible?: boolean;
+  defaultCollapsed?: boolean;
+}
+
 /**
  * Frontend UX eligibility contract for project ratings and comments.
  *

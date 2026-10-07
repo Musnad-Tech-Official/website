@@ -9,11 +9,36 @@ import {
   ProjectDetailHeader,
   ProjectDetailRelated,
   ProjectDetailComments,
+  ProjectTableOfContents,
+  type ProjectTableOfContentsItem,
 } from "@/components/projects/detail";
 import { CTA } from "@/components/ui";
 
 interface ProjectDetailPageProps {
   params: Promise<{ locale: string; slug: string }>;
+}
+
+function processProjectHtmlHeadings(html: string) {
+  let counter = 0;
+  const items: ProjectTableOfContentsItem[] = [];
+
+  const processedHtml = html.replace(/<h([23])([^>]*)>(.*?)<\/h\1>/gi, (full, levelStr, attrs, inner) => {
+    const level = parseInt(levelStr, 10) as 2 | 3;
+    const text = inner.replace(/<[^>]+>/g, "").trim();
+    if (!text) return full;
+
+    const idMatch = attrs.match(/id=["']([^"']+)["']/);
+    const id = idMatch ? idMatch[1] : `section-${++counter}-${text.toLowerCase().replace(/[^\w\s-]/g, "").replace(/\s+/g, "-")}`;
+
+    items.push({ id, label: text, level });
+
+    if (idMatch) {
+      return full;
+    }
+    return `<h${level}${attrs} id="${id}" class="scroll-mt-24">${inner}</h${level}>`;
+  });
+
+  return { processedHtml, tocItems: items };
 }
 
 export async function generateMetadata({
@@ -79,6 +104,32 @@ export default async function ProjectDetailPage({
       : dbProject.contentHtmlEn || dbProject.contentHtmlAr
     : null;
 
+  let processedContentHtml = contentHtml;
+  let tocItems: ProjectTableOfContentsItem[] = [];
+
+  if (contentHtml) {
+    const result = processProjectHtmlHeadings(contentHtml);
+    processedContentHtml = result.processedHtml;
+    tocItems = result.tocItems;
+  } else if (fallbackProject) {
+    if (fallbackProject.overview?.title) {
+      tocItems.push({ id: "overview", label: fallbackProject.overview.title, level: 2 });
+    }
+    if (fallbackProject.context?.title) {
+      tocItems.push({ id: "context", label: fallbackProject.context.title, level: 2 });
+    }
+    if (fallbackProject.solution?.title) {
+      tocItems.push({ id: "solution", label: fallbackProject.solution.title, level: 2 });
+    }
+  }
+
+  // Always append Discussion & Reviews so readers can jump straight to feedback
+  tocItems.push({
+    id: "project-discussion",
+    label: t("toc.discussion"),
+    level: 2,
+  });
+
   const rawCategory = dbProject?.category || fallbackProject?.metaBar?.find(m => m.id === "category")?.value || "Case Study";
   const category = getLocalizedProjectCategory(rawCategory, locale);
   const gradient = dbProject?.gradient || "from-zinc-900 via-neutral-900 to-zinc-950";
@@ -134,18 +185,30 @@ export default async function ProjectDetailPage({
 
       {/* 2. Focused Editorial Case Study (Clean Rich Text Article) */}
       <main className="max-w-4xl mx-auto py-12 sm:py-16">
-        {contentHtml ? (
-          <article className="prose prose-zinc dark:prose-invert max-w-none text-foreground leading-relaxed prose-headings:font-bold prose-headings:tracking-tight prose-h2:text-2xl sm:prose-h2:text-3xl prose-h3:text-xl prose-p:text-muted-foreground prose-p:leading-relaxed prose-code:font-mono prose-code:text-primary prose-code:bg-muted/70 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-pre:bg-zinc-950 prose-pre:border prose-pre:border-border/60 prose-img:rounded-2xl prose-img:border prose-img:border-border/60 shadow-xs">
-            <div dangerouslySetInnerHTML={{ __html: contentHtml }} />
+        {/* Table of Contents Box */}
+        {tocItems.length > 0 && (
+          <ProjectTableOfContents
+            items={tocItems}
+            title={t("toc.title")}
+            onThisPageText={t("toc.onThisPage")}
+            sectionsCountLabel={t("toc.sectionsCount", { count: tocItems.length })}
+            toggleOpenLabel={t("toc.toggleOpen")}
+            toggleCloseLabel={t("toc.toggleClose")}
+          />
+        )}
+
+        {processedContentHtml ? (
+          <article className="prose prose-zinc dark:prose-invert max-w-none text-foreground leading-relaxed prose-headings:font-bold prose-headings:tracking-tight prose-h2:text-2xl sm:prose-h2:text-3xl prose-h3:text-xl prose-h2:scroll-mt-24 prose-h3:scroll-mt-24 prose-p:text-muted-foreground prose-p:leading-relaxed prose-code:font-mono prose-code:text-primary prose-code:bg-muted/70 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-pre:bg-zinc-950 prose-pre:border prose-pre:border-border/60 prose-img:rounded-2xl prose-img:border prose-img:border-border/60 shadow-xs">
+            <div dangerouslySetInnerHTML={{ __html: processedContentHtml }} />
           </article>
         ) : (
-          <div className="text-base sm:text-lg text-muted-foreground leading-relaxed">
+          <div id="overview" className="text-base sm:text-lg text-muted-foreground leading-relaxed scroll-mt-24">
             <p>{projectSubtitle}</p>
           </div>
         )}
 
         {/* 3. User Reviews & Discussion */}
-        <div className="mt-14 pt-10 border-t border-border/50">
+        <div id="project-discussion" className="mt-14 pt-10 border-t border-border/50 scroll-mt-24">
           <ProjectDetailComments
             title={fallbackProject?.commentsConfig?.title || (isAr ? "مراجعات ونقاشات المشروع" : "Project Reviews & Discussion")}
             placeholder={fallbackProject?.commentsConfig?.placeholder || (isAr ? "اكتب تعليقك أو مراجعتك حول هذا المشروع..." : "Write your review or comment on this project...")}

@@ -585,6 +585,18 @@
         "eyebrow": "القدرات الهندسية",
         "heading": "القدرات الهندسية"
       },
+      "projects": {
+        "eyebrow": "مشاريع ذات صلة",
+        "heading": "مشاريع ذات صلة"
+      },
+      "sidebar": {
+        "onThisPage": "في هذه الصفحة",
+        "overview": "نظرة عامة",
+        "capabilities": "القدرات التقنية",
+        "relatedProjects": "مشاريع ذات صلة",
+        "cta": "ابدأ مشروعك في هذه الخدمة",
+        "technologies": "التقنيات المرتبطة"
+      },
       "cta": {
         "badge": "نرد خلال يومي عمل",
         "title": "هل لديك مشروع في بالك؟",
@@ -819,6 +831,14 @@
       "livePreview": "المعاينة الحية",
       "repository": "المستودع البرمجي"
     },
+    "toc": {
+      "title": "فهرس المحتويات",
+      "onThisPage": "محتويات دراسة المشروع",
+      "sectionsCount": "{count} أقسام",
+      "toggleOpen": "توسيع الفهرس",
+      "toggleClose": "طي الفهرس",
+      "discussion": "المراجعات والنقاشات"
+    },
     "meta": {
       "titleTemplate": "{title} — مسند للتقنية",
       "defaultDescription": "استعرض دراسات المشاريع التقنية من مسند للتقنية."
@@ -970,6 +990,8 @@
       "delete": "حذف",
       "deleting": "جاري الحذف...",
       "confirmDelete": "هل أنت متأكد من حذف هذا التعليق؟",
+      "deleteComment": "حذف التعليق",
+      "errorGeneric": "حدث خطأ ما. يرجى المحاولة مرة أخرى.",
       "authorBadge": "الكاتب",
       "teamBadge": "فريق مسند",
       "empty": "لا توجد تعليقات حتى الآن.",
@@ -1026,6 +1048,47 @@
       "phone": {
         "label": "رقم الهاتف",
         "placeholder": "رقم الهاتف (اختياري)"
+      },
+      "projectType": {
+        "label": "نوع المشروع",
+        "placeholder": "اختر نوع المشروع (اختياري)",
+        "options": {
+          "productEngineering": "هندسة وتطوير المنتجات",
+          "platformInfrastructure": "المنصات والبنية التحتية",
+          "dataEngineering": "هندسة البيانات",
+          "developerTools": "أدوات المطورين",
+          "aiIntegration": "حلول الذكاء الاصطناعي",
+          "designEngineering": "هندسة التصميم وواجهات المستخدم"
+        }
+      },
+      "budget": {
+        "label": "الميزانية التقديرية",
+        "placeholder": "اختر نطاق الميزانية (اختياري)",
+        "options": {
+          "under25k": "أقل من 25 ألف دولار",
+          "25k-50k": "25 – 50 ألف دولار",
+          "50k-100k": "50 – 100 ألف دولار",
+          "over100k": "أكثر من 100 ألف دولار",
+          "undisclosed": "غير محدد / مرن"
+        }
+      },
+      "timeline": {
+        "label": "الجدول الزمني",
+        "placeholder": "اختر الإطار الزمني المتوقع (اختياري)",
+        "options": {
+          "immediate": "أقل من شهر (فوري)",
+          "oneToThreeMonths": "1 – 3 أشهر",
+          "threeToSixMonths": "3 – 6 أشهر",
+          "flexible": "مرن"
+        }
+      },
+      "currentProduct": {
+        "label": "المنتج الحالي أو الموقع الإلكتروني",
+        "placeholder": "example.com"
+      },
+      "attachment": {
+        "label": "المرفقات",
+        "hint": "ملفات PDF أو DOC أو ZIP حتى 10 ميجابايت."
       },
       "projectDetails": {
         "title": "تفاصيل المشروع",
