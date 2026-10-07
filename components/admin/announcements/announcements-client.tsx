@@ -4,17 +4,12 @@ import * as React from "react";
 import {
   LuPlus,
   LuSearch,
-  LuMegaphone,
-  LuCircleCheck,
-  LuEyeOff,
   LuPencil,
   LuTrash2,
   LuExternalLink,
-  LuSparkles,
   LuFolderGit2,
   LuServer,
   LuWrench,
-  LuRadio,
 } from "react-icons/lu";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -87,7 +82,28 @@ export function AnnouncementsClient({
   }, [announcements, search, categoryFilter]);
 
   const handleOpenNew = (categoryPreset?: AnnouncementCategory) => {
-    setEditingAnnouncement(null);
+    setEditingAnnouncement(
+      categoryPreset
+        ? {
+            id: "",
+            category: categoryPreset,
+            textEn: "",
+            textAr: "",
+            tagEn: "New",
+            tagAr: "جديد",
+            href:
+              categoryPreset === "projects"
+                ? "/projects"
+                : categoryPreset === "services"
+                ? "/services"
+                : "/services/developer-tools",
+            linkTextEn: "Explore Now",
+            linkTextAr: "استكشف الآن",
+            isDismissible: true,
+            isActive: false,
+          }
+        : null
+    );
     setIsModalOpen(true);
   };
 

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
-import { getTeamStats } from "@/data/team";
+import { getTeamCultureStats } from "@/components/team/team-types";
 import { getTeamMembersAction } from "@/lib/team/actions";
 import {
   TeamHeader,
@@ -43,7 +43,7 @@ export default async function TeamPage({ params }: TeamPageProps) {
     skills: m.skills,
     socialLinks: m.socialLinks,
   }));
-  const stats = getTeamStats(locale);
+  const stats = getTeamCultureStats(locale);
 
   return (
     <PageGuard slug="team" locale={locale}>

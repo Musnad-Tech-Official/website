@@ -22,8 +22,6 @@ import {
   LuLoader,
   LuTriangleAlert,
   LuSparkles,
-  LuUser,
-  LuBuilding2,
   LuUpload,
   LuTrash2,
   LuImage,
@@ -37,8 +35,12 @@ interface TestimonialEditorModalProps {
   locale: string;
 }
 
-export function TestimonialEditorModal({
-  isOpen,
+export function TestimonialEditorModal(props: TestimonialEditorModalProps) {
+  if (!props.isOpen) return null;
+  return <TestimonialEditorModalContent key={props.testimonial?.id ?? "new"} {...props} />;
+}
+
+function TestimonialEditorModalContent({
   onClose,
   testimonial,
   onSave,
@@ -46,48 +48,21 @@ export function TestimonialEditorModal({
 }: TestimonialEditorModalProps) {
   const isRtl = locale === "ar";
 
-  const [authorNameEn, setAuthorNameEn] = React.useState("");
-  const [authorNameAr, setAuthorNameAr] = React.useState("");
-  const [roleEn, setRoleEn] = React.useState("");
-  const [roleAr, setRoleAr] = React.useState("");
-  const [quoteEn, setQuoteEn] = React.useState("");
-  const [quoteAr, setQuoteAr] = React.useState("");
-  const [initial, setInitial] = React.useState("");
-  const [avatarUrl, setAvatarUrl] = React.useState("");
-  const [displayOrder, setDisplayOrder] = React.useState(0);
-  const [isActive, setIsActive] = React.useState(true);
+  const [authorNameEn, setAuthorNameEn] = React.useState(testimonial?.authorNameEn || "");
+  const [authorNameAr, setAuthorNameAr] = React.useState(testimonial?.authorNameAr || "");
+  const [roleEn, setRoleEn] = React.useState(testimonial?.roleEn || "");
+  const [roleAr, setRoleAr] = React.useState(testimonial?.roleAr || "");
+  const [quoteEn, setQuoteEn] = React.useState(testimonial?.quoteEn || "");
+  const [quoteAr, setQuoteAr] = React.useState(testimonial?.quoteAr || "");
+  const [initial, setInitial] = React.useState(testimonial?.initial || "");
+  const [avatarUrl, setAvatarUrl] = React.useState(testimonial?.avatarUrl || "");
+  const [displayOrder, setDisplayOrder] = React.useState(testimonial?.displayOrder ?? 0);
+  const [isActive, setIsActive] = React.useState(testimonial?.isActive !== false);
 
   const [isSaving, setIsSaving] = React.useState(false);
   const [isUploading, setIsUploading] = React.useState(false);
   const [errorAlert, setErrorAlert] = React.useState<string | null>(null);
   const fileInputRef = React.useRef<HTMLInputElement | null>(null);
-
-  React.useEffect(() => {
-    if (testimonial) {
-      setAuthorNameEn(testimonial.authorNameEn);
-      setAuthorNameAr(testimonial.authorNameAr);
-      setRoleEn(testimonial.roleEn);
-      setRoleAr(testimonial.roleAr);
-      setQuoteEn(testimonial.quoteEn);
-      setQuoteAr(testimonial.quoteAr);
-      setInitial(testimonial.initial);
-      setAvatarUrl(testimonial.avatarUrl || "");
-      setDisplayOrder(testimonial.displayOrder);
-      setIsActive(testimonial.isActive);
-    } else {
-      setAuthorNameEn("");
-      setAuthorNameAr("");
-      setRoleEn("");
-      setRoleAr("");
-      setQuoteEn("");
-      setQuoteAr("");
-      setInitial("");
-      setAvatarUrl("");
-      setDisplayOrder(0);
-      setIsActive(true);
-    }
-    setErrorAlert(null);
-  }, [testimonial, isOpen]);
 
   const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -175,7 +150,7 @@ export function TestimonialEditorModal({
   const previewInitial = initial || authorNameEn.charAt(0).toUpperCase() || (isRtl ? "ع" : "A");
 
   return (
-    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+    <Dialog open onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="max-w-2xl p-0 overflow-hidden border-border bg-card">
         <DialogHeader className="p-6 pb-4 border-b border-border/40">
           <div className="flex items-center gap-3">
@@ -209,159 +184,147 @@ export function TestimonialEditorModal({
             </Alert>
           )}
 
-          {/* Live Card Preview */}
-          <div className="space-y-1.5">
-            <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">
-              {isRtl ? "معاينة البطاقة على الصفحة الرئيسية" : "Live Home Card Preview"}
-            </span>
-            <div className="p-5 rounded-2xl border border-border/80 bg-card shadow-2xs">
-              <LuQuote className="h-8 w-8 text-primary/30 mb-2" />
-              <p className="text-xs sm:text-sm text-foreground/90 leading-relaxed font-normal mb-4">
-                {isRtl ? `«${previewQuote}»` : `“${previewQuote}”`}
-              </p>
-              <div className="flex items-center gap-3 pt-3 border-t border-border/60">
-                <Avatar
-                  src={avatarUrl.trim() || undefined}
-                  alt={previewAuthor}
-                  fallback={previewInitial}
-                  size="md"
-                  shape="circle"
-                  className="rounded-full border border-primary/20 bg-primary/10 text-primary font-bold shrink-0"
-                />
-                <div className="min-w-0">
-                  <p className="text-xs font-bold text-foreground truncate">{previewAuthor}</p>
-                  <p className="text-[11px] text-muted-foreground truncate">{previewRole}</p>
-                </div>
-              </div>
+          {/* Live Quote Preview */}
+          <div className="p-4 rounded-xl border border-border/70 bg-muted/20 space-y-3">
+            <div className="flex items-center justify-between text-[11px] text-muted-foreground font-semibold uppercase tracking-wider">
+              <span>{isRtl ? "معاينة حية للبطاقة" : "Live Preview"}</span>
+              <span className="flex items-center gap-1 text-primary">
+                <LuSparkles className="h-3 w-3" />
+                <span>Featured</span>
+              </span>
             </div>
-          </div>
 
-          {/* Arabic Inputs */}
-          <div className="p-4 rounded-xl border border-border/50 bg-muted/10 space-y-3">
-            <span className="text-xs font-bold text-foreground">العربية (AR)</span>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div className="space-y-1">
-                <label className="text-[11px] font-medium text-muted-foreground">اسم العميل / الشريك *</label>
-                <Input
-                  value={authorNameAr}
-                  onChange={(e) => setAuthorNameAr(e.target.value)}
-                  placeholder="مثال: ريم السيد"
-                  className="h-9 text-xs"
-                  dir="rtl"
-                />
-              </div>
-              <div className="space-y-1">
-                <label className="text-[11px] font-medium text-muted-foreground">المسمى الوظيفي والشركة *</label>
-                <Input
-                  value={roleAr}
-                  onChange={(e) => setRoleAr(e.target.value)}
-                  placeholder="شريك مدير · شركة خدمات قانونية"
-                  className="h-9 text-xs"
-                  dir="rtl"
-                />
-              </div>
-            </div>
-            <div className="space-y-1">
-              <label className="text-[11px] font-medium text-muted-foreground">نص التوصية بالعربية *</label>
-              <Textarea
-                value={quoteAr}
-                onChange={(e) => setQuoteAr(e.target.value)}
-                placeholder="اكتب التوصية أو الرأي بالعربية..."
-                className="text-xs min-h-[70px]"
-                dir="rtl"
+            <p className="text-xs sm:text-sm text-foreground/90 italic leading-relaxed">
+              &ldquo;{previewQuote}&rdquo;
+            </p>
+
+            <div className="flex items-center gap-2.5 pt-1">
+              <Avatar
+                fallback={previewInitial}
+                src={avatarUrl}
+                size="sm"
+                className="bg-primary/10 text-primary border border-border/40"
               />
+              <div className="min-w-0">
+                <p className="text-xs font-bold text-foreground truncate">{previewAuthor}</p>
+                <p className="text-[11px] text-muted-foreground truncate">{previewRole}</p>
+              </div>
             </div>
           </div>
 
-          {/* English Inputs */}
-          <div className="p-4 rounded-xl border border-border/50 bg-muted/10 space-y-3">
-            <span className="text-xs font-bold text-foreground">English (EN)</span>
+          {/* English Fields */}
+          <div className="p-4 rounded-xl border border-border/60 bg-card space-y-3">
+            <span className="text-xs font-bold text-foreground flex items-center gap-1.5">
+              <span>English Information (EN)</span>
+            </span>
+
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div className="space-y-1">
-                <label className="text-[11px] font-medium text-muted-foreground">Author / Partner Name *</label>
+                <label className="text-[11px] font-semibold text-muted-foreground">Author Name (EN) *</label>
                 <Input
                   value={authorNameEn}
                   onChange={(e) => setAuthorNameEn(e.target.value)}
-                  placeholder="e.g. Reem Al-Sayed"
+                  placeholder="e.g. Rashid Al-Dosari"
                   className="h-9 text-xs"
-                  dir="ltr"
                 />
               </div>
+
               <div className="space-y-1">
-                <label className="text-[11px] font-medium text-muted-foreground">Role & Company *</label>
+                <label className="text-[11px] font-semibold text-muted-foreground">Role & Company (EN)</label>
                 <Input
                   value={roleEn}
                   onChange={(e) => setRoleEn(e.target.value)}
-                  placeholder="Managing Partner · Legal Services Firm"
+                  placeholder="e.g. VP of Product, FinTech Saudi"
                   className="h-9 text-xs"
-                  dir="ltr"
                 />
               </div>
             </div>
+
             <div className="space-y-1">
-              <label className="text-[11px] font-medium text-muted-foreground">Quote Statement (English) *</label>
+              <label className="text-[11px] font-semibold text-muted-foreground">Testimonial Quote (EN) *</label>
               <Textarea
                 value={quoteEn}
                 onChange={(e) => setQuoteEn(e.target.value)}
-                placeholder="Write the partner's testimonial quote in English..."
+                placeholder="Write the quote in English..."
                 className="text-xs min-h-[70px]"
-                dir="ltr"
               />
             </div>
           </div>
 
-          {/* Avatar Image Upload & Management */}
-          <div className="p-4 rounded-xl border border-border/60 bg-muted/20 space-y-3">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-bold text-foreground flex items-center gap-1.5">
-                <LuImage className="h-3.5 w-3.5 text-primary" />
-                {isRtl ? "صورة العميل الرمزية (Avatar Photo)" : "Client Avatar Photo"}
-              </span>
-              <span className="text-[11px] text-muted-foreground">
-                {isRtl ? "اختياري — رفع ملف أو رابط مباشر" : "Optional — Upload file or direct URL"}
-              </span>
-            </div>
+          {/* Arabic Fields */}
+          <div className="p-4 rounded-xl border border-border/60 bg-card space-y-3">
+            <span className="text-xs font-bold text-foreground flex items-center gap-1.5">
+              <span>المعلومات بالعربية (AR)</span>
+            </span>
 
-            <div className="flex flex-col sm:flex-row items-center gap-4">
-              <div className="relative group shrink-0">
-                <Avatar
-                  src={avatarUrl.trim() || undefined}
-                  alt={previewAuthor}
-                  fallback={previewInitial}
-                  size="lg"
-                  shape="circle"
-                  className="h-16 w-16 rounded-full border-2 border-primary/30 shadow-xs bg-muted font-bold text-lg"
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="space-y-1">
+                <label className="text-[11px] font-semibold text-muted-foreground">اسم العميل (عربي) *</label>
+                <Input
+                  value={authorNameAr}
+                  onChange={(e) => setAuthorNameAr(e.target.value)}
+                  placeholder="مثال: راشد الدوسري"
+                  dir="rtl"
+                  className="h-9 text-xs"
                 />
               </div>
 
-              <div className="flex-1 w-full space-y-2">
-                <div className="flex flex-wrap items-center gap-2">
+              <div className="space-y-1">
+                <label className="text-[11px] font-semibold text-muted-foreground">المسمى والجهة (عربي)</label>
+                <Input
+                  value={roleAr}
+                  onChange={(e) => setRoleAr(e.target.value)}
+                  placeholder="مثال: نائب رئيس المنتجات، فنتك السعودية"
+                  dir="rtl"
+                  className="h-9 text-xs"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-1">
+              <label className="text-[11px] font-semibold text-muted-foreground">نص التوصية والتقييم (عربي) *</label>
+              <Textarea
+                value={quoteAr}
+                onChange={(e) => setQuoteAr(e.target.value)}
+                placeholder="اكتب التوصية باللغة العربية..."
+                dir="rtl"
+                className="text-xs min-h-[70px]"
+              />
+            </div>
+          </div>
+
+          {/* Avatar Upload */}
+          <div className="p-4 rounded-xl border border-border/60 bg-card space-y-3">
+            <span className="text-xs font-bold text-foreground flex items-center gap-1.5">
+              <span>{isRtl ? "صورة العميل الرمزية (Avatar)" : "Author Avatar Image"}</span>
+            </span>
+
+            <div className="flex flex-col sm:flex-row items-center gap-4">
+              <div className="relative group">
+                <Avatar
+                  fallback={previewInitial}
+                  src={avatarUrl}
+                  size="lg"
+                  className="h-16 w-16 text-lg bg-primary/10 text-primary border border-border/60 shadow-xs"
+                />
+              </div>
+
+              <div className="flex-1 space-y-2 text-center sm:text-start">
+                <div className="flex flex-wrap items-center gap-2 justify-center sm:justify-start">
                   <Button
                     type="button"
                     variant="outline"
                     size="sm"
                     onClick={() => fileInputRef.current?.click()}
                     disabled={isUploading || isSaving}
-                    className="h-8 text-xs gap-1.5 cursor-pointer shadow-2xs"
+                    className="h-8 text-xs gap-1.5"
                   >
                     {isUploading ? (
                       <LuLoader className="h-3.5 w-3.5 animate-spin" />
                     ) : (
                       <LuUpload className="h-3.5 w-3.5" />
                     )}
-                    <span>
-                      {isUploading
-                        ? isRtl
-                          ? "جارٍ الرفع..."
-                          : "Uploading..."
-                        : avatarUrl
-                        ? isRtl
-                          ? "تغيير الصورة"
-                          : "Change Avatar"
-                        : isRtl
-                        ? "رفع صورة العميل"
-                        : "Upload Avatar"}
-                    </span>
+                    <span>{isRtl ? "رفع صورة من الجهاز" : "Upload Photo"}</span>
                   </Button>
 
                   {avatarUrl && (
@@ -371,29 +334,35 @@ export function TestimonialEditorModal({
                       size="sm"
                       onClick={() => setAvatarUrl("")}
                       disabled={isUploading || isSaving}
-                      className="h-8 text-xs text-destructive hover:text-destructive hover:bg-destructive/10 gap-1 cursor-pointer"
+                      className="h-8 text-xs text-destructive hover:bg-destructive/10 gap-1.5"
                     >
                       <LuTrash2 className="h-3.5 w-3.5" />
-                      <span>{isRtl ? "إزالة الصورة" : "Remove"}</span>
+                      <span>{isRtl ? "حذف الصورة" : "Remove"}</span>
                     </Button>
                   )}
                 </div>
 
-                <div className="relative">
-                  <Input
-                    value={avatarUrl}
-                    onChange={(e) => setAvatarUrl(e.target.value)}
-                    placeholder={
-                      isRtl
-                        ? "أو الصق رابط صورة خارجي (https://...)"
-                        : "Or paste direct image URL (https://...)"
-                    }
-                    className="h-8 text-xs font-mono"
-                    dir="ltr"
-                    disabled={isUploading || isSaving}
-                  />
+                <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground justify-center sm:justify-start">
+                  <LuImage className="h-3 w-3" />
+                  <span>
+                    {isRtl
+                      ? "صورة مربعة PNG, JPG أو WebP بحجم أقصاه 3 ميجابايت."
+                      : "Square PNG, JPG, or WebP up to 3MB recommended."}
+                  </span>
                 </div>
               </div>
+            </div>
+
+            <div className="space-y-1 pt-1">
+              <label className="text-[11px] font-semibold text-muted-foreground">
+                {isRtl ? "أو أدخل رابط الصورة المباشر (URL)" : "Or Direct Image URL"}
+              </label>
+              <Input
+                value={avatarUrl}
+                onChange={(e) => setAvatarUrl(e.target.value)}
+                placeholder="https://example.com/avatars/client.jpg"
+                className="h-8 text-xs font-mono"
+              />
             </div>
 
             <input

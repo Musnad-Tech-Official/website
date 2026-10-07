@@ -3,8 +3,6 @@ import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { getProjectBySlugAction, getProjectsAction } from "@/lib/projects/actions";
 import { getLocalizedProjectCategory } from "@/lib/projects/types";
-import { getProjectDetail } from "@/data/project-details";
-import { getProjects } from "@/data/projects";
 import {
   ProjectDetailHeader,
   ProjectDetailRelated,
@@ -47,22 +45,17 @@ export async function generateMetadata({
   const { locale, slug } = await params;
   const isAr = locale === "ar";
   const dbProject = await getProjectBySlugAction(slug);
-  const fallbackProject = !dbProject ? getProjectDetail(slug, locale) : null;
 
-  const title = dbProject
-    ? isAr
-      ? dbProject.titleAr || dbProject.titleEn
-      : dbProject.titleEn || dbProject.titleAr
-    : fallbackProject?.title;
-  const subtitle = dbProject
-    ? isAr
-      ? dbProject.descriptionAr || dbProject.descriptionEn
-      : dbProject.descriptionEn || dbProject.descriptionAr
-    : fallbackProject?.subtitle;
-
-  if (!title) {
+  if (!dbProject) {
     return {};
   }
+
+  const title = isAr
+    ? dbProject.titleAr || dbProject.titleEn
+    : dbProject.titleEn || dbProject.titleAr;
+  const subtitle = isAr
+    ? dbProject.descriptionAr || dbProject.descriptionEn
+    : dbProject.descriptionEn || dbProject.descriptionAr;
 
   const t = await getTranslations({ locale, namespace: "ProjectDetail" });
 
@@ -78,31 +71,24 @@ export default async function ProjectDetailPage({
   const { locale, slug } = await params;
   const isAr = locale === "ar";
   const dbProject = await getProjectBySlugAction(slug);
-  const fallbackProject = !dbProject ? getProjectDetail(slug, locale) : null;
 
-  if (!dbProject && !fallbackProject) {
+  if (!dbProject) {
     notFound();
   }
 
   const t = await getTranslations({ locale, namespace: "ProjectDetail" });
 
-  const projectTitle = dbProject
-    ? isAr
-      ? dbProject.titleAr || dbProject.titleEn
-      : dbProject.titleEn || dbProject.titleAr
-    : fallbackProject!.title;
+  const projectTitle = isAr
+    ? dbProject.titleAr || dbProject.titleEn
+    : dbProject.titleEn || dbProject.titleAr;
 
-  const projectSubtitle = dbProject
-    ? isAr
-      ? dbProject.descriptionAr || dbProject.descriptionEn
-      : dbProject.descriptionEn || dbProject.descriptionAr
-    : fallbackProject!.subtitle;
+  const projectSubtitle = isAr
+    ? dbProject.descriptionAr || dbProject.descriptionEn
+    : dbProject.descriptionEn || dbProject.descriptionAr;
 
-  const contentHtml = dbProject
-    ? isAr
-      ? dbProject.contentHtmlAr || dbProject.contentHtmlEn
-      : dbProject.contentHtmlEn || dbProject.contentHtmlAr
-    : null;
+  const contentHtml = isAr
+    ? dbProject.contentHtmlAr || dbProject.contentHtmlEn
+    : dbProject.contentHtmlEn || dbProject.contentHtmlAr;
 
   let processedContentHtml = contentHtml;
   let tocItems: ProjectTableOfContentsItem[] = [];
@@ -111,16 +97,6 @@ export default async function ProjectDetailPage({
     const result = processProjectHtmlHeadings(contentHtml);
     processedContentHtml = result.processedHtml;
     tocItems = result.tocItems;
-  } else if (fallbackProject) {
-    if (fallbackProject.overview?.title) {
-      tocItems.push({ id: "overview", label: fallbackProject.overview.title, level: 2 });
-    }
-    if (fallbackProject.context?.title) {
-      tocItems.push({ id: "context", label: fallbackProject.context.title, level: 2 });
-    }
-    if (fallbackProject.solution?.title) {
-      tocItems.push({ id: "solution", label: fallbackProject.solution.title, level: 2 });
-    }
   }
 
   // Always append Discussion & Reviews so readers can jump straight to feedback
@@ -130,39 +106,35 @@ export default async function ProjectDetailPage({
     level: 2,
   });
 
-  const rawCategory = dbProject?.category || fallbackProject?.metaBar?.find(m => m.id === "category")?.value || "Case Study";
-  const category = getLocalizedProjectCategory(rawCategory, locale);
-  const gradient = dbProject?.gradient || "from-zinc-900 via-neutral-900 to-zinc-950";
-  const projectImage = dbProject?.image || dbProject?.coverImage || undefined;
-  const liveDemoUrl = dbProject?.liveDemoUrl || undefined;
-  const githubUrl = dbProject?.githubUrl || undefined;
-  const technologies = dbProject?.technologies || (fallbackProject?.tools?.items?.map(t => t.name) || ["TypeScript", "Next.js", "PostgreSQL"]);
+  const category = getLocalizedProjectCategory(dbProject.category, locale);
+  const gradient = dbProject.gradient || "from-zinc-900 via-neutral-900 to-zinc-950";
+  const projectImage = dbProject.image || dbProject.coverImage || undefined;
+  const liveDemoUrl = dbProject.liveDemoUrl || undefined;
+  const githubUrl = dbProject.githubUrl || undefined;
+  const technologies = dbProject.technologies || [];
 
-  // Related projects
+  // Related projects from database
   const dbAll = await getProjectsAction("published");
-  const relatedProjects = (
-    dbAll.length > 0
-      ? dbAll.map((p) => ({
-          id: p.id,
-          slug: p.slug,
-          title: isAr ? p.titleAr || p.titleEn : p.titleEn || p.titleAr,
-          description: isAr ? p.descriptionAr || p.descriptionEn : p.descriptionEn || p.descriptionAr,
-          category: p.category,
-          year: p.year,
-          featured: p.featured,
-          liveDemo: Boolean(p.liveDemoUrl),
-          technologies: p.technologies,
-          rating: 5.0,
-          reviewCount: 0,
-          gradient: p.gradient,
-          completed: true,
-          image: p.image || p.coverImage || undefined,
-          clientName: p.clientName || undefined,
-        }))
-      : getProjects(locale)
-  )
+  const relatedProjects = dbAll
     .filter((p) => p.slug !== slug)
-    .slice(0, 3);
+    .slice(0, 3)
+    .map((p) => ({
+      id: p.id,
+      slug: p.slug,
+      title: isAr ? p.titleAr || p.titleEn : p.titleEn || p.titleAr,
+      description: isAr ? p.descriptionAr || p.descriptionEn : p.descriptionEn || p.descriptionAr,
+      category: p.category,
+      year: p.year,
+      featured: p.featured,
+      liveDemo: Boolean(p.liveDemoUrl),
+      technologies: p.technologies,
+      rating: p.rating || 5.0,
+      reviewCount: p.reviewCount || 0,
+      gradient: p.gradient,
+      completed: true,
+      image: p.image || p.coverImage || undefined,
+      clientName: p.clientName || undefined,
+    }));
 
   return (
     <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 w-full flex-1">
@@ -210,16 +182,16 @@ export default async function ProjectDetailPage({
         {/* 3. User Reviews & Discussion */}
         <div id="project-discussion" className="mt-14 pt-10 border-t border-border/50 scroll-mt-24">
           <ProjectDetailComments
-            title={fallbackProject?.commentsConfig?.title || (isAr ? "مراجعات ونقاشات المشروع" : "Project Reviews & Discussion")}
-            placeholder={fallbackProject?.commentsConfig?.placeholder || (isAr ? "اكتب تعليقك أو مراجعتك حول هذا المشروع..." : "Write your review or comment on this project...")}
-            submitLabel={fallbackProject?.commentsConfig?.submitLabel || (isAr ? "نشر المراجعة" : "Post Review")}
-            replyLabel={fallbackProject?.commentsConfig?.replyLabel || (isAr ? "رد" : "Reply")}
-            emptyMessage={fallbackProject?.commentsConfig?.emptyMessage || (isAr ? "لا توجد مراجعات حتى الآن. شارك برأيك الأول!" : "No reviews yet. Be the first to share your thoughts!")}
-            items={fallbackProject?.commentsConfig?.items || []}
+            title={isAr ? "مراجعات ونقاشات المشروع" : "Project Reviews & Discussion"}
+            placeholder={isAr ? "اكتب تعليقك أو مراجعتك حول هذا المشروع..." : "Write your review or comment on this project..."}
+            submitLabel={isAr ? "نشر المراجعة" : "Post Review"}
+            replyLabel={isAr ? "رد" : "Reply"}
+            emptyMessage={isAr ? "لا توجد مراجعات حتى الآن. شارك برأيك الأول!" : "No reviews yet. Be the first to share your thoughts!"}
+            items={[]}
             eligibility={{
               isAuthenticated: true,
               hasVerifiedExperience: true,
-              canRate: false,
+              canRate: true,
               canComment: true,
               reason: "eligible",
             }}
@@ -227,39 +199,22 @@ export default async function ProjectDetailPage({
         </div>
       </main>
 
-      {/* 4. Related Projects Grid */}
+      {/* 4. Related Projects Carousel / Grid from Real Database */}
       {relatedProjects.length > 0 && (
-        <section aria-labelledby="related-heading" className="py-14 sm:py-20 border-t border-border/50">
-          <ProjectDetailRelated
-            title={fallbackProject?.relatedProjectsHeading || t("relatedProjects")}
-            projects={relatedProjects}
-            locale={locale}
-          />
-        </section>
+        <ProjectDetailRelated
+          projects={relatedProjects}
+          title={t("related.title")}
+          locale={locale}
+        />
       )}
 
-      {/* 5. Final Call To Action */}
+      {/* 5. Project Inquiry Callout Banner */}
       <CTA
-        variant="default"
-        align="center"
-        title={fallbackProject?.cta?.title || (isAr ? "ابدأ العمل على مشروعك القادم" : "Ready to Build Something Great?")}
-        subtitle={
-          fallbackProject?.cta?.subtitle ||
-          (isAr
-            ? "فريق مسند الهندسي مستعد لمساعدتك في معمارية وتطوير منتجك القادم بأعلى معايير الجودة."
-            : "Musnad Tech engineering leads are ready to partner with you on high-scale architecture and delivery.")
-        }
-        primaryAction={{
-          label: fallbackProject?.cta?.primaryLabel || (isAr ? "ناقش مشروعك" : "Discuss Project"),
-          href: "/contact",
-          variant: "primary",
-          showArrow: true,
-        }}
-        secondaryAction={{
-          label: fallbackProject?.cta?.secondaryLabel || (isAr ? "استكشف كافة المشاريع" : "Explore Projects"),
-          href: "/projects",
-          variant: "outline",
-        }}
+        variant="projects"
+        title={t("cta.title")}
+        subtitle={t("cta.description")}
+        buttonLabel={t("cta.buttonText")}
+        contactHref="/contact"
       />
     </div>
   );

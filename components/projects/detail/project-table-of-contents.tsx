@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
-import { LuListTree, LuChevronDown, LuBookmark, LuArrowRight } from "react-icons/lu";
+import { LuListTree, LuChevronDown } from "react-icons/lu";
 import type { ProjectTableOfContentsProps } from "./project-detail-types";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";

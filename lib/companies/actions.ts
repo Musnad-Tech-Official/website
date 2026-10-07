@@ -8,62 +8,7 @@ import type { TrustedCompanyItem, CompanyFormData } from "./types";
 /**
  * Pre-seeded Trusted Companies (matches existing Home page partners)
  */
-const INITIAL_COMPANIES: TrustedCompanyItem[] = [
-  {
-    id: "yemen-mobile",
-    nameEn: "Yemen Mobile",
-    nameAr: "يمن موبايل",
-    logo: "/companies/yemen-mobile.svg",
-    websiteUrl: "https://www.yemenmobile.com.ye",
-    displayOrder: 1,
-    isActive: true,
-  },
-  {
-    id: "kuraimi-bank",
-    nameEn: "Al Kuraimi Bank",
-    nameAr: "بنك الكريمي",
-    logo: "/companies/kuraimi-bank.svg",
-    websiteUrl: "https://kuraimibank.com",
-    displayOrder: 2,
-    isActive: true,
-  },
-  {
-    id: "tadhamon-bank",
-    nameEn: "Tadhamon Bank",
-    nameAr: "بنك التضامن",
-    logo: "/companies/tadhamon-bank.svg",
-    websiteUrl: "https://www.tadhamonbank.com",
-    displayOrder: 3,
-    isActive: true,
-  },
-  {
-    id: "hsa-group",
-    nameEn: "HSA Group",
-    nameAr: "مجموعة هائل سعيد أنعم",
-    logo: "/companies/hsa-group.svg",
-    websiteUrl: "https://www.hsagroup.com",
-    displayOrder: 4,
-    isActive: true,
-  },
-  {
-    id: "cac-bank",
-    nameEn: "CAC Bank",
-    nameAr: "بنك التسليف التعاوني الزراعي",
-    logo: "/companies/cac-bank.svg",
-    websiteUrl: "https://cacbank.com.ye",
-    displayOrder: 5,
-    isActive: true,
-  },
-  {
-    id: "ykb",
-    nameEn: "Yemen Kuwait Bank",
-    nameAr: "بنك اليمن والكويت",
-    logo: "/companies/ykb.svg",
-    websiteUrl: "https://yk-bank.com",
-    displayOrder: 6,
-    isActive: true,
-  },
-];
+const INITIAL_COMPANIES: TrustedCompanyItem[] = [];
 
 // In-memory fallback cache
 let memoryCompaniesCache: TrustedCompanyItem[] = [...INITIAL_COMPANIES];

@@ -13,7 +13,6 @@ import { submitInquiryAction } from "@/lib/inquiries/actions";
 import { uploadImageAction } from "@/lib/storage/actions";
 import {
   LuSend,
-  LuSparkles,
   LuPaperclip,
   LuFileCheck,
   LuTrash2,

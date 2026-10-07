@@ -41,11 +41,13 @@ export function Avatar({
   className,
   ...props
 }: AvatarProps) {
+  const [prevSrc, setPrevSrc] = React.useState(src);
   const [imageError, setImageError] = React.useState(false);
 
-  React.useEffect(() => {
+  if (prevSrc !== src) {
+    setPrevSrc(src);
     setImageError(false);
-  }, [src]);
+  }
 
   const getInitials = (text?: string) => {
     if (!text) return "?";

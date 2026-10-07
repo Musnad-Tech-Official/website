@@ -3,7 +3,6 @@ import { Link } from "@/i18n/routing";
 import { LuArrowRight, LuArrowUpRight } from "react-icons/lu";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { CAPABILITY_CARDS } from "./home-data";
 import type { ServiceItem } from "@/lib/services/types";
 import { getServiceIconComponent } from "@/lib/services/service-icons";
 import { cn } from "@/lib/utils";
@@ -18,7 +17,9 @@ export function CapabilitiesSection({ className = "", services }: CapabilitiesSe
   const locale = useLocale();
   const isAr = locale === "ar";
 
-  const hasDynamicServices = Boolean(services && services.length > 0);
+  if (!services || services.length === 0) {
+    return null;
+  }
 
   return (
     <section
@@ -58,136 +59,75 @@ export function CapabilitiesSection({ className = "", services }: CapabilitiesSe
           </div>
         </div>
 
-        {/* 6 Capabilities Cards Grid */}
+        {/* Capabilities Cards Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {hasDynamicServices
-            ? services!.map((service) => {
-                const Icon = getServiceIconComponent(service.icon);
-                const title = isAr
-                  ? service.titleAr || service.titleEn
-                  : service.titleEn || service.titleAr;
-                const description = isAr
-                  ? service.descriptionAr || service.descriptionEn
-                  : service.descriptionEn || service.descriptionAr;
-                const tags = isAr
-                  ? service.tagsAr?.length
-                    ? service.tagsAr
-                    : service.tagsEn
-                  : service.tagsEn?.length
-                  ? service.tagsEn
-                  : service.tagsAr;
+          {services.map((service) => {
+            const Icon = getServiceIconComponent(service.icon);
+            const title = isAr
+              ? service.titleAr || service.titleEn
+              : service.titleEn || service.titleAr;
+            const description = isAr
+              ? service.descriptionAr || service.descriptionEn
+              : service.descriptionEn || service.descriptionAr;
+            const tags = isAr
+              ? service.tagsAr?.length
+                ? service.tagsAr
+                : service.tagsEn
+              : service.tagsEn?.length
+              ? service.tagsEn
+              : service.tagsAr;
 
-                return (
-                  <Card
-                    key={service.id}
-                    variant="interactive"
-                    className="group relative flex flex-col justify-between p-6 sm:p-7"
-                  >
-                    <div>
-                      {/* Icon */}
-                      <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-border/70 bg-muted/40 text-primary mb-5 group-hover:bg-primary/10 transition-colors">
-                        <Icon className="h-5 w-5" aria-hidden="true" />
-                      </div>
+            return (
+              <Card
+                key={service.id}
+                variant="interactive"
+                className="group relative flex flex-col justify-between p-6 sm:p-7"
+              >
+                <div>
+                  {/* Icon */}
+                  <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-border/70 bg-muted/40 text-primary mb-5 group-hover:bg-primary/10 transition-colors">
+                    <Icon className="h-5 w-5" aria-hidden="true" />
+                  </div>
 
-                      {/* Title & Description */}
-                      <h3 className="text-lg sm:text-xl font-bold text-foreground group-hover:text-primary transition-colors tracking-tight">
-                        {title}
-                      </h3>
-                      <p className="mt-2.5 text-sm text-muted-foreground leading-relaxed">
-                        {description}
-                      </p>
+                  {/* Title & Description */}
+                  <h3 className="text-lg sm:text-xl font-bold text-foreground group-hover:text-primary transition-colors tracking-tight">
+                    {title}
+                  </h3>
+                  <p className="mt-2.5 text-sm text-muted-foreground leading-relaxed">
+                    {description}
+                  </p>
 
-                      {/* Tags */}
-                      <div className="mt-5 flex flex-wrap gap-1.5" aria-label="Capability skills">
-                        {(tags || []).map((tag, idx) => (
-                          <Badge
-                            key={idx}
-                            variant="secondary"
-                            size="sm"
-                            className="font-normal text-[11px] text-muted-foreground/90 bg-muted/60 hover:bg-muted"
-                          >
-                            {tag}
-                          </Badge>
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* Learn More Action */}
-                    <div className="mt-6 pt-4 border-t border-border/40">
-                      <Link
-                        href={service.href || `/services/${service.slug}`}
-                        className="inline-flex items-center gap-1 text-xs font-semibold text-foreground/80 group-hover:text-primary transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring rounded-xs"
+                  {/* Tags */}
+                  <div className="mt-5 flex flex-wrap gap-1.5" aria-label="Capability skills">
+                    {(tags || []).map((tag, idx) => (
+                      <Badge
+                        key={idx}
+                        variant="secondary"
+                        size="sm"
+                        className="font-normal text-[11px] text-muted-foreground/90 bg-muted/60 hover:bg-muted"
                       >
-                        <span>{t("learnMore")}</span>
-                        <LuArrowUpRight
-                          className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5 rtl:-scale-x-100 rtl:group-hover:-translate-x-0.5"
-                          aria-hidden="true"
-                        />
-                      </Link>
-                    </div>
-                  </Card>
-                );
-              })
-            : CAPABILITY_CARDS.map((card) => {
-                const Icon = card.icon;
-                const title = t(`services.${card.serviceKey}.title`);
-                const description = t(`services.${card.serviceKey}.description`);
-                const tag1 = t(`services.${card.serviceKey}.tag1`);
-                const tag2 = t(`services.${card.serviceKey}.tag2`);
-                const tag3 = t(`services.${card.serviceKey}.tag3`);
-                const tags = [tag1, tag2, tag3];
+                        {tag}
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
 
-                return (
-                  <Card
-                    key={card.id}
-                    variant="interactive"
-                    className="group relative flex flex-col justify-between p-6 sm:p-7"
+                {/* Learn More Action */}
+                <div className="mt-6 pt-4 border-t border-border/40">
+                  <Link
+                    href={service.href || `/services/${service.slug}`}
+                    className="inline-flex items-center gap-1 text-xs font-semibold text-foreground/80 group-hover:text-primary transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring rounded-xs"
                   >
-                    <div>
-                      {/* Icon */}
-                      <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-border/70 bg-muted/40 text-primary mb-5 group-hover:bg-primary/10 transition-colors">
-                        <Icon className="h-5 w-5" aria-hidden="true" />
-                      </div>
-
-                      {/* Title & Description */}
-                      <h3 className="text-lg sm:text-xl font-bold text-foreground group-hover:text-primary transition-colors tracking-tight">
-                        {title}
-                      </h3>
-                      <p className="mt-2.5 text-sm text-muted-foreground leading-relaxed">
-                        {description}
-                      </p>
-
-                      {/* Tags */}
-                      <div className="mt-5 flex flex-wrap gap-1.5" aria-label="Capability skills">
-                        {tags.map((tag, idx) => (
-                          <Badge
-                            key={idx}
-                            variant="secondary"
-                            size="sm"
-                            className="font-normal text-[11px] text-muted-foreground/90 bg-muted/60 hover:bg-muted"
-                          >
-                            {tag}
-                          </Badge>
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* Learn More Action */}
-                    <div className="mt-6 pt-4 border-t border-border/40">
-                      <Link
-                        href={card.href}
-                        className="inline-flex items-center gap-1 text-xs font-semibold text-foreground/80 group-hover:text-primary transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring rounded-xs"
-                      >
-                        <span>{t("learnMore")}</span>
-                        <LuArrowUpRight
-                          className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5 rtl:-scale-x-100 rtl:group-hover:-translate-x-0.5"
-                          aria-hidden="true"
-                        />
-                      </Link>
-                    </div>
-                  </Card>
-                );
-              })}
+                    <span>{t("learnMore")}</span>
+                    <LuArrowUpRight
+                      className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5 rtl:-scale-x-100 rtl:group-hover:-translate-x-0.5"
+                      aria-hidden="true"
+                    />
+                  </Link>
+                </div>
+              </Card>
+            );
+          })}
         </div>
       </div>
     </section>

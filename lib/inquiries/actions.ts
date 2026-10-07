@@ -5,72 +5,7 @@ import { revalidatePath } from "next/cache";
 import { createClient } from "@/utils/supabase/server";
 import type { InquiryItem, SubmitInquiryInput, InquiryStatus } from "./types";
 
-const INITIAL_INQUIRIES: InquiryItem[] = [
-  {
-    id: "inq-01",
-    name: "Sarah Al-Ghamdi",
-    email: "s.ghamdi@fintech-ventures.sa",
-    company: "FinTech Ventures Riyadh",
-    phone: "+966 50 123 4567",
-    inquiryType: "project",
-    projectType: "Full-Stack Web & Mobile App",
-    budget: "$50k - $100k",
-    timeline: "3-6 months",
-    currentProduct: "Legacy monolithic PHP app needing modernization",
-    message: "We need an elite engineering team to redesign and rebuild our investment portal into a distributed Next.js + Go microservices architecture with bank-grade security and full Arabic/English localization.",
-    status: "new",
-    adminNotes: "High-priority financial client. Lead architect should review RFC.",
-    createdAt: new Date(Date.now() - 3600 * 1000 * 4).toISOString(),
-    updatedAt: new Date(Date.now() - 3600 * 1000 * 4).toISOString(),
-  },
-  {
-    id: "inq-02",
-    name: "Dr. Omar Basaeed",
-    email: "o.basaeed@medilink.org",
-    company: "MediLink Healthcare Network",
-    phone: "+966 55 987 6543",
-    inquiryType: "project",
-    projectType: "AI & RAG Knowledge Engine",
-    budget: "$25k - $50k",
-    timeline: "1-3 months",
-    currentProduct: "Internal electronic medical documentation database",
-    message: "Interested in Musnad's AI integration capabilities for internal clinical guideline retrieval using private LLMs on dedicated cloud infrastructure.",
-    status: "in_review",
-    adminNotes: "Scheduled introductory discovery call for Thursday.",
-    createdAt: new Date(Date.now() - 3600 * 1000 * 26).toISOString(),
-    updatedAt: new Date(Date.now() - 3600 * 1000 * 12).toISOString(),
-  },
-  {
-    id: "inq-03",
-    name: "Marcus Vance",
-    email: "m.vance@apexlogistics.ae",
-    company: "Apex Global Logistics",
-    phone: "+971 4 555 0192",
-    inquiryType: "partnership",
-    projectType: "Cloud Platform & Telemetry",
-    budget: ">$100k",
-    timeline: "6+ months",
-    message: "Looking for long-term technical partnership to maintain and scale our real-time GPS telemetry pipelines and driver assignment algorithms across the GCC region.",
-    status: "responded",
-    adminNotes: "Sent proposal draft on Monday. Waiting on procurement feedback.",
-    createdAt: new Date(Date.now() - 3600 * 1000 * 72).toISOString(),
-    updatedAt: new Date(Date.now() - 3600 * 1000 * 18).toISOString(),
-  },
-  {
-    id: "inq-04",
-    name: "Noura Al-Husseini",
-    email: "noura.design@gmail.com",
-    inquiryType: "careers",
-    message: "Applying for the Design Systems / Design Engineer position. Attached is my Figma portfolio and code specimens built with Tailwind v4 and React 19.",
-    attachmentName: "noura_portfolio_2026.pdf",
-    attachmentSize: 3450000,
-    status: "new",
-    createdAt: new Date(Date.now() - 3600 * 1000 * 96).toISOString(),
-    updatedAt: new Date(Date.now() - 3600 * 1000 * 96).toISOString(),
-  },
-];
-
-let memoryInquiriesCache: InquiryItem[] = [...INITIAL_INQUIRIES];
+let memoryInquiriesCache: InquiryItem[] = [];
 let lastFetch = 0;
 const CACHE_TTL_MS = 30 * 1000;
 

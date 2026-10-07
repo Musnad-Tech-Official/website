@@ -5,14 +5,11 @@ import {
   LuPlus,
   LuSearch,
   LuLayers,
-  LuCircleCheck,
-  LuEyeOff,
   LuPencil,
   LuTrash2,
   LuArrowUpRight,
   LuHouse,
   LuGlobe,
-  LuSparkles,
 } from "react-icons/lu";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";

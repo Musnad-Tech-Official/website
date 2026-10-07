@@ -38,7 +38,17 @@ interface AnnouncementModalProps {
   locale: string;
 }
 
-export function AnnouncementModal({
+export function AnnouncementModal(props: AnnouncementModalProps) {
+  if (!props.isOpen) return null;
+  return (
+    <AnnouncementModalContent
+      key={props.announcement?.id || (props.announcement?.category ? `preset-${props.announcement.category}` : "new")}
+      {...props}
+    />
+  );
+}
+
+function AnnouncementModalContent({
   isOpen,
   onClose,
   announcement,
@@ -47,46 +57,35 @@ export function AnnouncementModal({
 }: AnnouncementModalProps) {
   const isRtl = locale === "ar";
 
-  const [category, setCategory] = React.useState<AnnouncementCategory>("tools");
-  const [textEn, setTextEn] = React.useState("");
-  const [textAr, setTextAr] = React.useState("");
-  const [tagEn, setTagEn] = React.useState("New");
-  const [tagAr, setTagAr] = React.useState("جديد");
-  const [linkTextEn, setLinkTextEn] = React.useState("Explore Now");
-  const [linkTextAr, setLinkTextAr] = React.useState("استكشف الآن");
-  const [href, setHref] = React.useState("/services/developer-tools");
-  const [isActive, setIsActive] = React.useState(true);
-  const [isDismissible, setIsDismissible] = React.useState(true);
+  const [category, setCategory] = React.useState<AnnouncementCategory>(
+    announcement?.category || "tools"
+  );
+  const [textEn, setTextEn] = React.useState(
+    announcement?.textEn ?? (announcement ? "" : "Musnad UI Design System & Component Library is officially live!")
+  );
+  const [textAr, setTextAr] = React.useState(
+    announcement?.textAr ?? (announcement ? "" : "تم إطلاق مكتبة مكونات ونظام تصميم مسند للتقنية للجيل القادم!")
+  );
+  const [tagEn, setTagEn] = React.useState(announcement?.tagEn || "New");
+  const [tagAr, setTagAr] = React.useState(announcement?.tagAr || "جديد");
+  const [linkTextEn, setLinkTextEn] = React.useState(
+    announcement?.linkTextEn || (announcement ? "Explore Now" : "Explore components")
+  );
+  const [linkTextAr, setLinkTextAr] = React.useState(
+    announcement?.linkTextAr || "استكشف الآن"
+  );
+  const [href, setHref] = React.useState(
+    announcement?.href || "/services/developer-tools"
+  );
+  const [isActive, setIsActive] = React.useState(
+    announcement ? announcement.isActive : true
+  );
+  const [isDismissible, setIsDismissible] = React.useState(
+    announcement ? announcement.isDismissible !== false : true
+  );
 
   const [isSaving, setIsSaving] = React.useState(false);
   const [errorAlert, setErrorAlert] = React.useState<string | null>(null);
-
-  React.useEffect(() => {
-    if (announcement) {
-      setCategory(announcement.category);
-      setTextEn(announcement.textEn);
-      setTextAr(announcement.textAr);
-      setTagEn(announcement.tagEn);
-      setTagAr(announcement.tagAr);
-      setLinkTextEn(announcement.linkTextEn);
-      setLinkTextAr(announcement.linkTextAr);
-      setHref(announcement.href);
-      setIsActive(announcement.isActive);
-      setIsDismissible(announcement.isDismissible);
-    } else {
-      setCategory("tools");
-      setTextEn("Musnad UI Design System & Component Library is officially live!");
-      setTextAr("تم إطلاق مكتبة مكونات ونظام تصميم مسند للتقنية للجيل القادم!");
-      setTagEn("New");
-      setTagAr("جديد");
-      setLinkTextEn("Explore components");
-      setLinkTextAr("استكشف الآن");
-      setHref("/services/developer-tools");
-      setIsActive(true);
-      setIsDismissible(true);
-    }
-    setErrorAlert(null);
-  }, [announcement, isOpen]);
 
   // Quick preset templates
   const applyPreset = (presetType: "tools" | "projects" | "services") => {

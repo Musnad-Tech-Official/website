@@ -14,7 +14,6 @@ import {
   LuFolderGit2,
   LuFileText,
   LuMessageSquare,
-  LuUsers,
   LuTrendingUp,
   LuArrowUpRight,
   LuSparkles,
@@ -28,7 +27,6 @@ import {
 import { getInquiriesAction } from "@/lib/inquiries/actions";
 import { getProjectsAction } from "@/lib/projects/actions";
 import { getArticlesAction } from "@/lib/articles/actions";
-import { getTeamMembersAction } from "@/lib/team/actions";
 import { getServicesAction } from "@/lib/services/actions";
 
 interface AdminPageProps {
@@ -39,11 +37,10 @@ export default async function AdminDashboardPage({ params }: AdminPageProps) {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "Admin" });
 
-  const [inquiries, projects, articles, teamMembers, services] = await Promise.all([
+  const [inquiries, projects, articles, services] = await Promise.all([
     getInquiriesAction(),
     getProjectsAction(),
     getArticlesAction(),
-    getTeamMembersAction(true),
     getServicesAction(true),
   ]);
 

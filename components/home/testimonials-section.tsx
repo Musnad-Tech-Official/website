@@ -2,7 +2,6 @@ import { useLocale, useTranslations } from "next-intl";
 import { LuQuote } from "react-icons/lu";
 import { Card } from "@/components/ui/card";
 import { Avatar } from "@/components/ui/avatar";
-import { TESTIMONIALS } from "./home-data";
 import type { TestimonialItem } from "@/lib/testimonials/types";
 import { cn } from "@/lib/utils";
 
@@ -19,11 +18,12 @@ export function TestimonialsSection({
   const locale = useLocale();
   const isRtl = locale === "ar";
 
-  const hasDynamic = testimonials && testimonials.length > 0;
+  if (!testimonials || testimonials.length === 0) {
+    return null;
+  }
 
-  // Base list of items
-  const baseItems: Array<TestimonialItem | (typeof TESTIMONIALS)[number]> =
-    hasDynamic ? testimonials : TESTIMONIALS;
+  // Base list of dynamic items
+  const baseItems = testimonials;
 
   // Prepare full-width duplicated card sets for seamless infinite tracks
   const row1Base = [...baseItems, ...baseItems];
@@ -33,31 +33,15 @@ export function TestimonialsSection({
       : [...baseItems, ...baseItems];
 
   const renderCard = (
-    item: TestimonialItem | (typeof TESTIMONIALS)[number],
+    item: TestimonialItem,
     keyPrefix: string,
     idx: number
   ) => {
-    let quote: string;
-    let author: string;
-    let role: string;
-    let initial: string;
-    let avatarUrl: string | undefined;
-
-    if ("quoteAr" in item && "authorNameAr" in item) {
-      const dynamicItem = item as TestimonialItem;
-      quote = isRtl ? dynamicItem.quoteAr || dynamicItem.quoteEn : dynamicItem.quoteEn || dynamicItem.quoteAr;
-      author = isRtl ? dynamicItem.authorNameAr || dynamicItem.authorNameEn : dynamicItem.authorNameEn || dynamicItem.authorNameAr;
-      role = isRtl ? dynamicItem.roleAr || dynamicItem.roleEn : dynamicItem.roleEn || dynamicItem.roleAr;
-      initial = dynamicItem.initial || author.charAt(0).toUpperCase();
-      avatarUrl = dynamicItem.avatarUrl;
-    } else {
-      const legacyItem = item as (typeof TESTIMONIALS)[number];
-      quote = t(`items.${legacyItem.itemKey}.quote`);
-      author = t(`items.${legacyItem.itemKey}.author`);
-      role = t(`items.${legacyItem.itemKey}.role`);
-      initial = legacyItem.initial;
-      avatarUrl = "avatarUrl" in legacyItem ? (legacyItem as { avatarUrl?: string }).avatarUrl : undefined;
-    }
+    const quote = isRtl ? item.quoteAr || item.quoteEn : item.quoteEn || item.quoteAr;
+    const author = isRtl ? item.authorNameAr || item.authorNameEn : item.authorNameEn || item.authorNameAr;
+    const role = isRtl ? item.roleAr || item.roleEn : item.roleEn || item.roleAr;
+    const initial = item.initial || author.charAt(0).toUpperCase();
+    const avatarUrl = item.avatarUrl;
 
     return (
       <Card
@@ -74,7 +58,7 @@ export function TestimonialsSection({
         )}
       >
         <div>
-          {/* Freestanding large quote icon without square/box shape, subtle brand opacity */}
+          {/* Freestanding large quote icon */}
           <div className="flex items-center justify-start mb-3 sm:mb-4">
             <LuQuote
               className="h-10 w-10 sm:h-11 sm:w-11 text-primary/30 dark:text-primary/35 rtl:-scale-x-100 shrink-0 select-none"
@@ -88,7 +72,7 @@ export function TestimonialsSection({
           </blockquote>
         </div>
 
-        {/* Author Metadata with fully rounded Design System Avatar */}
+        {/* Author Metadata with Avatar */}
         <div className="mt-6 pt-5 border-t border-border/60 flex items-center gap-3.5">
           <Avatar
             src={avatarUrl}
@@ -138,7 +122,7 @@ export function TestimonialsSection({
 
       {/* Infinite Carousels Container with Edge Fade Mask */}
       <div className="relative w-full flex flex-col gap-6 sm:gap-8 overflow-hidden">
-        {/* Left & Right Gradient Shadows for seamless viewport integration */}
+        {/* Left & Right Gradient Shadows */}
         <div
           aria-hidden="true"
           className="pointer-events-none absolute inset-y-0 start-0 z-10 w-16 sm:w-32 bg-linear-to-r rtl:bg-linear-to-l from-background to-transparent"
@@ -153,7 +137,7 @@ export function TestimonialsSection({
           {row1Base.map((item, idx) => renderCard(item, "r1", idx))}
         </div>
 
-        {/* Track 2: Reverse Direction for Dynamic Contrast */}
+        {/* Track 2: Reverse Direction */}
         <div className="group flex w-max gap-6 sm:gap-8 animate-marquee-rtl rtl:animate-marquee-ltr hover:[animation-play-state:paused]">
           {row2Base.map((item, idx) => renderCard(item, "r2", idx))}
         </div>

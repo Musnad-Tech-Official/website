@@ -40,7 +40,6 @@ export function InquiriesClient({
     React.useState<InquiryItem[]>(initialInquiries);
   const [search, setSearch] = React.useState("");
   const [statusFilter, setStatusFilter] = React.useState<string>("all");
-  const [typeFilter, setTypeFilter] = React.useState<string>("all");
 
   const [selectedInquiry, setSelectedInquiry] =
     React.useState<InquiryItem | null>(null);
@@ -71,11 +70,10 @@ export function InquiriesClient({
         item.message.toLowerCase().includes(q);
 
       const matchStatus = statusFilter === "all" || item.status === statusFilter;
-      const matchType = typeFilter === "all" || item.inquiryType === typeFilter;
 
-      return matchSearch && matchStatus && matchType;
+      return matchSearch && matchStatus;
     });
-  }, [inquiries, search, statusFilter, typeFilter]);
+  }, [inquiries, search, statusFilter]);
 
   const stats = React.useMemo(() => {
     return {

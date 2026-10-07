@@ -34,7 +34,17 @@ interface CompanyEditorModalProps {
   locale: string;
 }
 
-export function CompanyEditorModal({
+export function CompanyEditorModal(props: CompanyEditorModalProps) {
+  if (!props.isOpen) return null;
+  return (
+    <CompanyEditorModalContent
+      key={props.company?.id ?? "new"}
+      {...props}
+    />
+  );
+}
+
+function CompanyEditorModalContent({
   isOpen,
   onClose,
   company,
@@ -44,36 +54,16 @@ export function CompanyEditorModal({
   const isRtl = locale === "ar";
   const fileInputRef = React.useRef<HTMLInputElement>(null);
 
-  const [nameEn, setNameEn] = React.useState("");
-  const [nameAr, setNameAr] = React.useState("");
-  const [logo, setLogo] = React.useState("");
-  const [websiteUrl, setWebsiteUrl] = React.useState("");
-  const [displayOrder, setDisplayOrder] = React.useState(0);
-  const [isActive, setIsActive] = React.useState(true);
+  const [nameEn, setNameEn] = React.useState(company?.nameEn || "");
+  const [nameAr, setNameAr] = React.useState(company?.nameAr || "");
+  const [logo, setLogo] = React.useState(company?.logo || "");
+  const [websiteUrl, setWebsiteUrl] = React.useState(company?.websiteUrl || "");
+  const [displayOrder, setDisplayOrder] = React.useState(company?.displayOrder ?? 0);
+  const [isActive, setIsActive] = React.useState(company?.isActive ?? true);
 
   const [isUploading, setIsUploading] = React.useState(false);
   const [isSaving, setIsSaving] = React.useState(false);
   const [errorAlert, setErrorAlert] = React.useState<string | null>(null);
-
-  // Sync form when modal opens or company changes
-  React.useEffect(() => {
-    if (company) {
-      setNameEn(company.nameEn);
-      setNameAr(company.nameAr);
-      setLogo(company.logo);
-      setWebsiteUrl(company.websiteUrl || "");
-      setDisplayOrder(company.displayOrder);
-      setIsActive(company.isActive);
-    } else {
-      setNameEn("");
-      setNameAr("");
-      setLogo("");
-      setWebsiteUrl("");
-      setDisplayOrder(0);
-      setIsActive(true);
-    }
-    setErrorAlert(null);
-  }, [company, isOpen]);
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];

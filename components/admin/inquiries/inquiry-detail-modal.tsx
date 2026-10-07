@@ -12,15 +12,11 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
-import { Select } from "@/components/ui/select";
 import type { InquiryItem, InquiryStatus } from "@/lib/inquiries/types";
 import {
   LuMail,
   LuPhone,
   LuBuilding2,
-  LuCalendar,
-  LuDollarSign,
-  LuClock,
   LuFileCheck,
   LuExternalLink,
   LuCheck,
@@ -36,26 +32,26 @@ interface InquiryDetailModalProps {
   locale: string;
 }
 
-export function InquiryDetailModal({
+export function InquiryDetailModal(props: InquiryDetailModalProps) {
+  if (!props.isOpen || !props.inquiry) return null;
+  return <InquiryDetailModalContent key={props.inquiry.id} {...props} inquiry={props.inquiry} />;
+}
+
+interface InquiryDetailModalContentProps extends InquiryDetailModalProps {
+  inquiry: InquiryItem;
+}
+
+function InquiryDetailModalContent({
   isOpen,
   onClose,
   inquiry,
   onUpdateStatus,
   locale,
-}: InquiryDetailModalProps) {
+}: InquiryDetailModalContentProps) {
   const isRtl = locale === "ar";
-  const [status, setStatus] = React.useState<InquiryStatus>("new");
-  const [adminNotes, setAdminNotes] = React.useState("");
+  const [status, setStatus] = React.useState<InquiryStatus>(inquiry.status);
+  const [adminNotes, setAdminNotes] = React.useState(inquiry.adminNotes || "");
   const [isSaving, setIsSaving] = React.useState(false);
-
-  React.useEffect(() => {
-    if (inquiry) {
-      setStatus(inquiry.status);
-      setAdminNotes(inquiry.adminNotes || "");
-    }
-  }, [inquiry, isOpen]);
-
-  if (!inquiry) return null;
 
   const handleSave = async () => {
     setIsSaving(true);

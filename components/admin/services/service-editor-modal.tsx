@@ -15,7 +15,6 @@ import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
-import { Card } from "@/components/ui/card";
 import type { ServiceItem, ServiceFormData } from "@/lib/services/types";
 import {
   SERVICE_AVAILABLE_ICONS,
@@ -28,7 +27,6 @@ import {
   LuArrowUpRight,
   LuPlus,
   LuX,
-  LuSparkles,
 } from "react-icons/lu";
 import { cn } from "@/lib/utils";
 
@@ -40,8 +38,19 @@ interface ServiceEditorModalProps {
   locale: string;
 }
 
-export function ServiceEditorModal({
-  isOpen,
+function ServicePreviewIcon({ iconName, className }: { iconName: string; className?: string }) {
+  return React.createElement(getServiceIconComponent(iconName), {
+    className,
+    "aria-hidden": "true",
+  });
+}
+
+export function ServiceEditorModal(props: ServiceEditorModalProps) {
+  if (!props.isOpen) return null;
+  return <ServiceEditorModalContent key={props.service?.id ?? "new"} {...props} />;
+}
+
+function ServiceEditorModalContent({
   onClose,
   service,
   onSave,
@@ -49,56 +58,23 @@ export function ServiceEditorModal({
 }: ServiceEditorModalProps) {
   const isRtl = locale === "ar";
 
-  const [slug, setSlug] = React.useState("");
-  const [titleEn, setTitleEn] = React.useState("");
-  const [titleAr, setTitleAr] = React.useState("");
-  const [descriptionEn, setDescriptionEn] = React.useState("");
-  const [descriptionAr, setDescriptionAr] = React.useState("");
-  const [icon, setIcon] = React.useState("LuCode");
-  const [tagsEn, setTagsEn] = React.useState<string[]>([]);
-  const [tagsAr, setTagsAr] = React.useState<string[]>([]);
+  const [slug, setSlug] = React.useState(service?.slug || "");
+  const [titleEn, setTitleEn] = React.useState(service?.titleEn || "");
+  const [titleAr, setTitleAr] = React.useState(service?.titleAr || "");
+  const [descriptionEn, setDescriptionEn] = React.useState(service?.descriptionEn || "");
+  const [descriptionAr, setDescriptionAr] = React.useState(service?.descriptionAr || "");
+  const [icon, setIcon] = React.useState(service?.icon || "LuCode");
+  const [tagsEn, setTagsEn] = React.useState<string[]>(service?.tagsEn || []);
+  const [tagsAr, setTagsAr] = React.useState<string[]>(service?.tagsAr || []);
   const [newTagEn, setNewTagEn] = React.useState("");
   const [newTagAr, setNewTagAr] = React.useState("");
-  const [href, setHref] = React.useState("");
-  const [displayOrder, setDisplayOrder] = React.useState(1);
-  const [enabledHome, setEnabledHome] = React.useState(true);
-  const [isActive, setIsActive] = React.useState(true);
+  const [href, setHref] = React.useState(service?.href || (service?.slug ? `/services/${service.slug}` : ""));
+  const [displayOrder, setDisplayOrder] = React.useState(service?.displayOrder ?? 1);
+  const [enabledHome, setEnabledHome] = React.useState(service?.enabledHome !== false);
+  const [isActive, setIsActive] = React.useState(service?.isActive !== false);
 
   const [isSaving, setIsSaving] = React.useState(false);
   const [errorAlert, setErrorAlert] = React.useState<string | null>(null);
-
-  React.useEffect(() => {
-    if (service) {
-      setSlug(service.slug);
-      setTitleEn(service.titleEn);
-      setTitleAr(service.titleAr);
-      setDescriptionEn(service.descriptionEn);
-      setDescriptionAr(service.descriptionAr);
-      setIcon(service.icon || "LuCode");
-      setTagsEn(service.tagsEn || []);
-      setTagsAr(service.tagsAr || []);
-      setHref(service.href || `/services/${service.slug}`);
-      setDisplayOrder(service.displayOrder ?? 1);
-      setEnabledHome(service.enabledHome !== false);
-      setIsActive(service.isActive !== false);
-    } else {
-      setSlug("");
-      setTitleEn("");
-      setTitleAr("");
-      setDescriptionEn("");
-      setDescriptionAr("");
-      setIcon("LuCode");
-      setTagsEn([]);
-      setTagsAr([]);
-      setHref("");
-      setDisplayOrder(1);
-      setEnabledHome(true);
-      setIsActive(true);
-    }
-    setNewTagEn("");
-    setNewTagAr("");
-    setErrorAlert(null);
-  }, [service, isOpen]);
 
   // Auto-generate slug and href from Title En when creating a new service
   const handleTitleEnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -196,7 +172,6 @@ export function ServiceEditorModal({
     }
   };
 
-  const IconComp = getServiceIconComponent(icon);
   const previewTitle = isRtl ? titleAr || "عنوان الخدمة التقنية" : titleEn || "Engineering Service Title";
   const previewDescription = isRtl
     ? descriptionAr || "وصف موجز للمخرجات الهندسية والقدرات البرمجية التي تقدمها مسند تك..."
@@ -210,7 +185,7 @@ export function ServiceEditorModal({
     : ["System Architecture", "Full-Stack Development", "Cloud Pipelines"];
 
   return (
-    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+    <Dialog open onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="max-w-3xl p-0 overflow-hidden border-border bg-card">
         {/* Header */}
         <DialogHeader className="p-6 pb-4 border-b border-border/40">
@@ -253,7 +228,7 @@ export function ServiceEditorModal({
             </span>
             <div className="p-5 sm:p-6 rounded-2xl border border-border/80 bg-card shadow-2xs">
               <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-border/70 bg-muted/40 text-primary mb-4">
-                <IconComp className="h-5 w-5" aria-hidden="true" />
+                <ServicePreviewIcon iconName={icon} className="h-5 w-5" />
               </div>
               <h3 className="text-lg font-bold text-foreground tracking-tight">
                 {previewTitle}

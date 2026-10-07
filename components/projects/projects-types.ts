@@ -1,4 +1,22 @@
-import type { Project } from "@/data/projects";
+export interface Project {
+  id: string;
+  slug: string;
+  title: string;
+  description: string;
+  category?: string;
+  year?: string;
+  featured?: boolean;
+  liveDemo?: boolean;
+  technologies?: string[];
+  rating?: number;
+  reviewCount?: number;
+  gradient?: string;
+  completed?: boolean;
+  image?: string;
+  clientName?: string;
+  keyMetric?: { label: string; value: string };
+  metrics?: { label: string; value: string; description?: string }[];
+}
 
 export interface ProjectsHeaderProps {
   eyebrow?: string;

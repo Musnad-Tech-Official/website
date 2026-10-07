@@ -6,50 +6,7 @@ import { createClient } from "@/utils/supabase/server";
 import type { AnnouncementBannerProps } from "@/components/navbar/nav-types";
 import type { AnnouncementBannerItem, AnnouncementFormData } from "./types";
 
-const INITIAL_ANNOUNCEMENTS: AnnouncementBannerItem[] = [
-  {
-    id: "default-tools-library",
-    category: "tools",
-    textEn: "Musnad UI Design System & Component Library is officially live!",
-    textAr: "تم إطلاق مكتبة مكونات ونظام تصميم مسند للتقنية للجيل القادم!",
-    tagEn: "New",
-    tagAr: "جديد",
-    linkTextEn: "Explore components",
-    linkTextAr: "استكشف الآن",
-    href: "/services/developer-tools",
-    isActive: true,
-    isDismissible: true,
-    createdAt: new Date().toISOString(),
-  },
-  {
-    id: "project-sahim-launch",
-    category: "projects",
-    textEn: "Discover our latest case study: Sahim Advanced Fleet Analytics & Telemetry!",
-    textAr: "اكتشف أحدث مشاريعنا الهندسية: منصة سهم للتحليلات المتقدمة والتتبع اللحظي!",
-    tagEn: "Featured",
-    tagAr: "مشروع جديد",
-    linkTextEn: "View Project",
-    linkTextAr: "عرض المشروع",
-    href: "/projects/sahim-analytics",
-    isActive: false,
-    isDismissible: true,
-    createdAt: new Date().toISOString(),
-  },
-  {
-    id: "service-ai-integration",
-    category: "services",
-    textEn: "Announcing Enterprise Generative AI & Autonomous Agent Architecture Solutions.",
-    textAr: "نعلن عن إطلاق حلول الذكاء الاصطناعي التوليدي والأنظمة الوكيلة للمؤسسات.",
-    tagEn: "Solutions",
-    tagAr: "خدمة جديدة",
-    linkTextEn: "Learn More",
-    linkTextAr: "تعرف على الحلول",
-    href: "/services/ai-integration",
-    isActive: false,
-    isDismissible: true,
-    createdAt: new Date().toISOString(),
-  },
-];
+const INITIAL_ANNOUNCEMENTS: AnnouncementBannerItem[] = [];
 
 let memoryAnnouncementsCache: AnnouncementBannerItem[] = [...INITIAL_ANNOUNCEMENTS];
 let lastFetch = 0;

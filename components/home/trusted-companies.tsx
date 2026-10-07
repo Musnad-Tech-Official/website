@@ -2,7 +2,6 @@
 
 import Image from "next/image";
 import { useTranslations, useLocale } from "next-intl";
-import { TRUSTED_COMPANIES } from "./home-data";
 import type { TrustedCompanyItem } from "@/lib/companies/types";
 import { cn } from "@/lib/utils";
 
@@ -19,9 +18,9 @@ export function TrustedCompanies({
   const locale = useLocale();
   const isAr = locale === "ar";
 
-  // Use dynamic companies from dashboard if provided and non-empty, otherwise fallback to seed fixtures
-  const hasDynamic = companies && companies.length > 0;
-  const items = hasDynamic ? companies : TRUSTED_COMPANIES;
+  if (!companies || companies.length === 0) {
+    return null;
+  }
 
   return (
     <section
@@ -36,27 +35,17 @@ export function TrustedCompanies({
           {t("eyebrow")}
         </p>
 
-        {/* Logos container with responsive layout matching design */}
+        {/* Logos container with responsive layout */}
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 items-stretch justify-center gap-4 sm:gap-6">
-          {items.map((company) => {
-            let companyName: string;
+          {companies.map((company) => {
+            const companyName = isAr
+              ? company.nameAr || company.nameEn
+              : company.nameEn || company.nameAr;
 
-            if ("nameAr" in company && "nameEn" in company) {
-              const item = company as TrustedCompanyItem;
-              companyName = isAr
-                ? item.nameAr || item.nameEn
-                : item.nameEn || item.nameAr;
-            } else {
-              companyName = t.has(`companies.${company.id}`)
-                ? t(`companies.${company.id}`)
-                : company.name;
-            }
-
-            const websiteUrl = "websiteUrl" in company ? (company as TrustedCompanyItem).websiteUrl : undefined;
-            const CardWrapper = websiteUrl ? "a" : "div";
-            const wrapperProps = websiteUrl
+            const CardWrapper = company.websiteUrl ? "a" : "div";
+            const wrapperProps = company.websiteUrl
               ? {
-                  href: websiteUrl,
+                  href: company.websiteUrl,
                   target: "_blank",
                   rel: "noopener noreferrer",
                 }
@@ -68,7 +57,7 @@ export function TrustedCompanies({
                 {...wrapperProps}
                 className={cn(
                   "group flex flex-col items-center justify-between p-4 rounded-xl border border-border/50 bg-card hover:bg-card/90 shadow-2xs hover:shadow-xs transition-all duration-300 hover:border-primary/40 hover:-translate-y-0.5 min-h-[110px]",
-                  websiteUrl && "cursor-pointer"
+                  company.websiteUrl && "cursor-pointer"
                 )}
                 title={companyName}
               >
