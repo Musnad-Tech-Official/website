@@ -9,3 +9,4 @@ export * from "./project-detail-related";
 export * from "./project-detail-rating";
 export * from "./project-detail-comments";
 export * from "./project-detail-tools";
+export * from "./project-table-of-contents";

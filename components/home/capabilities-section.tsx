@@ -1,17 +1,25 @@
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { Link } from "@/i18n/routing";
 import { LuArrowRight, LuArrowUpRight } from "react-icons/lu";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { CAPABILITY_CARDS } from "./home-data";
+import type { ServiceItem } from "@/lib/services/types";
+import { getServiceIconComponent } from "@/lib/services/service-icons";
 import { cn } from "@/lib/utils";
 
 export interface CapabilitiesSectionProps {
   className?: string;
+  services?: ServiceItem[];
 }
 
-export function CapabilitiesSection({ className = "" }: CapabilitiesSectionProps) {
+export function CapabilitiesSection({ className = "", services }: CapabilitiesSectionProps) {
   const t = useTranslations("Home.capabilities");
+  const locale = useLocale();
+  const isAr = locale === "ar";
+
+  if (!services || services.length === 0) {
+    return null;
+  }
 
   return (
     <section
@@ -51,20 +59,27 @@ export function CapabilitiesSection({ className = "" }: CapabilitiesSectionProps
           </div>
         </div>
 
-        {/* 6 Capabilities Cards Grid */}
+        {/* Capabilities Cards Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {CAPABILITY_CARDS.map((card) => {
-            const Icon = card.icon;
-            const title = t(`services.${card.serviceKey}.title`);
-            const description = t(`services.${card.serviceKey}.description`);
-            const tag1 = t(`services.${card.serviceKey}.tag1`);
-            const tag2 = t(`services.${card.serviceKey}.tag2`);
-            const tag3 = t(`services.${card.serviceKey}.tag3`);
-            const tags = [tag1, tag2, tag3];
+          {services.map((service) => {
+            const Icon = getServiceIconComponent(service.icon);
+            const title = isAr
+              ? service.titleAr || service.titleEn
+              : service.titleEn || service.titleAr;
+            const description = isAr
+              ? service.descriptionAr || service.descriptionEn
+              : service.descriptionEn || service.descriptionAr;
+            const tags = isAr
+              ? service.tagsAr?.length
+                ? service.tagsAr
+                : service.tagsEn
+              : service.tagsEn?.length
+              ? service.tagsEn
+              : service.tagsAr;
 
             return (
               <Card
-                key={card.id}
+                key={service.id}
                 variant="interactive"
                 className="group relative flex flex-col justify-between p-6 sm:p-7"
               >
@@ -84,7 +99,7 @@ export function CapabilitiesSection({ className = "" }: CapabilitiesSectionProps
 
                   {/* Tags */}
                   <div className="mt-5 flex flex-wrap gap-1.5" aria-label="Capability skills">
-                    {tags.map((tag, idx) => (
+                    {(tags || []).map((tag, idx) => (
                       <Badge
                         key={idx}
                         variant="secondary"
@@ -100,7 +115,7 @@ export function CapabilitiesSection({ className = "" }: CapabilitiesSectionProps
                 {/* Learn More Action */}
                 <div className="mt-6 pt-4 border-t border-border/40">
                   <Link
-                    href={card.href}
+                    href={service.href || `/services/${service.slug}`}
                     className="inline-flex items-center gap-1 text-xs font-semibold text-foreground/80 group-hover:text-primary transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring rounded-xs"
                   >
                     <span>{t("learnMore")}</span>

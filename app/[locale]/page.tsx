@@ -14,7 +14,11 @@ import { PageGuard } from "@/lib/page-control/guard";
 import { getArticlesAction } from "@/lib/articles/actions";
 import { getTeamMembersAction } from "@/lib/team/actions";
 import { getProjectsAction } from "@/lib/projects/actions";
+import { getLocalizedProjectCategory } from "@/lib/projects/types";
 import { getHomeTechnologiesAction } from "@/lib/technologies/actions";
+import { getTrustedCompaniesAction } from "@/lib/companies/actions";
+import { getTestimonialsAction } from "@/lib/testimonials/actions";
+import { getHomeServicesAction } from "@/lib/services/actions";
 
 interface HomePageProps {
   params: Promise<{ locale: string }>;
@@ -24,11 +28,14 @@ export default async function Page({ params }: HomePageProps) {
   const { locale } = await params;
   const isAr = locale === "ar";
 
-  const [articles, dbTeamMembers, dbProjects, dbTechnologies] = await Promise.all([
+  const [articles, dbTeamMembers, dbProjects, dbTechnologies, dbCompanies, dbTestimonials, dbServices] = await Promise.all([
     getArticlesAction("published"),
     getTeamMembersAction(true),
     getProjectsAction("published"),
     getHomeTechnologiesAction(),
+    getTrustedCompaniesAction(false),
+    getTestimonialsAction(false),
+    getHomeServicesAction(),
   ]);
 
   const teamMembers = dbTeamMembers.map((m) => ({
@@ -48,7 +55,7 @@ export default async function Page({ params }: HomePageProps) {
     slug: p.slug,
     title: isAr ? p.titleAr || p.titleEn : p.titleEn || p.titleAr,
     description: isAr ? p.descriptionAr || p.descriptionEn : p.descriptionEn || p.descriptionAr,
-    category: p.category,
+    category: getLocalizedProjectCategory(p.category, locale),
     year: p.year,
     featured: p.featured,
     liveDemo: Boolean(p.liveDemoUrl),
@@ -77,10 +84,10 @@ export default async function Page({ params }: HomePageProps) {
         <HeroSection />
 
         {/* 1. Trusted Companies strip */}
-        <TrustedCompanies />
+        <TrustedCompanies companies={dbCompanies} />
 
         {/* 2. Capabilities / Services */}
-        <CapabilitiesSection />
+        <CapabilitiesSection services={dbServices} />
 
         {/* 3. Selected Projects */}
         <SelectedProjects projects={projects} />
@@ -92,7 +99,7 @@ export default async function Page({ params }: HomePageProps) {
         <TechnologiesSection technologies={dbTechnologies} />
 
         {/* 6. Testimonials */}
-        <TestimonialsSection />
+        <TestimonialsSection testimonials={dbTestimonials} />
 
         {/* 7. Latest Insights */}
         <LatestInsights articles={articles} />

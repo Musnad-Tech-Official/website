@@ -80,3 +80,23 @@ export interface ProjectFormData {
   status: ProjectStatus;
   displayOrder?: number;
 }
+
+export const PROJECT_CATEGORY_MAP_AR: Record<string, string> = {
+  "Fintech Platform": "منصة تقنية مالية",
+  "Developer Tool": "أداة مطورين",
+  "Client Portal": "بوابة عملاء",
+  "CLI & Tooling": "أدوات برمجية وحزم طرفية",
+  "Observability": "رصد ومراقبة الأنظمة",
+  "AI & Realtime": "ذكاء اصطناعي وأنظمة فورية",
+  "Cloud Architecture": "معمارية سحابية",
+  "Mobile Application": "تطبيقات الهواتف",
+  "Enterprise Software": "برمجيات المؤسسات",
+  "Case Study": "دراسة حالة",
+};
+
+export function getLocalizedProjectCategory(category: string, locale: string): string {
+  if (locale === "ar") {
+    return PROJECT_CATEGORY_MAP_AR[category] || category;
+  }
+  return category;
+}

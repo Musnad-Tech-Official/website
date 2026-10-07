@@ -1,11 +1,17 @@
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { ServiceCard } from "./service-card";
-import { SERVICES_LIST } from "./services-data";
 import type { ServicesGridProps } from "./services-types";
+import { getServiceIconComponent } from "@/lib/services/service-icons";
 import { cn } from "@/lib/utils";
 
-export function ServicesGrid({ className = "" }: ServicesGridProps) {
+export function ServicesGrid({ className = "", services }: ServicesGridProps) {
   const t = useTranslations("Services");
+  const locale = useLocale();
+  const isAr = locale === "ar";
+
+  if (!services || services.length === 0) {
+    return null;
+  }
 
   return (
     <section
@@ -17,12 +23,21 @@ export function ServicesGrid({ className = "" }: ServicesGridProps) {
       </h2>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {SERVICES_LIST.map((service) => {
-          const title = t(`items.${service.translationKey}.title`);
-          const description = t(`items.${service.translationKey}.description`);
-          const tags = service.tagKeys.map((key) =>
-            t(`items.${service.translationKey}.${key}`)
-          );
+        {services.map((service) => {
+          const title = isAr
+            ? service.titleAr || service.titleEn
+            : service.titleEn || service.titleAr;
+          const description = isAr
+            ? service.descriptionAr || service.descriptionEn
+            : service.descriptionEn || service.descriptionAr;
+          const tags = isAr
+            ? service.tagsAr?.length
+              ? service.tagsAr
+              : service.tagsEn
+            : service.tagsEn?.length
+            ? service.tagsEn
+            : service.tagsAr;
+          const Icon = getServiceIconComponent(service.icon);
 
           return (
             <ServiceCard
@@ -30,9 +45,9 @@ export function ServicesGrid({ className = "" }: ServicesGridProps) {
               id={service.id}
               title={title}
               description={description}
-              tags={tags}
-              href={service.href}
-              icon={service.icon}
+              tags={tags || []}
+              href={service.href || `/services/${service.slug}`}
+              icon={Icon}
               learnMoreLabel={t("card.learnMore")}
               ariaLabel={t("card.viewService", { title })}
             />

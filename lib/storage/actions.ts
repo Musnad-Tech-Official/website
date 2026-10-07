@@ -84,3 +84,63 @@ export async function uploadImageAction(
     return { success: false, error: (err as Error).message || "Failed to upload image." };
   }
 }
+
+/**
+ * Uploads an attachment file (PDF, DOC, ZIP, Image) from a prospective client inquiry.
+ * Available to public contact submissions without admin authentication.
+ */
+export async function uploadInquiryAttachmentAction(
+  formData: FormData
+): Promise<UploadImageResult> {
+  try {
+    const file = formData.get("file") as File | null;
+    if (!file) {
+      return { success: false, error: "No attachment file provided." };
+    }
+
+    // Limit to 10MB
+    if (file.size > 10 * 1024 * 1024) {
+      return { success: false, error: "Attachment exceeds 10MB limit." };
+    }
+
+    const arrayBuffer = await file.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
+
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, "0");
+    const randomSuffix = Math.random().toString(36).substring(2, 8);
+    const cleanName = file.name.replace(/[^a-zA-Z0-9.-]/g, "_").toLowerCase();
+    const storagePath = `inquiries/${year}/${month}/${Date.now()}-${randomSuffix}-${cleanName}`;
+
+    try {
+      const supabase = await createClient();
+      const { error: uploadError } = await supabase.storage
+        .from("inquiry-attachments")
+        .upload(storagePath, buffer, {
+          contentType: file.type || "application/octet-stream",
+          upsert: false,
+        });
+
+      if (!uploadError) {
+        const {
+          data: { publicUrl },
+        } = supabase.storage.from("inquiry-attachments").getPublicUrl(storagePath);
+        return { success: true, url: publicUrl };
+      }
+    } catch {
+      // Storage bucket fallback
+    }
+
+    // Fallback data URL if bucket is pending or offline
+    const base64 = buffer.toString("base64");
+    const mime = file.type || "application/octet-stream";
+    return { success: true, url: `data:${mime};base64,${base64}` };
+  } catch (err: unknown) {
+    return {
+      success: false,
+      error: (err as Error).message || "Failed to upload attachment.",
+    };
+  }
+}
+

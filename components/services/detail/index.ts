@@ -1,5 +1,4 @@
 export * from "./service-detail-types";
-export * from "./service-detail-data";
 export * from "./service-detail-intro";
 export * from "./service-overview";
 export * from "./service-capabilities";
@@ -7,4 +6,3 @@ export * from "./service-detail-sidebar";
 export * from "./service-project-card";
 export * from "./related-projects";
 export * from "./related-by-technology";
-export * from "./service-detail-template";

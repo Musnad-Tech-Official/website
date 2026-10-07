@@ -1,6 +1,24 @@
-import type { BlogArticle, BlogAuthor } from "@/data/blog";
+export interface BlogAuthor {
+  id?: string;
+  name: string;
+}
 
-export type { BlogArticle, BlogAuthor };
+export interface BlogArticle {
+  id: string;
+  slug: string;
+  title: string;
+  excerpt: string;
+  author?: BlogAuthor;
+  category?: string;
+  categorySlug?: string;
+  tags?: string[];
+  publishedAt?: string;
+  readTime?: string;
+  coverImage?: string;
+  layoutVariant?: "default" | "featured";
+  visualKey?: string;
+  previewGradient?: string;
+}
 
 export interface BlogHeaderProps {
   eyebrow: string;

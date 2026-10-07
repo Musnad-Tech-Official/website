@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
-import type { ArticleDetailData } from "@/data/article-details";
-import type { BlogArticle } from "@/data/blog";
+import type { ArticleDetailData } from "@/components/blog/detail/article-detail-types";
+import type { BlogArticle } from "@/components/blog/blog-types";
 import { getArticleBySlugAction, getArticlesAction } from "@/lib/articles/actions";
 import { getArticleCommentsAction } from "@/lib/comments/actions";
 import { getTeamMemberBySlugAction } from "@/lib/team/actions";

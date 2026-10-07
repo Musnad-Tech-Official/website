@@ -2,7 +2,7 @@ import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/routing";
 import { LuArrowRight } from "react-icons/lu";
 import { TeamMemberCard } from "@/components/team";
-import type { TeamMember } from "@/data/team";
+import type { TeamMember } from "@/components/team/team-types";
 import { cn } from "@/lib/utils";
 
 export interface TeamPreviewProps {

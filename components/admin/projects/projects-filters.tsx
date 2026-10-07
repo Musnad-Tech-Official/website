@@ -1,6 +1,6 @@
 "use client";
 
-import { LuSearch, LuX, LuPlus, LuFilter, LuChevronDown } from "react-icons/lu";
+import { LuSearch, LuX, LuPlus, LuChevronDown } from "react-icons/lu";
 import { Button } from "@/components/ui/button";
 import type { ProjectStatus } from "@/lib/projects/types";
 

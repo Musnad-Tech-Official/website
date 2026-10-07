@@ -41,7 +41,13 @@ export function Avatar({
   className,
   ...props
 }: AvatarProps) {
+  const [prevSrc, setPrevSrc] = React.useState(src);
   const [imageError, setImageError] = React.useState(false);
+
+  if (prevSrc !== src) {
+    setPrevSrc(src);
+    setImageError(false);
+  }
 
   const getInitials = (text?: string) => {
     if (!text) return "?";
@@ -76,6 +82,7 @@ export function Avatar({
             height={sizeConfig.px}
             className="h-full w-full object-cover"
             onError={() => setImageError(true)}
+            unoptimized={Boolean(src.startsWith("data:") || src.startsWith("blob:"))}
           />
         ) : (
           <span className={cn("font-semibold text-muted-foreground", sizeConfig.text)}>

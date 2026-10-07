@@ -17,6 +17,10 @@ import {
   LuSettings,
   LuGlobe,
   LuCpu,
+  LuBuilding2,
+  LuMegaphone,
+  LuQuote,
+  LuLayers,
   LuChevronLeft,
   LuChevronRight,
   LuX,
@@ -45,7 +49,15 @@ export function AdminSidebar({
 
   const isRtl = locale === "ar";
 
-  const navItems = [
+  interface SidebarNavItem {
+    title: string;
+    href: string;
+    icon: React.ComponentType<{ className?: string }>;
+    exact?: boolean;
+    badge?: string;
+  }
+
+  const navItems: SidebarNavItem[] = [
     {
       title: t("nav.dashboard"),
       href: "/admin",
@@ -58,10 +70,14 @@ export function AdminSidebar({
       icon: LuGlobe,
     },
     {
+      title: t("nav.services"),
+      href: "/admin/services",
+      icon: LuLayers,
+    },
+    {
       title: t("nav.projects"),
       href: "/admin/projects",
       icon: LuFolderGit2,
-      badge: "0",
     },
     {
       title: t("nav.technologies"),
@@ -69,10 +85,24 @@ export function AdminSidebar({
       icon: LuCpu,
     },
     {
+      title: t("nav.companies"),
+      href: "/admin/companies",
+      icon: LuBuilding2,
+    },
+    {
+      title: t("nav.announcements"),
+      href: "/admin/announcements",
+      icon: LuMegaphone,
+    },
+    {
+      title: t("nav.testimonials"),
+      href: "/admin/testimonials",
+      icon: LuQuote,
+    },
+    {
       title: t("nav.articles"),
       href: "/admin/articles",
       icon: LuFileText,
-      badge: "0",
     },
     {
       title: t("nav.comments"),
@@ -83,7 +113,6 @@ export function AdminSidebar({
       title: t("nav.inquiries"),
       href: "/admin/inquiries",
       icon: LuMessageSquare,
-      badge: "0",
     },
     {
       title: t("nav.team"),

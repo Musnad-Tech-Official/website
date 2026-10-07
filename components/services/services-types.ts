@@ -20,6 +20,13 @@ export interface HowWeWorkStep {
   stepKey: string;
 }
 
+export const HOW_WE_WORK_STEPS: HowWeWorkStep[] = [
+  { id: "discovery", stepKey: "discovery" },
+  { id: "architecture", stepKey: "architecture" },
+  { id: "implementation", stepKey: "implementation" },
+  { id: "evolution", stepKey: "evolution" },
+];
+
 /**
  * Props for ServicesIntro component.
  */
@@ -48,11 +55,14 @@ export interface ServiceCardProps {
   className?: string;
 }
 
+import type { ServiceItem } from "@/lib/services/types";
+
 /**
  * Props for ServicesGrid section.
  */
 export interface ServicesGridProps {
   className?: string;
+  services?: ServiceItem[];
 }
 
 /**

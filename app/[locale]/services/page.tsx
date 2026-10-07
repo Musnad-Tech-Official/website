@@ -7,6 +7,7 @@ import {
 } from "@/components/services";
 import { CtaSection } from "@/components/ui/cta-section";
 import { PageGuard } from "@/lib/page-control/guard";
+import { getServicesAction } from "@/lib/services/actions";
 
 interface ServicesPageProps {
   params: Promise<{ locale: string }>;
@@ -26,7 +27,10 @@ export async function generateMetadata({
 
 export default async function ServicesPage({ params }: ServicesPageProps) {
   const { locale } = await params;
-  const t = await getTranslations({ locale, namespace: "Services" });
+  const [t, services] = await Promise.all([
+    getTranslations({ locale, namespace: "Services" }),
+    getServicesAction(false),
+  ]);
 
   return (
     <PageGuard slug="services" locale={locale}>
@@ -41,8 +45,8 @@ export default async function ServicesPage({ params }: ServicesPageProps) {
         breadcrumbLabel={t("breadcrumb.label")}
       />
 
-      {/* 2. Services Grid (6 Core Capabilities) */}
-      <ServicesGrid />
+      {/* 2. Services Grid (Core Capabilities from DB/Config) */}
+      <ServicesGrid services={services} />
 
       {/* 3. How We Work Section (Deliberate 4-Step Process) */}
       <ServicesProcess />

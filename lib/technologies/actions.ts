@@ -3,7 +3,7 @@
 import { auth } from "@clerk/nextjs/server";
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/utils/supabase/server";
-import { ALL_TECH_ITEMS, type TechItem } from "@/components/hero/tech-data";
+import { ALL_TECH_ITEMS } from "@/components/hero/tech-data";
 import type { ManagedTechnology, NewTechnologyInput } from "./types";
 
 /**

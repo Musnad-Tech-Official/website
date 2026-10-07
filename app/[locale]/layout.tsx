@@ -5,7 +5,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { Navbar } from "@/components/navbar/navbar";
 import { Footer } from "@/components/footer";
 import { NavbarUtilities } from "@/components/navbar-utilities";
-import { getAnnouncement } from "@/data/announcement";
+import { getActiveAnnouncementAction } from "@/lib/announcements/actions";
 import { NextIntlClientProvider, hasLocale } from "next-intl";
 import { getMessages } from "next-intl/server";
 import { notFound } from "next/navigation";
@@ -74,7 +74,7 @@ export default async function LocaleLayout({
 
   const isRtl = locale === "ar";
   const activeFont = isRtl ? tajawal : poppins;
-  const announcement = getAnnouncement(locale);
+  const announcement = isAdminRoute ? null : await getActiveAnnouncementAction(locale);
 
   const pageSettings = isAdminRoute ? [] : await getPageControlsAction();
   const { sessionClaims } = await auth();

@@ -3,7 +3,6 @@
 import * as React from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { TechIcon } from "@/components/hero/tech-icon";
 import {
@@ -20,7 +19,6 @@ import {
   LuX,
   LuCpu,
   LuSparkles,
-  LuLayers,
   LuLoader,
 } from "react-icons/lu";
 import { cn } from "@/lib/utils";

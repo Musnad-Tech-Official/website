@@ -7,18 +7,13 @@ import { Card } from "@/components/ui/card";
 import { Avatar } from "@/components/ui/avatar";
 import { formatArticleDate } from "@/lib/utils/date";
 import type { Article } from "@/lib/articles/types";
-import type { InsightArticleData } from "./home-types";
 import { cn } from "@/lib/utils";
 
-export type FeaturedArticleItem = Article | InsightArticleData;
+export type FeaturedArticleItem = Article;
 
 export interface FeaturedArticleCardProps {
   article: FeaturedArticleItem;
   className?: string;
-}
-
-function isDbArticle(item: FeaturedArticleItem): item is Article {
-  return "titleEn" in item || "titleAr" in item;
 }
 
 function getInitials(name?: string): string {
@@ -36,61 +31,30 @@ export function FeaturedArticleCard({
   const locale = useLocale();
   const isRtl = locale === "ar";
 
-  let title = "";
-  let excerpt = "";
-  let category = "";
-  let author = "";
-  let authorAvatar: string | undefined = undefined;
-  let authorInitials = "SA";
-  let articleDate = "";
-  let dateTimeAttr: string | undefined = undefined;
-  let readTime = "";
-  let coverImage: string | undefined = undefined;
-  let previewGradient = "from-neutral-800/80 via-zinc-900/60 to-stone-950";
-  let isFeatured = false;
-  let tags: string[] = [];
-  let href = "/blog";
+  const title = isRtl
+    ? (article.titleAr || article.titleEn)
+    : (article.titleEn || article.titleAr);
+  const excerpt = isRtl
+    ? (article.excerptAr || article.excerptEn)
+    : (article.excerptEn || article.excerptAr);
 
-  if (isDbArticle(article)) {
-    title = isRtl
-      ? (article.titleAr || article.titleEn)
-      : (article.titleEn || article.titleAr);
-    excerpt = isRtl
-      ? (article.excerptAr || article.excerptEn)
-      : (article.excerptEn || article.excerptAr);
-    category = article.category;
-    author = article.authorName || (isRtl ? "المسؤول" : "Administrator");
-    authorAvatar = article.authorAvatar;
-    authorInitials = getInitials(article.authorName);
+  const category = article.category;
+  const author = article.authorName || (isRtl ? "المسؤول" : "Administrator");
+  const authorAvatar = article.authorAvatar;
+  const authorInitials = getInitials(article.authorName);
 
-    const dateVal = article.publishedAt || article.createdAt;
-    articleDate = formatArticleDate(dateVal, locale);
-    dateTimeAttr = dateVal ? new Date(dateVal).toISOString() : undefined;
+  const dateVal = article.publishedAt || article.createdAt;
+  const articleDate = formatArticleDate(dateVal, locale);
+  const dateTimeAttr = dateVal ? new Date(dateVal).toISOString() : undefined;
 
-    readTime = isRtl
-      ? (article.readTimeAr || "5 دقائق للقراءة")
-      : (article.readTimeEn || "5 min read");
-    coverImage = article.coverImage;
-    isFeatured = article.layoutVariant === "featured";
-    tags = article.tags || [];
-    href = `/blog/${article.slug}`;
-  } else {
-    title = t(`articles.${article.articleKey}.title`);
-    excerpt = t(`articles.${article.articleKey}.excerpt`);
-    category = t(`articles.${article.articleKey}.category`);
-    author = t(`articles.${article.articleKey}.author`);
-    authorAvatar = undefined;
-    authorInitials = article.authorInitials || "SA";
-    articleDate = t.has(`articles.${article.articleKey}.date`)
-      ? t(`articles.${article.articleKey}.date`)
-      : article.date || "2024";
-    readTime = t("minRead", { count: article.readTime });
-    coverImage = undefined;
-    previewGradient = article.previewGradient;
-    isFeatured = article.isTrending;
-    tags = article.tags || [];
-    href = article.href || "/blog";
-  }
+  const readTime = isRtl
+    ? (article.readTimeAr || "5 دقائق للقراءة")
+    : (article.readTimeEn || "5 min read");
+  const coverImage = article.coverImage;
+  const previewGradient = "from-neutral-800/80 via-zinc-900/60 to-stone-950";
+  const isFeatured = article.layoutVariant === "featured";
+  const tags = article.tags || [];
+  const href = `/blog/${article.slug}`;
 
   return (
     <Card
@@ -103,160 +67,119 @@ export function FeaturedArticleCard({
         className
       )}
     >
-      <Link
-        href={href}
-        className="flex flex-col h-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-2xl"
-        aria-label={title}
-      >
-        {/* Prominent Visual Editorial Thumbnail Area */}
-        <div className="relative h-60 sm:h-72 lg:h-80 w-full overflow-hidden bg-muted/30 border-b border-border/50 p-6 flex flex-col justify-between">
-          {coverImage ? (
-            <>
-              {/* Real cover image */}
-              <img
-                src={coverImage}
-                alt={title}
-                className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
-                loading="lazy"
-              />
-              {/* Rich gradient overlay for contrast */}
-              <div
-                className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/35 to-black/20 pointer-events-none"
-                aria-hidden="true"
-              />
-            </>
-          ) : (
-            <>
-              {/* Editorial gradient fallback */}
-              <div
-                className={cn(
-                  "absolute inset-0 bg-gradient-to-br transition-transform duration-700 ease-out group-hover:scale-105",
-                  previewGradient
-                )}
-              />
-
-              {/* Geometric Tech Grid Texture Overlay */}
-              <div
-                className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.06)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.06)_1px,transparent_1px)] bg-[size:28px_28px] opacity-50 mix-blend-overlay pointer-events-none"
-                aria-hidden="true"
-              />
-            </>
-          )}
-
-          {/* Top Badges Row */}
-          <div className="relative z-10 flex items-center justify-between w-full gap-2">
-            {category ? (
-              <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-background/90 dark:bg-black/60 text-foreground backdrop-blur-md border border-border/50 shadow-xs">
-                {category}
-              </span>
-            ) : <span />}
-
-            {isFeatured && (
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-primary text-primary-foreground backdrop-blur-md border border-primary/20 shadow-xs">
-                <span
-                  className="h-1.5 w-1.5 rounded-full bg-primary-foreground animate-pulse"
-                  aria-hidden="true"
-                />
-                <LuSparkles className="h-3 w-3" aria-hidden="true" />
-                <span>
-                  {t.has("featuredBadge")
-                    ? t("featuredBadge")
-                    : isRtl
-                    ? "مقال مميز"
-                    : "Featured"}
-                </span>
-              </span>
+      {/* 1. Article Visual Header Banner (Cover Image or Curated Tech Gradient) */}
+      <div className="relative aspect-16/9 w-full overflow-hidden bg-muted/40">
+        {coverImage ? (
+          <img
+            src={coverImage}
+            alt={title}
+            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+          />
+        ) : (
+          <div
+            className={cn(
+              "h-full w-full bg-linear-to-br transition-transform duration-500 group-hover:scale-105",
+              previewGradient
             )}
-          </div>
+          />
+        )}
 
-          {/* Stylized Tech Architecture Preview Graphics (shown when no cover image) */}
-          {!coverImage && (
-            <div
-              className="relative z-10 mt-auto flex flex-col gap-2 pointer-events-none opacity-50 group-hover:opacity-80 transition-opacity duration-300"
-              aria-hidden="true"
-            >
-              <div className="flex items-center gap-2">
-                <div className="h-2 w-2 rounded-full bg-primary/70" />
-                <div className="h-1.5 w-36 rounded-full bg-white/40" />
-              </div>
-              <div className="h-1.5 w-56 rounded-full bg-white/25" />
-              <div className="h-1.5 w-24 rounded-full bg-white/20" />
-            </div>
+        {/* Ambient Subtle Texture Pattern Overlay */}
+        <div
+          aria-hidden="true"
+          className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(255,255,255,0.08),transparent_70%)]"
+        />
+
+        {/* Top Badges: Category & Featured Tag */}
+        <div className="absolute top-3 inset-x-3 flex items-center justify-between pointer-events-none">
+          <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-background/85 dark:bg-background/90 text-foreground backdrop-blur-md border border-border/50 shadow-2xs">
+            {category}
+          </span>
+
+          {isFeatured && (
+            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-primary text-primary-foreground shadow-xs animate-pulse">
+              <LuSparkles className="h-3 w-3" aria-hidden="true" />
+              <span>{t("featuredBadge")}</span>
+            </span>
           )}
         </div>
+      </div>
 
-        {/* Card Body with Rich Editorial Typography */}
-        <div className="p-6 sm:p-8 flex flex-col flex-1 justify-between text-start">
-          <div>
-            {/* Author Metadata with fully rounded Avatar */}
-            <div className="flex items-center gap-3 mb-4">
-              <Avatar
-                src={authorAvatar}
-                fallback={authorInitials}
-                size="sm"
-                shape="circle"
-                className="rounded-full border border-border/80 bg-muted/80 text-foreground font-bold shrink-0"
-              />
-              <div className="flex flex-wrap items-center gap-2 text-xs sm:text-sm text-muted-foreground font-medium">
-                <span className="font-semibold text-foreground">{author}</span>
-                {articleDate && (
-                  <>
-                    <span aria-hidden="true">·</span>
-                    {dateTimeAttr ? (
-                      <time dateTime={dateTimeAttr}>{articleDate}</time>
-                    ) : (
-                      <span>{articleDate}</span>
-                    )}
-                  </>
-                )}
-                {readTime && (
-                  <>
-                    <span aria-hidden="true">·</span>
-                    <span className="inline-flex items-center gap-1">
-                      <LuClock className="h-3.5 w-3.5" aria-hidden="true" />
-                      <span>{readTime}</span>
-                    </span>
-                  </>
-                )}
-              </div>
-            </div>
-
-            {/* Article Title */}
-            <h3 className="text-xl sm:text-2xl lg:text-3xl font-extrabold text-foreground group-hover:text-primary transition-colors tracking-tight leading-snug line-clamp-2">
-              {title}
-            </h3>
-
-            {/* Excerpt */}
-            {excerpt && (
-              <p className="mt-3.5 text-sm sm:text-base text-muted-foreground leading-relaxed line-clamp-3">
-                {excerpt}
-              </p>
-            )}
+      {/* 2. Article Editorial Content */}
+      <div className="flex flex-1 flex-col justify-between p-6 sm:p-7">
+        <div className="space-y-3">
+          {/* Metadata Row: Date & Read Time */}
+          <div className="flex items-center gap-3 text-xs text-muted-foreground/90 font-medium">
+            <time dateTime={dateTimeAttr}>{articleDate}</time>
+            <span aria-hidden="true" className="text-border">
+              •
+            </span>
+            <span className="inline-flex items-center gap-1">
+              <LuClock className="h-3.5 w-3.5" aria-hidden="true" />
+              <span>{readTime}</span>
+            </span>
           </div>
 
-          {/* Bottom Tags & Read Article CTA with animated arrow */}
-          <div className="mt-8 pt-5 border-t border-border/50 flex flex-wrap items-center justify-between gap-4">
-            <div className="flex flex-wrap gap-2" aria-label="Tags">
-              {tags.slice(0, 3).map((tag, idx) => (
+          {/* Article Title */}
+          <h3 className="text-lg sm:text-xl font-bold tracking-tight text-foreground group-hover:text-primary transition-colors line-clamp-2">
+            <Link
+              href={href}
+              className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-xs"
+            >
+              {title}
+            </Link>
+          </h3>
+
+          {/* Excerpt Summary */}
+          <p className="text-sm text-muted-foreground leading-relaxed line-clamp-3">
+            {excerpt}
+          </p>
+
+          {/* Technical Tags */}
+          {tags.length > 0 && (
+            <div
+              className="pt-2 flex flex-wrap gap-1.5"
+              aria-label="Article Topics"
+            >
+              {tags.map((tag, idx) => (
                 <span
                   key={idx}
-                  className="inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-mono bg-muted/60 text-muted-foreground border border-border/40"
+                  className="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-medium bg-muted/60 text-muted-foreground border border-border/40"
                 >
-                  {tag.startsWith("#") ? tag : `#${tag}`}
+                  {tag}
                 </span>
               ))}
             </div>
+          )}
+        </div>
 
-            <span className="inline-flex items-center gap-1.5 text-sm font-bold text-primary group-hover:text-primary/80 transition-colors shrink-0">
-              <span>{t("readArticle")}</span>
-              <LuArrowRight
-                className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-1.5 rtl:rotate-180 rtl:group-hover:-translate-x-1.5"
-                aria-hidden="true"
-              />
+        {/* 3. Card Footer: Author & Read More Link */}
+        <div className="mt-6 pt-5 border-t border-border/50 flex items-center justify-between gap-4">
+          <div className="flex items-center gap-2.5 min-w-0">
+            <Avatar
+              src={authorAvatar}
+              fallback={authorInitials}
+              size="sm"
+              className="border border-border/40 bg-primary/10 text-primary font-bold shrink-0"
+            />
+            <span className="text-xs font-semibold text-foreground/90 truncate">
+              {author}
             </span>
           </div>
+
+          <Link
+            href={href}
+            className="group/link inline-flex items-center gap-1 text-xs font-bold text-primary hover:text-primary/80 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-xs shrink-0"
+            aria-label={`${t("readArticle")}: ${title}`}
+          >
+            <span>{t("readArticle")}</span>
+            <LuArrowRight
+              className="h-3.5 w-3.5 transition-transform group-hover/link:translate-x-1 rtl:rotate-180 rtl:group-hover/link:-translate-x-1"
+              aria-hidden="true"
+            />
+          </Link>
         </div>
-      </Link>
+      </div>
     </Card>
   );
 }

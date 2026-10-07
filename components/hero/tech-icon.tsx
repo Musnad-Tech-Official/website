@@ -29,7 +29,6 @@ import {
 } from "react-icons/si";
 import { FaJava } from "react-icons/fa6";
 import { LuCode } from "react-icons/lu";
-import type { TechId } from "./tech-data";
 
 export interface TechIconProps {
   id: string;

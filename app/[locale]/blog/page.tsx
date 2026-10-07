@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
-import type { BlogArticle } from "@/data/blog";
+import type { BlogArticle } from "@/components/blog/blog-types";
 import { getArticlesAction } from "@/lib/articles/actions";
 import {
   BlogHeader,

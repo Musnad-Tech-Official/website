@@ -14,21 +14,19 @@ import {
   LuImage,
   LuGlobe,
   LuLoader,
-  LuSparkles,
   LuPlus,
-  LuTrash2,
   LuLayers,
   LuCheck,
   LuSearch,
 } from "react-icons/lu";
 import { FaGithub } from "react-icons/fa6";
-import type { Project, ProjectFormData, ProjectMetric } from "@/lib/projects/types";
+import type { Project, ProjectFormData } from "@/lib/projects/types";
 import { ALL_TECH_ITEMS } from "@/components/hero/tech-data";
 import { TechIcon } from "@/components/hero/tech-icon";
 import { cn } from "@/lib/utils";
 
 interface ProjectEditorModalProps {
-  project: Project | null; // null if creating new
+  project: Project | null;
   isOpen: boolean;
   onClose: () => void;
   onSave: (data: ProjectFormData) => Promise<boolean>;
@@ -43,7 +41,8 @@ const PRESET_CATEGORIES = [
   "Observability",
   "AI & Realtime",
   "Cloud Architecture",
-  "Design Engineering",
+  "Mobile Application",
+  "Enterprise Software",
 ];
 
 export function ProjectEditorModal({
@@ -59,16 +58,20 @@ export function ProjectEditorModal({
   const [errorAlert, setErrorAlert] = React.useState<string | null>(null);
   const coverInputRef = React.useRef<HTMLInputElement | null>(null);
 
-  // Form Fields State
+  // Exact Fields Requested:
+  // 1. Title (EN & AR)
+  // 2. Short description (EN & AR)
+  // 3. Category / Type
+  // 4. Technologies
+  // 5. Cover Image
+  // 6. Rich Text Editor (EN & AR)
+  // 7. Essential system fields (slug, status, optional URLs)
   const [titleEn, setTitleEn] = React.useState(project?.titleEn || "");
   const [titleAr, setTitleAr] = React.useState(project?.titleAr || "");
   const [slug, setSlug] = React.useState(project?.slug || "");
-  const [subtitleEn, setSubtitleEn] = React.useState(project?.subtitleEn || "");
-  const [subtitleAr, setSubtitleAr] = React.useState(project?.subtitleAr || "");
   const [descriptionEn, setDescriptionEn] = React.useState(project?.descriptionEn || "");
   const [descriptionAr, setDescriptionAr] = React.useState(project?.descriptionAr || "");
   const [category, setCategory] = React.useState(project?.category || "Fintech Platform");
-  const [year, setYear] = React.useState(project?.year || "2024");
   const [selectedTechs, setSelectedTechs] = React.useState<string[]>(
     project?.technologies && project.technologies.length > 0
       ? project.technologies
@@ -77,20 +80,11 @@ export function ProjectEditorModal({
   const [techSearch, setTechSearch] = React.useState("");
   const [customTechInput, setCustomTechInput] = React.useState("");
   const [coverImage, setCoverImage] = React.useState(project?.coverImage || "");
-  const [featured, setFeatured] = React.useState(project?.featured ?? false);
   const [liveDemoUrl, setLiveDemoUrl] = React.useState(project?.liveDemoUrl || "");
   const [githubUrl, setGithubUrl] = React.useState(project?.githubUrl || "");
   const [status, setStatus] = React.useState<Project["status"]>(project?.status || "published");
   const [contentHtmlEn, setContentHtmlEn] = React.useState(project?.contentHtmlEn || "");
   const [contentHtmlAr, setContentHtmlAr] = React.useState(project?.contentHtmlAr || "");
-  const [metrics, setMetrics] = React.useState<ProjectMetric[]>(
-    project?.metrics && project.metrics.length > 0
-      ? project.metrics
-      : [
-          { label: "Uptime", value: "99.99%", description: "Availability" },
-          { label: "Latency", value: "<50ms", description: "Sub-second response" },
-        ]
-  );
 
   const handleTitleEnChange = (val: string) => {
     setTitleEn(val);
@@ -114,12 +108,10 @@ export function ProjectEditorModal({
       const fd = new FormData();
       fd.append("file", file);
 
-      // Upload to project-media or article-media
       const res = await uploadImageAction(fd, "project-media");
       if (res.success && res.url) {
         setCoverImage(res.url);
       } else {
-        // Fallback to article-media if project-media is pending
         const fallbackRes = await uploadImageAction(fd, "article-media");
         if (fallbackRes.success && fallbackRes.url) {
           setCoverImage(fallbackRes.url);
@@ -133,22 +125,6 @@ export function ProjectEditorModal({
       setIsUploadingCover(false);
       if (coverInputRef.current) coverInputRef.current.value = "";
     }
-  };
-
-  const handleAddMetric = () => {
-    setMetrics((prev) => [...prev, { label: "", value: "", description: "" }]);
-  };
-
-  const handleRemoveMetric = (index: number) => {
-    setMetrics((prev) => prev.filter((_, i) => i !== index));
-  };
-
-  const handleMetricChange = (index: number, field: keyof ProjectMetric, value: string) => {
-    setMetrics((prev) => {
-      const updated = [...prev];
-      updated[index] = { ...updated[index], [field]: value };
-      return updated;
-    });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -170,8 +146,8 @@ export function ProjectEditorModal({
       slug: slug.trim(),
       titleEn: titleEn.trim(),
       titleAr: titleAr.trim(),
-      subtitleEn: subtitleEn.trim(),
-      subtitleAr: subtitleAr.trim(),
+      subtitleEn: descriptionEn.trim(),
+      subtitleAr: descriptionAr.trim(),
       descriptionEn: descriptionEn.trim(),
       descriptionAr: descriptionAr.trim(),
       contentHtmlEn,
@@ -179,14 +155,14 @@ export function ProjectEditorModal({
       coverImage: coverImage.trim() || undefined,
       category: category.trim(),
       categorySlug: category.toLowerCase().replace(/[^\w\s-]/g, "").replace(/[\s_-]+/g, "-"),
-      year: year.trim(),
+      year: project?.year || new Date().getFullYear().toString(),
       technologies: selectedTechs,
-      featured,
+      featured: false,
       liveDemoUrl: liveDemoUrl.trim() || undefined,
       githubUrl: githubUrl.trim() || undefined,
       rating: 5.0,
       reviewCount: 0,
-      metrics: metrics.filter((m) => m.label.trim() && m.value.trim()),
+      metrics: [],
       status,
       displayOrder: project?.displayOrder ?? 0,
     };
@@ -198,7 +174,7 @@ export function ProjectEditorModal({
         onClose();
       }
     } catch (err: unknown) {
-      setErrorAlert((err as Error).message || "An unexpected error occurred while saving.");
+      setErrorAlert((err as Error).message || "Failed to save project.");
     } finally {
       setIsSaving(false);
     }
@@ -207,28 +183,28 @@ export function ProjectEditorModal({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/60 backdrop-blur-xs animate-in fade-in-50 duration-200 overflow-y-auto">
-      <div className="relative w-full max-w-5xl my-auto bg-card border border-border/80 rounded-2xl sm:rounded-3xl shadow-2xl flex flex-col max-h-[92vh] overflow-hidden">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-black/70 backdrop-blur-sm overflow-y-auto">
+      <div className="bg-card w-full max-w-4xl rounded-2xl border border-border/80 shadow-2xl overflow-hidden my-auto animate-in fade-in zoom-in-95 duration-200">
         {/* Modal Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-border/70 shrink-0">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-border/70 bg-muted/30">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center text-primary">
-              <LuLayers className="w-4 h-4" />
+            <div className="w-9 h-9 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary">
+              <LuLayers className="w-5 h-5" />
             </div>
             <div>
-              <h2 className="text-base sm:text-lg font-bold text-foreground">
+              <h2 className="text-base font-bold text-foreground">
                 {project
                   ? isRtl
-                    ? "تعديل تفاصيل المشروع"
-                    : "Edit Project Details"
+                    ? "تعديل المشروع"
+                    : "Edit Project"
                   : isRtl
-                  ? "إضافة مشروع هندسي جديد"
-                  : "Create New Engineering Project"}
+                  ? "إضافة مشروع جديد"
+                  : "Create New Project"}
               </h2>
-              <p className="text-xs text-muted-foreground">
+              <p className="text-xs text-muted-foreground mt-0.5">
                 {isRtl
-                  ? "إدارة المحتوى المتقدم، المحرر المرئي، المقاييس التقنية والصور."
-                  : "Manage project case study, rich text editor, technical metrics, and media."}
+                  ? "أدخل بيانات المشروع، الصورة، التقنيات، واكتب دراسة الحالة بالمحرر"
+                  : "Set cover image, title, short description, technologies, and rich case study."}
               </p>
             </div>
           </div>
@@ -236,57 +212,56 @@ export function ProjectEditorModal({
           <button
             type="button"
             onClick={onClose}
-            className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/80 transition-colors cursor-pointer"
+            className="text-muted-foreground hover:text-foreground p-1.5 rounded-lg hover:bg-muted transition-colors cursor-pointer"
           >
-            <LuX className="w-5 h-5" />
+            <LuX className="w-4 h-4" />
           </button>
         </div>
 
-        {/* Modal Body */}
-        <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-6 space-y-6">
+        {/* Modal Form */}
+        <form onSubmit={handleSubmit} className="p-6 space-y-6 max-h-[80vh] overflow-y-auto">
           {errorAlert && (
             <Alert variant="destructive">
               <AlertDescription className="text-xs">{errorAlert}</AlertDescription>
             </Alert>
           )}
 
-          {/* Bilingual Language Selector */}
-          <div className="flex items-center justify-between p-1 bg-muted/40 border border-border/70 rounded-xl">
-            <div className="flex items-center gap-1">
+          {/* Language Switcher Tabs */}
+          <div className="flex items-center justify-between border-b border-border/70 pb-3">
+            <div className="flex items-center gap-2">
               <button
                 type="button"
                 onClick={() => setActiveTab("en")}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+                className={cn(
+                  "px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer",
                   activeTab === "en"
-                    ? "bg-card text-foreground shadow-2xs"
-                    : "text-muted-foreground hover:text-foreground"
-                }`}
+                    ? "bg-primary text-primary-foreground shadow-xs"
+                    : "bg-muted/70 text-muted-foreground hover:bg-muted"
+                )}
               >
-                <LuGlobe className="w-3.5 h-3.5" />
-                <span>English (LTR)</span>
+                English (EN)
               </button>
               <button
                 type="button"
                 onClick={() => setActiveTab("ar")}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+                className={cn(
+                  "px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer",
                   activeTab === "ar"
-                    ? "bg-card text-foreground shadow-2xs"
-                    : "text-muted-foreground hover:text-foreground"
-                }`}
+                    ? "bg-primary text-primary-foreground shadow-xs"
+                    : "bg-muted/70 text-muted-foreground hover:bg-muted"
+                )}
               >
-                <LuGlobe className="w-3.5 h-3.5" />
-                <span>العربية (RTL)</span>
+                العربية (AR)
               </button>
             </div>
-
-            <span className="text-[11px] font-mono text-muted-foreground pe-3">
+            <span className="text-xs text-muted-foreground hidden sm:inline">
               {activeTab === "en" ? "Editing English content" : "تعديل المحتوى العربي"}
             </span>
           </div>
 
-          {/* Tab 1: English Fields */}
+          {/* Tab 1: English Content */}
           {activeTab === "en" && (
-            <div className="space-y-4 animate-in fade-in-50 duration-150 text-start" dir="ltr">
+            <div className="space-y-4 animate-in fade-in-50 duration-150 text-start">
               <div className="space-y-1.5">
                 <label className="text-xs font-semibold text-foreground">
                   Project Title (EN) <span className="text-destructive">*</span>
@@ -294,21 +269,9 @@ export function ProjectEditorModal({
                 <Input
                   value={titleEn}
                   onChange={(e) => handleTitleEnChange(e.target.value)}
-                  placeholder="e.g. Sahim Analytics"
+                  placeholder="e.g. Sahim Analytics Platform"
                   className="text-xs h-9.5 rounded-xl"
                   required
-                />
-              </div>
-
-              <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-foreground">
-                  Subtitle / Tagline (EN)
-                </label>
-                <Input
-                  value={subtitleEn}
-                  onChange={(e) => setSubtitleEn(e.target.value)}
-                  placeholder="e.g. Streaming market intelligence & real-time analytics engine"
-                  className="text-xs h-9.5 rounded-xl"
                 />
               </div>
 
@@ -319,24 +282,24 @@ export function ProjectEditorModal({
                 <Textarea
                   value={descriptionEn}
                   onChange={(e) => setDescriptionEn(e.target.value)}
-                  placeholder="Concise overview rendered in cards and search summaries..."
+                  placeholder="A concise summary of the project shown on project cards and previews..."
                   rows={2}
                   className="text-xs rounded-xl"
                 />
               </div>
 
-              {/* Rich Text Editor for English Case Study */}
+              {/* Rich Text Editor for English */}
               <div className="space-y-1.5 pt-2">
                 <label className="text-xs font-semibold text-foreground flex items-center justify-between">
-                  <span>Case Study & Architecture Narrative (EN)</span>
+                  <span>Project Case Study & Content (EN)</span>
                   <span className="text-[11px] font-normal text-muted-foreground">
-                    Tiptap Rich Text Editor
+                    Rich Text Editor
                   </span>
                 </label>
                 <RichTextEditor
                   value={contentHtmlEn}
                   onChange={(html) => setContentHtmlEn(html)}
-                  placeholder="Write comprehensive case study, challenges, architecture diagrams, and outcomes..."
+                  placeholder="Write full case study, system architecture, engineering challenges, screenshots, and solutions..."
                   minHeight="260px"
                   dir="ltr"
                 />
@@ -344,7 +307,7 @@ export function ProjectEditorModal({
             </div>
           )}
 
-          {/* Tab 2: Arabic Fields */}
+          {/* Tab 2: Arabic Content */}
           {activeTab === "ar" && (
             <div className="space-y-4 animate-in fade-in-50 duration-150 text-start" dir="rtl">
               <div className="space-y-1.5">
@@ -354,21 +317,9 @@ export function ProjectEditorModal({
                 <Input
                   value={titleAr}
                   onChange={(e) => setTitleAr(e.target.value)}
-                  placeholder="مثال: سهم للتحليلات"
+                  placeholder="مثال: منصة سهم للتحليلات"
                   className="text-xs h-9.5 rounded-xl"
                   required
-                />
-              </div>
-
-              <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-foreground">
-                  العنوان الفرعي / الشعار المختصر (بالعربية)
-                </label>
-                <Input
-                  value={subtitleAr}
-                  onChange={(e) => setSubtitleAr(e.target.value)}
-                  placeholder="مثال: منصة تحليلات فورية متدفقة لمعالجة إشارات السوق"
-                  className="text-xs h-9.5 rounded-xl"
                 />
               </div>
 
@@ -379,24 +330,24 @@ export function ProjectEditorModal({
                 <Textarea
                   value={descriptionAr}
                   onChange={(e) => setDescriptionAr(e.target.value)}
-                  placeholder="وصف مختصر للمشروع يظهر في البطاقات وقوائم الاستعراض..."
+                  placeholder="نبذة موجزة عن المشروع تظهر في البطاقات والمعاينات..."
                   rows={2}
                   className="text-xs rounded-xl"
                 />
               </div>
 
-              {/* Rich Text Editor for Arabic Case Study */}
+              {/* Rich Text Editor for Arabic */}
               <div className="space-y-1.5 pt-2">
                 <label className="text-xs font-semibold text-foreground flex items-center justify-between">
-                  <span>دراسة الحالة والمعمارية البرمجية (بالعربية)</span>
+                  <span>دراسة الحالة وتفاصيل المشروع (بالعربية)</span>
                   <span className="text-[11px] font-normal text-muted-foreground">
-                    محرر نصوص غني ومتطور
+                    محرر نصوص غني
                   </span>
                 </label>
                 <RichTextEditor
                   value={contentHtmlAr}
                   onChange={(html) => setContentHtmlAr(html)}
-                  placeholder="اكتب دراسة الحالة المعمقة، التحديات الهندسية، معمارية الحل والنتائج..."
+                  placeholder="اكتب دراسة الحالة المفصلة، المعمارية الهندسية، التحديات والحلول..."
                   minHeight="260px"
                   dir="rtl"
                 />
@@ -404,30 +355,18 @@ export function ProjectEditorModal({
             </div>
           )}
 
-          {/* Global Meta & Technical Settings */}
+          {/* Project Configuration: Category, Cover, Techs, Links */}
           <div className="pt-4 border-t border-border/70 space-y-4">
             <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
-              {isRtl ? "الإعدادات العامة والتقنية" : "Metadata & Technical Configuration"}
+              {isRtl ? "المواصفات والتقنيات والصورة" : "Specifications, Technologies & Media"}
             </h3>
 
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              {/* Slug */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {/* Category / Type */}
               <div className="space-y-1">
                 <label className="text-xs font-semibold text-foreground">
-                  URL Slug <span className="text-destructive">*</span>
+                  {isRtl ? "تصنيف / نوع المشروع" : "Project Category / Type"}
                 </label>
-                <Input
-                  value={slug}
-                  onChange={(e) => setSlug(e.target.value)}
-                  placeholder="e.g. sahim-analytics"
-                  className="text-xs h-9 font-mono rounded-xl"
-                  required
-                />
-              </div>
-
-              {/* Category */}
-              <div className="space-y-1">
-                <label className="text-xs font-semibold text-foreground">Category</label>
                 <select
                   value={category}
                   onChange={(e) => setCategory(e.target.value)}
@@ -441,16 +380,71 @@ export function ProjectEditorModal({
                 </select>
               </div>
 
-              {/* Year */}
+              {/* Slug */}
               <div className="space-y-1">
-                <label className="text-xs font-semibold text-foreground">Year</label>
+                <label className="text-xs font-semibold text-foreground">
+                  URL Slug <span className="text-destructive">*</span>
+                </label>
                 <Input
-                  value={year}
-                  onChange={(e) => setYear(e.target.value)}
-                  placeholder="2024"
-                  className="text-xs h-9 rounded-xl"
+                  value={slug}
+                  onChange={(e) => setSlug(e.target.value)}
+                  placeholder="e.g. sahim-analytics"
+                  className="text-xs h-9 font-mono rounded-xl"
+                  required
                 />
               </div>
+            </div>
+
+            {/* Cover Image Uploader */}
+            <div className="space-y-1.5 p-3.5 rounded-xl border border-border/70 bg-muted/20">
+              <label className="text-xs font-semibold text-foreground block">
+                {isRtl ? "صورة غلاف المشروع (رفع أو رابط)" : "Featured Cover Image (Upload or URL)"}
+              </label>
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+                <Input
+                  value={coverImage}
+                  onChange={(e) => setCoverImage(e.target.value)}
+                  placeholder="https://... cover image URL"
+                  className="text-xs h-9 flex-1 rounded-xl bg-background"
+                />
+
+                <input
+                  ref={coverInputRef}
+                  type="file"
+                  accept="image/png,image/jpeg,image/webp,image/svg+xml"
+                  onChange={handleCoverUpload}
+                  className="hidden"
+                />
+
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => coverInputRef.current?.click()}
+                  disabled={isUploadingCover}
+                  className="text-xs h-9 px-3 gap-1.5 rounded-xl shrink-0 cursor-pointer"
+                >
+                  {isUploadingCover ? (
+                    <LuLoader className="w-3.5 h-3.5 animate-spin" />
+                  ) : (
+                    <LuImage className="w-3.5 h-3.5" />
+                  )}
+                  <span>{isUploadingCover ? (isRtl ? "جارٍ الرفع..." : "Uploading...") : (isRtl ? "رفع صورة" : "Upload Image")}</span>
+                </Button>
+              </div>
+
+              {coverImage && (
+                <div className="relative w-44 h-24 rounded-xl overflow-hidden border border-border/80 mt-2 bg-muted">
+                  <img src={coverImage} alt="Cover preview" className="w-full h-full object-cover" />
+                  <button
+                    type="button"
+                    onClick={() => setCoverImage("")}
+                    className="absolute top-1 end-1 bg-black/70 hover:bg-black text-white p-1 rounded-md"
+                  >
+                    <LuX className="w-3 h-3" />
+                  </button>
+                </div>
+              )}
             </div>
 
             {/* Technologies Selector from Official Tech Catalog */}
@@ -458,13 +452,13 @@ export function ProjectEditorModal({
               <div className="flex items-center justify-between">
                 <label className="text-xs font-semibold text-foreground flex items-center gap-1.5">
                   <LuLayers className="w-3.5 h-3.5 text-primary" />
-                  <span>{isRtl ? "التقنيات البرمجية المستخدمة" : "Technologies & Architecture Stack"}</span>
+                  <span>{isRtl ? "التقنيات البرمجية المستخدمة" : "Technologies Stack"}</span>
                   <span className="text-[10px] font-mono px-1.5 py-0.5 rounded-full bg-primary/10 text-primary font-bold">
                     {selectedTechs.length}
                   </span>
                 </label>
                 <span className="text-[11px] text-muted-foreground hidden sm:inline">
-                  {isRtl ? "اختر من التقنيات الرسمية أو أضف جديدة" : "Click to toggle or type custom"}
+                  {isRtl ? "اختر من التقنيات الرسمية أو أضف جديدة" : "Click to select from catalog or type custom"}
                 </span>
               </div>
 
@@ -502,7 +496,7 @@ export function ProjectEditorModal({
                     value={techSearch}
                     onChange={(e) => setTechSearch(e.target.value)}
                     placeholder={isRtl ? "ابحث في التقنيات (e.g. Next.js, Go, Redis)..." : "Filter catalog (e.g. Next.js, Go, Redis)..."}
-                    className="text-xs h-8 ps-8 rounded-lg"
+                    className="text-xs h-8 ps-8 rounded-lg bg-background"
                   />
                 </div>
                 <div className="flex items-center gap-1 shrink-0">
@@ -510,7 +504,7 @@ export function ProjectEditorModal({
                     value={customTechInput}
                     onChange={(e) => setCustomTechInput(e.target.value)}
                     placeholder={isRtl ? "تقنية مخصصة..." : "Custom tech..."}
-                    className="text-xs h-8 w-28 sm:w-36 rounded-lg"
+                    className="text-xs h-8 w-28 sm:w-36 rounded-lg bg-background"
                     onKeyDown={(e) => {
                       if (e.key === "Enter") {
                         e.preventDefault();
@@ -572,146 +566,40 @@ export function ProjectEditorModal({
               </div>
             </div>
 
-            {/* URLs */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {/* Optional Links & Publication Status */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <div className="space-y-1">
                 <label className="text-xs font-semibold text-foreground flex items-center gap-1.5">
                   <LuGlobe className="w-3.5 h-3.5 text-primary" />
-                  <span>Live Demo URL (Optional)</span>
+                  <span>{isRtl ? "رابط المعاينة الحية (اختياري)" : "Live Demo URL (Optional)"}</span>
                 </label>
                 <Input
                   type="url"
                   value={liveDemoUrl}
                   onChange={(e) => setLiveDemoUrl(e.target.value)}
-                  placeholder="https://project.musnad.tech"
+                  placeholder="https://..."
                   className="text-xs h-9 rounded-xl font-mono"
                 />
               </div>
 
               <div className="space-y-1">
                 <label className="text-xs font-semibold text-foreground flex items-center gap-1.5">
-                  <FaGithub className="w-3.5 h-3.5 text-primary" />
-                  <span>GitHub Repository URL (Optional)</span>
+                  <FaGithub className="w-3.5 h-3.5 text-foreground" />
+                  <span>{isRtl ? "رابط GitHub (اختياري)" : "GitHub URL (Optional)"}</span>
                 </label>
                 <Input
                   type="url"
                   value={githubUrl}
                   onChange={(e) => setGithubUrl(e.target.value)}
-                  placeholder="https://github.com/Musnad-Tech-Official/..."
+                  placeholder="https://github.com/..."
                   className="text-xs h-9 rounded-xl font-mono"
                 />
               </div>
-            </div>
 
-            {/* Cover Image Uploader */}
-            <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-foreground">
-                Featured Cover Image (Upload or URL)
-              </label>
-              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
-                <Input
-                  value={coverImage}
-                  onChange={(e) => setCoverImage(e.target.value)}
-                  placeholder="https://... cover image URL"
-                  className="text-xs h-9 flex-1 rounded-xl"
-                />
-
-                <input
-                  ref={coverInputRef}
-                  type="file"
-                  accept="image/png,image/jpeg,image/webp,image/svg+xml"
-                  onChange={handleCoverUpload}
-                  className="hidden"
-                />
-
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={() => coverInputRef.current?.click()}
-                  disabled={isUploadingCover}
-                  className="text-xs h-9 px-3 gap-1.5 rounded-xl shrink-0 cursor-pointer"
-                >
-                  {isUploadingCover ? (
-                    <LuLoader className="w-3.5 h-3.5 animate-spin" />
-                  ) : (
-                    <LuImage className="w-3.5 h-3.5" />
-                  )}
-                  <span>{isUploadingCover ? "Uploading..." : "Upload Image"}</span>
-                </Button>
-              </div>
-
-              {coverImage && (
-                <div className="relative w-36 h-20 rounded-xl overflow-hidden border border-border/80 mt-2 bg-muted">
-                  <img src={coverImage} alt="Cover preview" className="w-full h-full object-cover" />
-                  <button
-                    type="button"
-                    onClick={() => setCoverImage("")}
-                    className="absolute top-1 end-1 bg-black/70 hover:bg-black text-white p-1 rounded-md"
-                  >
-                    <LuX className="w-3 h-3" />
-                  </button>
-                </div>
-              )}
-            </div>
-
-            {/* Key Metrics Editor */}
-            <div className="space-y-2 pt-2">
-              <div className="flex items-center justify-between">
-                <label className="text-xs font-semibold text-foreground">
-                  Key Results & Architecture Metrics
-                </label>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={handleAddMetric}
-                  className="text-xs h-7 px-2.5 gap-1 rounded-lg"
-                >
-                  <LuPlus className="w-3 h-3" />
-                  <span>Add Metric</span>
-                </Button>
-              </div>
-
-              <div className="space-y-2">
-                {metrics.map((metric, idx) => (
-                  <div key={idx} className="flex items-center gap-2">
-                    <Input
-                      value={metric.label}
-                      onChange={(e) => handleMetricChange(idx, "label", e.target.value)}
-                      placeholder="Label (e.g. Latency)"
-                      className="text-xs h-8 rounded-lg flex-1"
-                    />
-                    <Input
-                      value={metric.value}
-                      onChange={(e) => handleMetricChange(idx, "value", e.target.value)}
-                      placeholder="Value (e.g. <50ms)"
-                      className="text-xs h-8 rounded-lg w-28 font-mono"
-                    />
-                    <Input
-                      value={metric.description || ""}
-                      onChange={(e) => handleMetricChange(idx, "description", e.target.value)}
-                      placeholder="Note (optional)"
-                      className="text-xs h-8 rounded-lg flex-1 hidden sm:block"
-                    />
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => handleRemoveMetric(idx)}
-                      className="h-8 w-8 text-destructive hover:bg-destructive/10 rounded-lg shrink-0"
-                    >
-                      <LuTrash2 className="w-3.5 h-3.5" />
-                    </Button>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Status & Featured Controls */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-3 border-t border-border/60">
               <div className="space-y-1">
-                <label className="text-xs font-semibold text-foreground">Publication Status</label>
+                <label className="text-xs font-semibold text-foreground">
+                  {isRtl ? "حالة النشر" : "Publication Status"}
+                </label>
                 <select
                   value={status}
                   onChange={(e) => setStatus(e.target.value as Project["status"])}
@@ -722,50 +610,29 @@ export function ProjectEditorModal({
                   <option value="archived">Archived</option>
                 </select>
               </div>
-
-              <div className="flex items-center gap-3 pt-5">
-                <label className="relative inline-flex items-center cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={featured}
-                    onChange={(e) => setFeatured(e.target.checked)}
-                    className="sr-only peer"
-                  />
-                  <div className="w-9 h-5 bg-muted peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-primary" />
-                </label>
-                <span className="text-xs font-medium text-foreground flex items-center gap-1">
-                  <LuSparkles className="w-3.5 h-3.5 text-primary" />
-                  <span>Feature on Home Page</span>
-                </span>
-              </div>
             </div>
           </div>
 
-          {/* Modal Actions */}
+          {/* Action Buttons */}
           <div className="flex items-center justify-end gap-3 pt-4 border-t border-border/70">
             <Button
               type="button"
               variant="outline"
               size="sm"
               onClick={onClose}
-              disabled={isSaving}
               className="text-xs h-9 px-4 rounded-xl cursor-pointer"
             >
               {isRtl ? "إلغاء" : "Cancel"}
             </Button>
-
             <Button
               type="submit"
+              variant="primary"
               size="sm"
               disabled={isSaving}
-              className="text-xs h-9 px-5 gap-1.5 rounded-xl font-semibold bg-primary text-primary-foreground shadow-xs cursor-pointer"
+              className="text-xs h-9 px-5 gap-1.5 rounded-xl cursor-pointer shadow-md shadow-primary/20"
             >
-              {isSaving ? (
-                <LuLoader className="w-3.5 h-3.5 animate-spin" />
-              ) : (
-                <LuSave className="w-3.5 h-3.5" />
-              )}
-              <span>{isSaving ? "Saving..." : isRtl ? "حفظ المشروع" : "Save Project"}</span>
+              {isSaving ? <LuLoader className="w-3.5 h-3.5 animate-spin" /> : <LuSave className="w-3.5 h-3.5" />}
+              <span>{isSaving ? (isRtl ? "جارٍ الحفظ..." : "Saving...") : (isRtl ? "حفظ المشروع" : "Save Project")}</span>
             </Button>
           </div>
         </form>
@@ -773,3 +640,5 @@ export function ProjectEditorModal({
     </div>
   );
 }
+
+export default ProjectEditorModal;

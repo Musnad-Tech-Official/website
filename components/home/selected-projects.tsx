@@ -1,21 +1,24 @@
-import { useLocale, useTranslations } from "next-intl";
+import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/routing";
 import { LuArrowRight } from "react-icons/lu";
 import { ProjectCard } from "@/components/projects/project-card";
-import { getProjects } from "@/data/projects";
 import { cn } from "@/lib/utils";
 
-import type { Project } from "@/data/projects";
+import type { Project } from "@/components/projects/projects-types";
 
 export interface SelectedProjectsProps {
   projects?: Project[];
   className?: string;
 }
 
-export function SelectedProjects({ projects, className = "" }: SelectedProjectsProps) {
+export function SelectedProjects({ projects = [], className = "" }: SelectedProjectsProps) {
   const t = useTranslations("Home.projects");
-  const locale = useLocale();
-  const allProjects = projects && projects.length > 0 ? projects : getProjects(locale);
+  const allProjects = projects;
+
+  if (allProjects.length === 0) {
+    return null;
+  }
+
   // Pick featured projects, fallback to first 3
   const featuredProjects = allProjects.filter((p) => p.featured).slice(0, 3);
   const displayProjects = featuredProjects.length >= 3 ? featuredProjects : allProjects.slice(0, 3);

@@ -1,5 +1,4 @@
 import { useTranslations } from "next-intl";
-import { ALL_TECH_ITEMS } from "@/components/hero/tech-data";
 import { TechIcon } from "@/components/hero/tech-icon";
 import { cn } from "@/lib/utils";
 
@@ -13,7 +12,12 @@ export function TechnologiesSection({
   technologies,
 }: TechnologiesSectionProps) {
   const t = useTranslations("Home.technologies");
-  const techList = technologies && technologies.length > 0 ? technologies : ALL_TECH_ITEMS;
+
+  if (!technologies || technologies.length === 0) {
+    return null;
+  }
+
+  const techList = technologies;
 
   return (
     <section

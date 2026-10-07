@@ -142,7 +142,7 @@ export async function addArticleCommentAction(
     const supabase = await createClient();
     const { error } = await supabase.from("article_comments").insert({
       id: newComment.id,
-      article_id: newComment.articleId,
+      article_id: newComment.articleId || null,
       article_slug: newComment.articleSlug,
       user_id: newComment.userId,
       user_name: newComment.userName,
@@ -171,6 +171,7 @@ export async function addArticleCommentAction(
   }
 
   revalidatePath(`/blog/${params.articleSlug}`);
+  revalidatePath(`/projects/${params.articleSlug}`);
 
   return {
     success: true,
@@ -221,6 +222,7 @@ export async function deleteArticleCommentAction(
   );
 
   revalidatePath(`/blog/${articleSlug}`);
+  revalidatePath(`/projects/${articleSlug}`);
 
   return {
     success: true,
@@ -349,6 +351,7 @@ export async function updateCommentStatusAction(
 
   revalidatePath("/admin/comments");
   revalidatePath("/blog");
+  revalidatePath("/projects");
 
   return { success: true };
 }
