@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { getProjectsAction } from "@/lib/projects/actions";
+import { getLocalizedProjectCategory } from "@/lib/projects/types";
 import { getProjects } from "@/data/projects";
 import {
   ProjectsHeader,
@@ -39,7 +40,7 @@ export default async function ProjectsPage({ params }: ProjectsPageProps) {
           slug: p.slug,
           title: isAr ? p.titleAr || p.titleEn : p.titleEn || p.titleAr,
           description: isAr ? p.descriptionAr || p.descriptionEn : p.descriptionEn || p.descriptionAr,
-          category: p.category,
+          category: getLocalizedProjectCategory(p.category, locale),
           year: p.year,
           featured: p.featured,
           liveDemo: Boolean(p.liveDemoUrl),

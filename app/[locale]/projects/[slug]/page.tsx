@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { getProjectBySlugAction, getProjectsAction } from "@/lib/projects/actions";
+import { getLocalizedProjectCategory } from "@/lib/projects/types";
 import { getProjectDetail } from "@/data/project-details";
 import { getProjects } from "@/data/projects";
 import {
@@ -78,18 +79,8 @@ export default async function ProjectDetailPage({
       : dbProject.contentHtmlEn || dbProject.contentHtmlAr
     : null;
 
-  const CATEGORY_MAP_AR: Record<string, string> = {
-    "Fintech Platform": "منصة تقنية مالية",
-    "Developer Tool": "أداة تطوير ونشر",
-    "Client Portal": "بوابة عملاء آمنة",
-    "CLI & Tooling": "أدوات الطرفية والهندسة",
-    "Observability": "الرصد والمراقبة السحابية",
-    "Design System": "نظم التصميم الموحدة",
-    "Case Study": "دراسة حالة",
-  };
-
   const rawCategory = dbProject?.category || fallbackProject?.metaBar?.find(m => m.id === "category")?.value || "Case Study";
-  const category = isAr ? (CATEGORY_MAP_AR[rawCategory] || rawCategory) : rawCategory;
+  const category = getLocalizedProjectCategory(rawCategory, locale);
   const gradient = dbProject?.gradient || "from-zinc-900 via-neutral-900 to-zinc-950";
   const projectImage = dbProject?.image || dbProject?.coverImage || undefined;
   const liveDemoUrl = dbProject?.liveDemoUrl || undefined;

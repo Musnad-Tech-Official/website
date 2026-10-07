@@ -14,6 +14,7 @@ import { PageGuard } from "@/lib/page-control/guard";
 import { getArticlesAction } from "@/lib/articles/actions";
 import { getTeamMembersAction } from "@/lib/team/actions";
 import { getProjectsAction } from "@/lib/projects/actions";
+import { getLocalizedProjectCategory } from "@/lib/projects/types";
 import { getHomeTechnologiesAction } from "@/lib/technologies/actions";
 import { getTrustedCompaniesAction } from "@/lib/companies/actions";
 import { getTestimonialsAction } from "@/lib/testimonials/actions";
@@ -54,7 +55,7 @@ export default async function Page({ params }: HomePageProps) {
     slug: p.slug,
     title: isAr ? p.titleAr || p.titleEn : p.titleEn || p.titleAr,
     description: isAr ? p.descriptionAr || p.descriptionEn : p.descriptionEn || p.descriptionAr,
-    category: p.category,
+    category: getLocalizedProjectCategory(p.category, locale),
     year: p.year,
     featured: p.featured,
     liveDemo: Boolean(p.liveDemoUrl),
