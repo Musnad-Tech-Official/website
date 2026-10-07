@@ -20,6 +20,13 @@ export interface HowWeWorkStep {
   stepKey: string;
 }
 
+export const HOW_WE_WORK_STEPS: HowWeWorkStep[] = [
+  { id: "discovery", stepKey: "discovery" },
+  { id: "architecture", stepKey: "architecture" },
+  { id: "implementation", stepKey: "implementation" },
+  { id: "evolution", stepKey: "evolution" },
+];
+
 /**
  * Props for ServicesIntro component.
  */

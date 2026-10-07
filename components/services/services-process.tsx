@@ -1,6 +1,6 @@
 import { useTranslations } from "next-intl";
 import { Card } from "@/components/ui/card";
-import { HOW_WE_WORK_STEPS } from "./services-data";
+import { HOW_WE_WORK_STEPS } from "./services-types";
 import type { ServicesProcessProps } from "./services-types";
 import { cn } from "@/lib/utils";
 

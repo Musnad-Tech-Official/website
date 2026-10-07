@@ -1,4 +1,3 @@
-export * from "./home-types";
 export * from "./trusted-companies";
 export * from "./capabilities-section";
 export * from "./selected-projects";
