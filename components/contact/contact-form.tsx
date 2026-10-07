@@ -10,7 +10,7 @@ import { Select } from "@/components/ui/select";
 import { Card } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { submitInquiryAction } from "@/lib/inquiries/actions";
-import { uploadImageAction } from "@/lib/storage/actions";
+import { uploadInquiryAttachmentAction } from "@/lib/storage/actions";
 import {
   LuSend,
   LuPaperclip,
@@ -89,7 +89,7 @@ export function ContactForm({ className }: ContactFormProps) {
       try {
         const formData = new FormData();
         formData.append("file", attachment);
-        const uploadRes = await uploadImageAction(formData, "inquiry-attachments");
+        const uploadRes = await uploadInquiryAttachmentAction(formData);
         if (uploadRes.success && uploadRes.url) {
           attachmentUrl = uploadRes.url;
         }

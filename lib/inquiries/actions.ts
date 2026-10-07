@@ -1,11 +1,39 @@
 "use server";
 
+import fs from "fs";
+import path from "path";
 import { auth } from "@clerk/nextjs/server";
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/utils/supabase/server";
 import type { InquiryItem, SubmitInquiryInput, InquiryStatus } from "./types";
 
-let memoryInquiriesCache: InquiryItem[] = [];
+const DATA_DIR = path.join(process.cwd(), ".data");
+const INQUIRIES_FILE = path.join(DATA_DIR, "inquiries.json");
+
+function readDiskInquiries(): InquiryItem[] {
+  try {
+    if (fs.existsSync(INQUIRIES_FILE)) {
+      const content = fs.readFileSync(INQUIRIES_FILE, "utf-8");
+      return JSON.parse(content) as InquiryItem[];
+    }
+  } catch {
+    // Disk read fallback
+  }
+  return [];
+}
+
+function writeDiskInquiries(items: InquiryItem[]): void {
+  try {
+    if (!fs.existsSync(DATA_DIR)) {
+      fs.mkdirSync(DATA_DIR, { recursive: true });
+    }
+    fs.writeFileSync(INQUIRIES_FILE, JSON.stringify(items, null, 2), "utf-8");
+  } catch {
+    // Disk write fallback
+  }
+}
+
+let memoryInquiriesCache: InquiryItem[] = readDiskInquiries();
 let lastFetch = 0;
 const CACHE_TTL_MS = 30 * 1000;
 
@@ -117,7 +145,7 @@ export async function submitInquiryAction(input: SubmitInquiryInput): Promise<{
 
     try {
       const supabase = await createClient();
-      const { data, error } = await supabase
+      const { error } = await supabase
         .from("inquiries")
         .insert({
           id: newInquiry.id,
@@ -136,21 +164,17 @@ export async function submitInquiryAction(input: SubmitInquiryInput): Promise<{
           attachment_size: newInquiry.attachmentSize || null,
           status: newInquiry.status,
           user_id: newInquiry.userId || null,
-        })
-        .select()
-        .single();
+        });
 
-      if (!error && data) {
-        const created = mapRowToInquiry(data as unknown as InquiryDbRow);
-        memoryInquiriesCache = [created, ...memoryInquiriesCache];
-        revalidatePath("/[locale]/admin/inquiries", "page");
-        return { success: true, inquiryId: created.id };
+      if (error) {
+        console.warn("Supabase inquiry insert note (will use persistent fallback):", error.message);
       }
-    } catch {
-      // Fallback
+    } catch (dbErr) {
+      console.warn("Supabase inquiry insert exception (using persistent fallback):", dbErr);
     }
 
-    memoryInquiriesCache = [newInquiry, ...memoryInquiriesCache];
+    memoryInquiriesCache = [newInquiry, ...memoryInquiriesCache.filter((i) => i.id !== newInquiry.id)];
+    writeDiskInquiries(memoryInquiriesCache);
     revalidatePath("/[locale]/admin/inquiries", "page");
     return { success: true, inquiryId: newInquiry.id };
   } catch (err: unknown) {
@@ -165,8 +189,9 @@ export async function getInquiriesAction(status?: InquiryStatus): Promise<Inquir
   try {
     await verifyAdminAuth();
   } catch {
-    // If auth check fails in SSR context, return memory cache
-    return memoryInquiriesCache;
+    // If auth check fails in SSR context, return memory/disk cache
+    const current = memoryInquiriesCache.length > 0 ? memoryInquiriesCache : readDiskInquiries();
+    return status ? current.filter((i) => i.status === status) : current;
   }
 
   const now = Date.now();
@@ -187,12 +212,20 @@ export async function getInquiriesAction(status?: InquiryStatus): Promise<Inquir
 
     const { data, error } = await query;
     if (!error && data && data.length > 0) {
-      memoryInquiriesCache = (data as unknown as InquiryDbRow[]).map(mapRowToInquiry);
+      const dbInquiries = (data as unknown as InquiryDbRow[]).map(mapRowToInquiry);
+      memoryInquiriesCache = dbInquiries;
+      writeDiskInquiries(dbInquiries);
       lastFetch = now;
       return memoryInquiriesCache;
     }
   } catch (err) {
-    console.warn("Could not query inquiries from Supabase, using cache:", err);
+    console.warn("Could not query inquiries from Supabase, using persistent cache:", err);
+  }
+
+  // Fallback to disk persistence
+  const diskItems = readDiskInquiries();
+  if (diskItems.length > 0) {
+    memoryInquiriesCache = diskItems;
   }
 
   return status ? memoryInquiriesCache.filter((i) => i.status === status) : memoryInquiriesCache;
@@ -223,21 +256,12 @@ export async function updateInquiryStatusAction(
         updatePayload.admin_notes = adminNotes;
       }
 
-      const { data, error } = await supabase
+      await supabase
         .from("inquiries")
         .update(updatePayload)
-        .eq("id", id)
-        .select()
-        .single();
-
-      if (!error && data) {
-        const updated = mapRowToInquiry(data as unknown as InquiryDbRow);
-        memoryInquiriesCache = memoryInquiriesCache.map((i) => (i.id === id ? updated : i));
-        revalidatePath("/[locale]/admin/inquiries", "page");
-        return { success: true, data: updated };
-      }
+        .eq("id", id);
     } catch {
-      // In-memory
+      // Supabase table pending
     }
 
     memoryInquiriesCache = memoryInquiriesCache.map((i) => {
@@ -249,6 +273,7 @@ export async function updateInquiryStatusAction(
         updatedAt: new Date().toISOString(),
       };
     });
+    writeDiskInquiries(memoryInquiriesCache);
 
     const updated = memoryInquiriesCache.find((i) => i.id === id);
     revalidatePath("/[locale]/admin/inquiries", "page");
@@ -272,10 +297,11 @@ export async function deleteInquiryAction(id: string): Promise<{
       const supabase = await createClient();
       await supabase.from("inquiries").delete().eq("id", id);
     } catch {
-      // In-memory
+      // Supabase table pending
     }
 
     memoryInquiriesCache = memoryInquiriesCache.filter((i) => i.id !== id);
+    writeDiskInquiries(memoryInquiriesCache);
     revalidatePath("/[locale]/admin/inquiries", "page");
     return { success: true };
   } catch (err: unknown) {

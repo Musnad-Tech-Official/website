@@ -1,4 +1,5 @@
 import type { Project } from "../projects-types";
+import type { ArticleComment } from "@/lib/comments/types";
 
 export interface ProjectDetailBadge {
   label: string;
@@ -255,6 +256,9 @@ export interface ProjectDetailRatingProps {
 
 export interface ProjectDetailCommentsProps {
   title: string;
+  projectSlug?: string;
+  projectId?: string;
+  initialComments?: ArticleComment[];
   placeholder?: string;
   submitLabel?: string;
   replyLabel?: string;

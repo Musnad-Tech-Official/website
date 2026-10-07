@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { getProjectBySlugAction, getProjectsAction } from "@/lib/projects/actions";
+import { getArticleCommentsAction } from "@/lib/comments/actions";
 import { getLocalizedProjectCategory } from "@/lib/projects/types";
 import {
   ProjectDetailHeader,
@@ -136,6 +137,8 @@ export default async function ProjectDetailPage({
       clientName: p.clientName || undefined,
     }));
 
+  const initialComments = await getArticleCommentsAction(slug);
+
   return (
     <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 w-full flex-1">
       {/* 1. Clean Header with Category, Title, Short Description, Cover & Techs */}
@@ -183,18 +186,13 @@ export default async function ProjectDetailPage({
         <div id="project-discussion" className="mt-14 pt-10 border-t border-border/50 scroll-mt-24">
           <ProjectDetailComments
             title={isAr ? "مراجعات ونقاشات المشروع" : "Project Reviews & Discussion"}
+            projectSlug={slug}
+            projectId={dbProject.id}
+            initialComments={initialComments}
             placeholder={isAr ? "اكتب تعليقك أو مراجعتك حول هذا المشروع..." : "Write your review or comment on this project..."}
             submitLabel={isAr ? "نشر المراجعة" : "Post Review"}
             replyLabel={isAr ? "رد" : "Reply"}
-            emptyMessage={isAr ? "لا توجد مراجعات حتى الآن. شارك برأيك الأول!" : "No reviews yet. Be the first to share your thoughts!"}
-            items={[]}
-            eligibility={{
-              isAuthenticated: true,
-              hasVerifiedExperience: true,
-              canRate: true,
-              canComment: true,
-              reason: "eligible",
-            }}
+            emptyMessage={isAr ? "لا توجد مراجعات أو تعليقات حتى الآن. شارك برأيك الأول!" : "No reviews yet. Be the first to share your thoughts!"}
           />
         </div>
       </main>

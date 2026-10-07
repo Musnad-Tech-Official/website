@@ -399,17 +399,32 @@ export function AdminCommentsClient({
 
                     {/* Article Reference & Actions */}
                     <div className="flex flex-wrap items-center justify-between gap-3 pt-1">
-                      {/* Target article link */}
-                      <Link
-                        href={`/blog/${comment.articleSlug}`}
-                        target="_blank"
-                        className="inline-flex items-center gap-1.5 text-xs font-medium text-primary hover:underline underline-offset-2"
-                      >
-                        <LuExternalLink className="w-3.5 h-3.5" />
-                        <span className="font-mono text-[11px] truncate max-w-xs sm:max-w-md">
-                          /blog/{comment.articleSlug}
-                        </span>
-                      </Link>
+                      {/* Target article or project link */}
+                      {(() => {
+                        const isProject = [
+                          "naft-deploy",
+                          "musnad-cli",
+                          "wathq-observability",
+                          "hudhud-chat",
+                          "rakeen-portal",
+                          "sahim-analytics",
+                        ].includes(comment.articleSlug);
+                        const href = isProject
+                          ? `/projects/${comment.articleSlug}`
+                          : `/blog/${comment.articleSlug}`;
+                        return (
+                          <Link
+                            href={href}
+                            target="_blank"
+                            className="inline-flex items-center gap-1.5 text-xs font-medium text-primary hover:underline underline-offset-2"
+                          >
+                            <LuExternalLink className="w-3.5 h-3.5" />
+                            <span className="font-mono text-[11px] truncate max-w-xs sm:max-w-md">
+                              {href}
+                            </span>
+                          </Link>
+                        );
+                      })()}
 
                       {/* Moderation Action Buttons */}
                       <div className="flex items-center gap-2 ms-auto">
