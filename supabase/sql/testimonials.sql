@@ -128,5 +128,6 @@ ON CONFLICT (id) DO UPDATE SET
   quote_en = EXCLUDED.quote_en,
   quote_ar = EXCLUDED.quote_ar,
   initial = EXCLUDED.initial,
+  avatar_url = EXCLUDED.avatar_url,
   display_order = EXCLUDED.display_order,
   is_active = EXCLUDED.is_active;

@@ -41,6 +41,7 @@ export function TestimonialsSection({
     let author: string;
     let role: string;
     let initial: string;
+    let avatarUrl: string | undefined;
 
     if ("quoteAr" in item && "authorNameAr" in item) {
       const dynamicItem = item as TestimonialItem;
@@ -48,12 +49,14 @@ export function TestimonialsSection({
       author = isRtl ? dynamicItem.authorNameAr || dynamicItem.authorNameEn : dynamicItem.authorNameEn || dynamicItem.authorNameAr;
       role = isRtl ? dynamicItem.roleAr || dynamicItem.roleEn : dynamicItem.roleEn || dynamicItem.roleAr;
       initial = dynamicItem.initial || author.charAt(0).toUpperCase();
+      avatarUrl = dynamicItem.avatarUrl;
     } else {
       const legacyItem = item as (typeof TESTIMONIALS)[number];
       quote = t(`items.${legacyItem.itemKey}.quote`);
       author = t(`items.${legacyItem.itemKey}.author`);
       role = t(`items.${legacyItem.itemKey}.role`);
       initial = legacyItem.initial;
+      avatarUrl = "avatarUrl" in legacyItem ? (legacyItem as { avatarUrl?: string }).avatarUrl : undefined;
     }
 
     return (
@@ -88,6 +91,8 @@ export function TestimonialsSection({
         {/* Author Metadata with fully rounded Design System Avatar */}
         <div className="mt-6 pt-5 border-t border-border/60 flex items-center gap-3.5">
           <Avatar
+            src={avatarUrl}
+            alt={author}
             fallback={initial}
             size="md"
             shape="circle"

@@ -18,6 +18,7 @@ export interface TestimonialData {
   id: string;
   itemKey: string;
   initial: string;
+  avatarUrl?: string;
 }
 
 export interface InsightArticleData {

@@ -15,6 +15,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Avatar } from "@/components/ui/avatar";
+import { uploadImageAction } from "@/lib/storage/actions";
 import type { TestimonialItem, TestimonialFormData } from "@/lib/testimonials/types";
 import {
   LuQuote,
@@ -23,6 +24,9 @@ import {
   LuSparkles,
   LuUser,
   LuBuilding2,
+  LuUpload,
+  LuTrash2,
+  LuImage,
 } from "react-icons/lu";
 
 interface TestimonialEditorModalProps {
@@ -49,11 +53,14 @@ export function TestimonialEditorModal({
   const [quoteEn, setQuoteEn] = React.useState("");
   const [quoteAr, setQuoteAr] = React.useState("");
   const [initial, setInitial] = React.useState("");
+  const [avatarUrl, setAvatarUrl] = React.useState("");
   const [displayOrder, setDisplayOrder] = React.useState(0);
   const [isActive, setIsActive] = React.useState(true);
 
   const [isSaving, setIsSaving] = React.useState(false);
+  const [isUploading, setIsUploading] = React.useState(false);
   const [errorAlert, setErrorAlert] = React.useState<string | null>(null);
+  const fileInputRef = React.useRef<HTMLInputElement | null>(null);
 
   React.useEffect(() => {
     if (testimonial) {
@@ -64,6 +71,7 @@ export function TestimonialEditorModal({
       setQuoteEn(testimonial.quoteEn);
       setQuoteAr(testimonial.quoteAr);
       setInitial(testimonial.initial);
+      setAvatarUrl(testimonial.avatarUrl || "");
       setDisplayOrder(testimonial.displayOrder);
       setIsActive(testimonial.isActive);
     } else {
@@ -74,11 +82,44 @@ export function TestimonialEditorModal({
       setQuoteEn("");
       setQuoteAr("");
       setInitial("");
+      setAvatarUrl("");
       setDisplayOrder(0);
       setIsActive(true);
     }
     setErrorAlert(null);
   }, [testimonial, isOpen]);
+
+  const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsUploading(true);
+    setErrorAlert(null);
+
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const res = await uploadImageAction(formData, "article-media");
+      if (res.success && res.url) {
+        setAvatarUrl(res.url);
+      } else {
+        setErrorAlert(
+          res.error || (isRtl ? "فشل رفع صورة العميل." : "Failed to upload avatar image.")
+        );
+      }
+    } catch (err: unknown) {
+      setErrorAlert(
+        (err as Error).message ||
+          (isRtl ? "حدث خطأ أثناء رفع الصورة." : "Upload error occurred.")
+      );
+    } finally {
+      setIsUploading(false);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
+    }
+  };
 
   const handleSubmit = async () => {
     if (!authorNameEn.trim() || !authorNameAr.trim()) {
@@ -116,6 +157,7 @@ export function TestimonialEditorModal({
       quoteEn: quoteEn.trim(),
       quoteAr: quoteAr.trim(),
       initial: computedInitial,
+      avatarUrl: avatarUrl.trim() || undefined,
       displayOrder: Number(displayOrder) || 0,
       isActive,
     };
@@ -179,6 +221,8 @@ export function TestimonialEditorModal({
               </p>
               <div className="flex items-center gap-3 pt-3 border-t border-border/60">
                 <Avatar
+                  src={avatarUrl.trim() || undefined}
+                  alt={previewAuthor}
                   fallback={previewInitial}
                   size="md"
                   shape="circle"
@@ -266,6 +310,102 @@ export function TestimonialEditorModal({
             </div>
           </div>
 
+          {/* Avatar Image Upload & Management */}
+          <div className="p-4 rounded-xl border border-border/60 bg-muted/20 space-y-3">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-bold text-foreground flex items-center gap-1.5">
+                <LuImage className="h-3.5 w-3.5 text-primary" />
+                {isRtl ? "صورة العميل الرمزية (Avatar Photo)" : "Client Avatar Photo"}
+              </span>
+              <span className="text-[11px] text-muted-foreground">
+                {isRtl ? "اختياري — رفع ملف أو رابط مباشر" : "Optional — Upload file or direct URL"}
+              </span>
+            </div>
+
+            <div className="flex flex-col sm:flex-row items-center gap-4">
+              <div className="relative group shrink-0">
+                <Avatar
+                  src={avatarUrl.trim() || undefined}
+                  alt={previewAuthor}
+                  fallback={previewInitial}
+                  size="lg"
+                  shape="circle"
+                  className="h-16 w-16 rounded-full border-2 border-primary/30 shadow-xs bg-muted font-bold text-lg"
+                />
+              </div>
+
+              <div className="flex-1 w-full space-y-2">
+                <div className="flex flex-wrap items-center gap-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={isUploading || isSaving}
+                    className="h-8 text-xs gap-1.5 cursor-pointer shadow-2xs"
+                  >
+                    {isUploading ? (
+                      <LuLoader className="h-3.5 w-3.5 animate-spin" />
+                    ) : (
+                      <LuUpload className="h-3.5 w-3.5" />
+                    )}
+                    <span>
+                      {isUploading
+                        ? isRtl
+                          ? "جارٍ الرفع..."
+                          : "Uploading..."
+                        : avatarUrl
+                        ? isRtl
+                          ? "تغيير الصورة"
+                          : "Change Avatar"
+                        : isRtl
+                        ? "رفع صورة العميل"
+                        : "Upload Avatar"}
+                    </span>
+                  </Button>
+
+                  {avatarUrl && (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setAvatarUrl("")}
+                      disabled={isUploading || isSaving}
+                      className="h-8 text-xs text-destructive hover:text-destructive hover:bg-destructive/10 gap-1 cursor-pointer"
+                    >
+                      <LuTrash2 className="h-3.5 w-3.5" />
+                      <span>{isRtl ? "إزالة الصورة" : "Remove"}</span>
+                    </Button>
+                  )}
+                </div>
+
+                <div className="relative">
+                  <Input
+                    value={avatarUrl}
+                    onChange={(e) => setAvatarUrl(e.target.value)}
+                    placeholder={
+                      isRtl
+                        ? "أو الصق رابط صورة خارجي (https://...)"
+                        : "Or paste direct image URL (https://...)"
+                    }
+                    className="h-8 text-xs font-mono"
+                    dir="ltr"
+                    disabled={isUploading || isSaving}
+                  />
+                </div>
+              </div>
+            </div>
+
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/png,image/jpeg,image/webp,image/gif,image/svg+xml"
+              onChange={handleAvatarUpload}
+              disabled={isUploading || isSaving}
+              className="hidden"
+            />
+          </div>
+
           {/* Meta & Toggles */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
             <div className="space-y-1.5">
@@ -309,10 +449,10 @@ export function TestimonialEditorModal({
         </div>
 
         <DialogFooter className="p-4 sm:p-6 pt-3 border-t border-border/40 gap-2 bg-muted/10">
-          <Button type="button" variant="ghost" size="sm" onClick={onClose} disabled={isSaving}>
+          <Button type="button" variant="ghost" size="sm" onClick={onClose} disabled={isSaving || isUploading}>
             {isRtl ? "إلغاء" : "Cancel"}
           </Button>
-          <Button type="button" size="sm" onClick={handleSubmit} disabled={isSaving} className="gap-2 min-w-28">
+          <Button type="button" size="sm" onClick={handleSubmit} disabled={isSaving || isUploading} className="gap-2 min-w-28">
             {isSaving ? (
               <LuLoader className="h-3.5 w-3.5 animate-spin" />
             ) : (

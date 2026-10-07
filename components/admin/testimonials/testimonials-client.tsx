@@ -353,6 +353,8 @@ export function TestimonialsClient({
             <div className="pt-4 border-t border-border/60 flex items-center justify-between gap-2">
               <div className="flex items-center gap-2.5 min-w-0">
                 <Avatar
+                  src={item.avatarUrl}
+                  alt={isRtl ? item.authorNameAr : item.authorNameEn}
                   fallback={item.initial}
                   size="sm"
                   shape="circle"
