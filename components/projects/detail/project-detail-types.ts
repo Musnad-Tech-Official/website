@@ -46,6 +46,8 @@ export interface ProjectDetailHeaderProps {
   year?: string;
   liveDemoUrl?: string;
   githubUrl?: string;
+  liveDemoLabel?: string;
+  repositoryLabel?: string;
   technologies?: string[];
   className?: string;
 }

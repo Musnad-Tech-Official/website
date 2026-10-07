@@ -78,7 +78,18 @@ export default async function ProjectDetailPage({
       : dbProject.contentHtmlEn || dbProject.contentHtmlAr
     : null;
 
-  const category = dbProject?.category || fallbackProject?.metaBar?.find(m => m.id === "category")?.value || "Case Study";
+  const CATEGORY_MAP_AR: Record<string, string> = {
+    "Fintech Platform": "منصة تقنية مالية",
+    "Developer Tool": "أداة تطوير ونشر",
+    "Client Portal": "بوابة عملاء آمنة",
+    "CLI & Tooling": "أدوات الطرفية والهندسة",
+    "Observability": "الرصد والمراقبة السحابية",
+    "Design System": "نظم التصميم الموحدة",
+    "Case Study": "دراسة حالة",
+  };
+
+  const rawCategory = dbProject?.category || fallbackProject?.metaBar?.find(m => m.id === "category")?.value || "Case Study";
+  const category = isAr ? (CATEGORY_MAP_AR[rawCategory] || rawCategory) : rawCategory;
   const gradient = dbProject?.gradient || "from-zinc-900 via-neutral-900 to-zinc-950";
   const projectImage = dbProject?.image || dbProject?.coverImage || undefined;
   const liveDemoUrl = dbProject?.liveDemoUrl || undefined;
@@ -122,6 +133,8 @@ export default async function ProjectDetailPage({
         gradient={gradient}
         liveDemoUrl={liveDemoUrl}
         githubUrl={githubUrl}
+        liveDemoLabel={t("actions.liveDemo")}
+        repositoryLabel={t("actions.repository")}
         technologies={technologies}
         homeLabel={t("breadcrumb.home")}
         projectsLabel={t("breadcrumb.projects")}

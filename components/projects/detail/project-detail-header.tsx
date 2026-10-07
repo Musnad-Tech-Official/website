@@ -20,6 +20,8 @@ export function ProjectDetailHeader({
   category,
   liveDemoUrl,
   githubUrl,
+  liveDemoLabel,
+  repositoryLabel,
   technologies,
   className = "",
 }: ProjectDetailHeaderProps) {
@@ -89,7 +91,7 @@ export function ProjectDetailHeader({
               size="lg"
               className="gap-2 shadow-lg shadow-primary/20"
             >
-              <span>Live Demonstration</span>
+              <span>{liveDemoLabel || "Live Demonstration"}</span>
               <LuExternalLink className="h-4 w-4" />
             </Button>
           </a>
@@ -104,7 +106,7 @@ export function ProjectDetailHeader({
           >
             <Button variant="outline" size="lg" className="gap-2">
               <FaGithub className="h-4 w-4" />
-              <span>Repository</span>
+              <span>{repositoryLabel || "Repository"}</span>
             </Button>
           </a>
         )}

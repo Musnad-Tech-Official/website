@@ -814,6 +814,11 @@
       "projects": "Projects",
       "label": "Breadcrumbs"
     },
+    "actions": {
+      "liveDemo": "Live Demonstration",
+      "livePreview": "Live Preview",
+      "repository": "Repository"
+    },
     "meta": {
       "titleTemplate": "{title} — Musnad Tech",
       "defaultDescription": "Explore project case studies from Musnad Tech."

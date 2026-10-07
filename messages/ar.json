@@ -814,6 +814,11 @@
       "projects": "مشاريعنا",
       "label": "مسار التنقل"
     },
+    "actions": {
+      "liveDemo": "المعاينة الحية",
+      "livePreview": "المعاينة الحية",
+      "repository": "المستودع البرمجي"
+    },
     "meta": {
       "titleTemplate": "{title} — مسند للتقنية",
       "defaultDescription": "استعرض دراسات المشاريع التقنية من مسند للتقنية."
