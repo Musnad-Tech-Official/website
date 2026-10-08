@@ -844,6 +844,14 @@
       "defaultDescription": "Explore project case studies from Musnad Tech."
     },
     "relatedProjects": "Related projects",
+    "related": {
+      "title": "Related Projects"
+    },
+    "cta": {
+      "title": "Have a similar technical initiative in mind?",
+      "description": "Partner with our specialized engineering teams to architect, build, and deploy production-grade software.",
+      "buttonText": "Start a project inquiry"
+    },
     "gallery": {
       "previewPrefix": "Preview"
     },

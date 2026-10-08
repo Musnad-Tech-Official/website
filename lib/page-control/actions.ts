@@ -81,12 +81,12 @@ export async function getPageControlsAction(): Promise<PageControlItem[]> {
         if (!row) return inv;
         return {
           ...inv,
-          status: (row.status as PageStatus) || inv.status,
+          status: inv.isProtected ? "live" : ((row.status as PageStatus) || inv.status),
           showInNavbar: row.show_in_navbar ?? inv.showInNavbar,
           showInFooter: row.show_in_footer ?? inv.showInFooter,
           maintenanceNoticeEn: row.maintenance_notice_en || inv.maintenanceNoticeEn,
           maintenanceNoticeAr: row.maintenance_notice_ar || inv.maintenanceNoticeAr,
-          isProtected: row.is_protected ?? inv.isProtected ?? false,
+          isProtected: inv.isProtected || (row.is_protected ?? false),
           updatedAt: row.updated_at,
           updatedBy: row.updated_by,
         };

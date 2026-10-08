@@ -21,10 +21,10 @@ export interface HowWeWorkStep {
 }
 
 export const HOW_WE_WORK_STEPS: HowWeWorkStep[] = [
-  { id: "discovery", stepKey: "discovery" },
-  { id: "architecture", stepKey: "architecture" },
-  { id: "implementation", stepKey: "implementation" },
-  { id: "evolution", stepKey: "evolution" },
+  { id: "discovery", stepKey: "step1" },
+  { id: "architecture", stepKey: "step2" },
+  { id: "implementation", stepKey: "step3" },
+  { id: "evolution", stepKey: "step4" },
 ];
 
 /**

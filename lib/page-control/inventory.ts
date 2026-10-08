@@ -28,6 +28,7 @@ export const MASTER_PAGE_INVENTORY: PageControlItem[] = [
     status: "live",
     showInNavbar: true,
     showInFooter: true,
+    isProtected: true,
     maintenanceNoticeEn: "We are currently updating our company profile and story.",
     maintenanceNoticeAr: "نقوم حالياً بتحديث الملف التعريفي وقصة الشركة.",
   },
