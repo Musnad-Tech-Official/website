@@ -69,3 +69,23 @@ export async function subscribeNewsletterAction(
     };
   }
 }
+
+/**
+ * Returns the count of newsletter subscribers for admin telemetry.
+ */
+export async function getNewsletterSubscribersCountAction(): Promise<number> {
+  try {
+    const supabase = await createClient();
+    const { count, error } = await supabase
+      .from("newsletter_subscribers")
+      .select("*", { count: "exact", head: true });
+
+    if (error || count === null) {
+      return fallbackSubscribers.size;
+    }
+    return count;
+  } catch {
+    return fallbackSubscribers.size;
+  }
+}
+

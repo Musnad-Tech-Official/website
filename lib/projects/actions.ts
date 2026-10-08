@@ -1,6 +1,6 @@
 "use server";
 
-import { auth, currentUser } from "@clerk/nextjs/server";
+import { auth } from "@clerk/nextjs/server";
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/utils/supabase/server";
 import type { Project, ProjectFormData, ProjectStatus } from "./types";
@@ -161,8 +161,7 @@ export async function saveProjectAction(
   formData: ProjectFormData
 ): Promise<{ success: boolean; project?: Project; error?: string }> {
   try {
-    const user = await currentUser();
-    const adminId = user?.id || (await verifyAdminAuth());
+    const adminId = await verifyAdminAuth();
     const now = new Date().toISOString();
 
     const cleanSlug = (formData.slug || formData.titleEn)

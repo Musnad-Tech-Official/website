@@ -141,7 +141,7 @@ export async function saveArticleAction(
 ): Promise<{ success: boolean; article?: Article; error?: string }> {
   try {
     const user = await currentUser();
-    const adminId = user?.id || (await verifyAdminAuth());
+    const adminId = await verifyAdminAuth();
     const now = new Date().toISOString();
 
     // Automatically resolve author name, avatar and role from the current Clerk user
