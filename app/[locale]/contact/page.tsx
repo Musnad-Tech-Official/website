@@ -1,3 +1,6 @@
+import { getPageMetadata } from "@/lib/seo/page-metadata";
+import { localizedUrl } from "@/lib/seo/config";
+import { breadcrumbsJsonLd, contactPageJsonLd, organizationJsonLd, serializeJsonLd } from "@/lib/seo/structured-data";
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { getContactInfo } from "@/data/contact";
@@ -18,10 +21,12 @@ export async function generateMetadata({
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "Contact.meta" });
 
-  return {
+  return getPageMetadata({
+    locale,
+    path: "/contact",
     title: t("title"),
     description: t("description"),
-  };
+  });
 }
 
 export default async function ContactPage({ params }: ContactPageProps) {
@@ -32,6 +37,17 @@ export default async function ContactPage({ params }: ContactPageProps) {
 
   return (
     <PageGuard slug="contact" locale={locale}>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd({
+        "@context": "https://schema.org",
+        "@graph": [
+          organizationJsonLd(),
+          contactPageJsonLd(locale),
+          breadcrumbsJsonLd([
+            { name: tBreadcrumb("home"), url: localizedUrl(locale, "/") },
+            { name: tBreadcrumb("contact"), url: localizedUrl(locale, "/contact") },
+          ]),
+        ],
+      }) }} />
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 w-full flex-1 pb-16 sm:pb-24 lg:pb-32">
       {/* 1. Page Header with Breadcrumbs, Eyebrow, Title & Subtitle */}
       <ContactHeader

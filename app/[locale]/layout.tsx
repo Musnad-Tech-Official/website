@@ -7,7 +7,7 @@ import { Footer } from "@/components/footer";
 import { NavbarUtilities } from "@/components/navbar-utilities";
 import { getActiveAnnouncementAction } from "@/lib/announcements/actions";
 import { NextIntlClientProvider, hasLocale } from "next-intl";
-import { getMessages } from "next-intl/server";
+import { getMessages, getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { routing } from "@/i18n/routing";
 import { ClerkProvider } from "@clerk/nextjs";
@@ -15,6 +15,7 @@ import { auth } from "@clerk/nextjs/server";
 import { headers } from "next/headers";
 import { getPageControlsAction } from "@/lib/page-control/actions";
 import { QueryProvider } from "@/components/providers/query-provider";
+import { getSiteUrl, isSiteIndexable } from "@/lib/seo/config";
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -32,10 +33,44 @@ const tajawal = Tajawal({
   fallback: ["system-ui", "-apple-system", "BlinkMacSystemFont", "Segoe UI", "sans-serif"],
 });
 
-export const metadata: Metadata = {
-  title: "Musnad Tech",
-  description: "Empowering Next-Generation Digital Experiences",
-};
+export async function generateMetadata({ params }: LocaleLayoutProps): Promise<Metadata> {
+  const { locale } = await params;
+  if (!hasLocale(routing.locales, locale)) notFound();
+  const t = await getTranslations({ locale, namespace: "SEO" });
+  const keywordsStr = t("keywords");
+  const keywords = keywordsStr ? keywordsStr.split(/[,،]/).map((k) => k.trim()).filter(Boolean) : undefined;
+  return {
+    metadataBase: getSiteUrl(),
+    title: { default: t("homeTitle"), template: "%s | Musnad Tech" },
+    description: t("homeDescription"),
+    keywords,
+    applicationName: "Musnad Tech",
+    authors: [{ name: "Musnad Tech", url: getSiteUrl().origin }],
+    creator: "Musnad Tech",
+    publisher: "Musnad Tech",
+    formatDetection: { email: false, address: false, telephone: false },
+    manifest: "/manifest.webmanifest",
+    icons: {
+      icon: [{ url: "/favicon.ico", sizes: "any" }],
+      apple: [{ url: "/brand/logo-light.png", sizes: "180x180", type: "image/png" }],
+    },
+    verification: {
+      google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION || undefined,
+      yandex: process.env.NEXT_PUBLIC_YANDEX_VERIFICATION || undefined,
+    },
+    robots: {
+      index: isSiteIndexable(),
+      follow: true,
+      googleBot: isSiteIndexable() ? {
+        index: true,
+        follow: true,
+        "max-image-preview": "large",
+        "max-snippet": -1,
+        "max-video-preview": -1,
+      } : { index: false, follow: true },
+    },
+  };
+}
 
 export const viewport: Viewport = {
   themeColor: [

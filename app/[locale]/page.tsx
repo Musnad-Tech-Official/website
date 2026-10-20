@@ -19,9 +19,18 @@ import { getHomeTechnologiesAction } from "@/lib/technologies/actions";
 import { getTrustedCompaniesAction } from "@/lib/companies/actions";
 import { getTestimonialsAction } from "@/lib/testimonials/actions";
 import { getHomeServicesAction } from "@/lib/services/actions";
+import { getTranslations } from "next-intl/server";
+import { getPageMetadata } from "@/lib/seo/page-metadata";
+import { organizationJsonLd, serializeJsonLd, websiteJsonLd } from "@/lib/seo/structured-data";
 
 interface HomePageProps {
   params: Promise<{ locale: string }>;
+}
+
+export async function generateMetadata({ params }: HomePageProps) {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "SEO" });
+  return getPageMetadata({ locale, path: "/", title: t("homeTitle"), description: t("homeDescription") });
 }
 
 export default async function Page({ params }: HomePageProps) {
@@ -79,6 +88,10 @@ export default async function Page({ params }: HomePageProps) {
 
   return (
     <PageGuard slug="home" locale={locale}>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd({
+        "@context": "https://schema.org",
+        "@graph": [organizationJsonLd(), websiteJsonLd(locale)],
+      }) }} />
       <div className="w-full bg-background text-foreground selection:bg-primary/20 selection:text-primary">
         {/* Hero (Pre-existing, untouched) */}
         <HeroSection />

@@ -9,6 +9,8 @@ import { JobNiceToHave } from "./job-nice-to-have";
 import { JobApplicationForm } from "./job-application-form";
 import { OtherOpenPositions } from "./other-open-positions";
 import type { JobDetailTemplateProps } from "./job-detail-types";
+import { localizedUrl } from "@/lib/seo/config";
+import { breadcrumbsJsonLd, jobPostingJsonLd, organizationJsonLd, serializeJsonLd } from "@/lib/seo/structured-data";
 
 export async function JobDetailTemplate({
   slug,
@@ -32,6 +34,26 @@ export async function JobDetailTemplate({
 
   return (
     <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 w-full flex-1">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd({
+        "@context": "https://schema.org",
+        "@graph": [
+          organizationJsonLd(),
+          jobPostingJsonLd({
+            title: jobTitle,
+            description: subtitle,
+            department: tPositions(`departments.${config.department}`),
+            employmentType: config.workTypeKey === "fullTime" ? "FULL_TIME" : "CONTRACTOR",
+            location: tPositions(`locations.${config.locationKey}`),
+            datePosted: "2026-01-01",
+            validThrough: config.deadlineEn,
+          }, locale),
+          breadcrumbsJsonLd([
+            { name: t("common.breadcrumb.home"), url: localizedUrl(locale, "/") },
+            { name: t("common.breadcrumb.careers"), url: localizedUrl(locale, "/careers") },
+            { name: jobTitle, url: localizedUrl(locale, `/careers/${slug}`) },
+          ]),
+        ],
+      }) }} />
       {/* 1. Header with Breadcrumb and Meta Badges */}
       <JobDetailIntro
         homeLabel={t("common.breadcrumb.home")}

@@ -1,3 +1,4 @@
+import { getPageMetadata } from "@/lib/seo/page-metadata";
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { JobDetailTemplate } from "@/components/careers/detail";
@@ -15,10 +16,12 @@ export async function generateMetadata({
     namespace: "JobDetail.seniorBackendEngineer",
   });
 
-  return {
+  return getPageMetadata({
+    locale,
+    path: "/careers/senior-backend-engineer",
     title: `${t("title")} — Musnad Tech`,
     description: t("subtitle"),
-  };
+  });
 }
 
 export default async function SeniorBackendEngineerPage({

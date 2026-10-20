@@ -3,7 +3,7 @@ import { notFound, redirect } from "next/navigation";
 import { AdminShell } from "@/components/admin/layout/admin-shell";
 
 export const metadata = {
-  title: "Admin Portal | Musnad Tech",
+  title: { absolute: "Admin Portal | Musnad Tech" },
   description: "Musnad Tech Administrative Cockpit and Operations Center",
   robots: {
     index: false,

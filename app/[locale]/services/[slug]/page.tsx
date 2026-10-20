@@ -1,5 +1,8 @@
 import * as React from "react";
 import type { Metadata } from "next";
+import { getPageMetadata } from "@/lib/seo/page-metadata";
+import { localizedUrl } from "@/lib/seo/config";
+import { breadcrumbsJsonLd, organizationJsonLd, serializeJsonLd, serviceJsonLd } from "@/lib/seo/structured-data";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { getServiceBySlugAction } from "@/lib/services/actions";
@@ -25,9 +28,7 @@ export async function generateMetadata({
   const service = await getServiceBySlugAction(slug);
 
   if (!service || !service.isActive) {
-    return {
-      title: "Service Not Found — Musnad Tech",
-    };
+    notFound();
   }
 
   const isAr = locale === "ar";
@@ -36,10 +37,12 @@ export async function generateMetadata({
     ? service.descriptionAr || service.descriptionEn
     : service.descriptionEn;
 
-  return {
+  return getPageMetadata({
+    locale,
+    path: `/services/${encodeURIComponent(service.slug)}`,
     title: `${title} — Musnad Tech`,
     description,
-  };
+  });
 }
 
 export default async function DynamicServicePage({
@@ -86,6 +89,20 @@ export default async function DynamicServicePage({
 
   return (
     <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 w-full flex-1 pb-16">
+      {service.isActive && (
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd({
+          "@context": "https://schema.org",
+          "@graph": [
+            organizationJsonLd(),
+            serviceJsonLd(service, locale),
+            breadcrumbsJsonLd([
+              { name: tCommon("breadcrumb.home"), url: localizedUrl(locale, "/") },
+              { name: tCommon("breadcrumb.services"), url: localizedUrl(locale, "/services") },
+              { name: title, url: localizedUrl(locale, `/services/${encodeURIComponent(service.slug)}`) },
+            ]),
+          ],
+        }) }} />
+      )}
       {/* 1. Header & Breadcrumbs */}
       <ServiceDetailIntro
         eyebrow={isAr ? "القدرات والخدمات الهندسية" : "Engineering Capability"}

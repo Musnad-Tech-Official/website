@@ -1,4 +1,10 @@
 import { createClient } from "@/utils/supabase/server";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: { absolute: "Todos | Musnad Tech" },
+  robots: { index: false, follow: false },
+};
 
 export default async function Page() {
   const supabase = await createClient();
