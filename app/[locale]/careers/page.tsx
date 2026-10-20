@@ -1,3 +1,4 @@
+import { getPageMetadata } from "@/lib/seo/page-metadata";
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { CAREER_VALUES, JOB_POSITIONS } from "@/data/careers";
@@ -19,10 +20,12 @@ export async function generateMetadata({
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "Careers" });
 
-  return {
+  return getPageMetadata({
+    locale,
+    path: "/careers",
     title: t("metaTitle"),
     description: t("metaDescription"),
-  };
+  });
 }
 
 export default async function CareersPage({ params }: CareersPageProps) {

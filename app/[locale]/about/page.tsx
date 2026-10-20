@@ -1,3 +1,6 @@
+import { getPageMetadata } from "@/lib/seo/page-metadata";
+import { localizedUrl } from "@/lib/seo/config";
+import { aboutPageJsonLd, breadcrumbsJsonLd, organizationJsonLd, serializeJsonLd } from "@/lib/seo/structured-data";
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import {
@@ -21,10 +24,12 @@ export async function generateMetadata({
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "About" });
 
-  return {
+  return getPageMetadata({
+    locale,
+    path: "/about",
     title: t("metaTitle"),
     description: t("metaDescription"),
-  };
+  });
 }
 
 export default async function AboutPage({ params }: AboutPageProps) {
@@ -32,6 +37,17 @@ export default async function AboutPage({ params }: AboutPageProps) {
 
   return (
     <PageGuard slug="about" locale={locale}>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd({
+        "@context": "https://schema.org",
+        "@graph": [
+          organizationJsonLd(),
+          aboutPageJsonLd(locale),
+          breadcrumbsJsonLd([
+            { name: locale === "ar" ? "الرئيسية" : "Home", url: localizedUrl(locale, "/") },
+            { name: locale === "ar" ? "من نحن" : "About Us", url: localizedUrl(locale, "/about") },
+          ]),
+        ],
+      }) }} />
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 w-full flex-1 space-y-16 sm:space-y-24 lg:space-y-28 py-4 sm:py-6 lg:py-8">
         {/* 1. About Intro / Page Hero */}
       <AboutIntro />

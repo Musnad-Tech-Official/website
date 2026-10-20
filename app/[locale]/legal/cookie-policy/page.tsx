@@ -1,3 +1,4 @@
+import { getPageMetadata } from "@/lib/seo/page-metadata";
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { LegalPageTemplate, getCookiePolicyData } from "@/components/legal";
@@ -12,10 +13,12 @@ export async function generateMetadata({
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "Legal.cookiePolicy" });
 
-  return {
+  return getPageMetadata({
+    locale,
+    path: "/legal/cookie-policy",
     title: t("metaTitle"),
     description: t("metaDescription"),
-  };
+  });
 }
 
 export default async function CookiePolicyPage({

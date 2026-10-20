@@ -1,6 +1,9 @@
 /* eslint-disable @next/next/no-img-element */
 import * as React from "react";
 import type { Metadata } from "next";
+import { getPageMetadata } from "@/lib/seo/page-metadata";
+import { localizedUrl } from "@/lib/seo/config";
+import { breadcrumbsJsonLd, organizationJsonLd, personJsonLd, serializeJsonLd } from "@/lib/seo/structured-data";
 import { notFound } from "next/navigation";
 import { Link } from "@/i18n/routing";
 import { Card } from "@/components/ui/card";
@@ -36,10 +39,8 @@ export async function generateMetadata({
   const { locale, slug } = await params;
   const member = await getTeamMemberBySlugAction(slug);
 
-  if (!member) {
-    return {
-      title: "Team Member Not Found — Musnad Tech",
-    };
+  if (!member || !member.isActive) {
+    notFound();
   }
 
   const isRtl = locale === "ar";
@@ -47,10 +48,13 @@ export async function generateMetadata({
   const role = isRtl ? member.roleAr : member.roleEn;
   const bio = isRtl ? member.bioAr : member.bioEn;
 
-  return {
+  return getPageMetadata({
+    locale,
+    path: `/team/${encodeURIComponent(member.slug)}`,
     title: `${name} — ${role} — Musnad Tech`,
     description: bio || `${name} is ${role} at Musnad Tech.`,
-  };
+    image: member.image,
+  });
 }
 
 export default async function TeamMemberDetailPage({
@@ -75,6 +79,20 @@ export default async function TeamMemberDetailPage({
 
   return (
     <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 w-full flex-1 pb-16 pt-8 sm:pt-12 animate-in fade-in-50 duration-300">
+      {member.isActive && (
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd({
+          "@context": "https://schema.org",
+          "@graph": [
+            organizationJsonLd(),
+            personJsonLd(member, locale),
+            breadcrumbsJsonLd([
+              { name: isRtl ? "الرئيسية" : "Home", url: localizedUrl(locale, "/") },
+              { name: isRtl ? "الفريق" : "Team", url: localizedUrl(locale, "/team") },
+              { name: displayName, url: localizedUrl(locale, `/team/${encodeURIComponent(member.slug)}`) },
+            ]),
+          ],
+        }) }} />
+      )}
       {/* 1. Breadcrumbs & Back Navigation */}
       <div className="flex flex-wrap items-center justify-between gap-4 mb-8">
         <nav aria-label="Breadcrumb">

@@ -1,3 +1,4 @@
+import { getPageMetadata } from "@/lib/seo/page-metadata";
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import type { BlogArticle } from "@/components/blog/blog-types";
@@ -19,10 +20,12 @@ export async function generateMetadata({
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "Blog" });
 
-  return {
+  return getPageMetadata({
+    locale,
+    path: "/blog",
     title: t("meta.title"),
     description: t("meta.description"),
-  };
+  });
 }
 
 export default async function BlogPage({ params }: BlogPageProps) {

@@ -1,3 +1,6 @@
+import { getPageMetadata } from "@/lib/seo/page-metadata";
+import { localizedUrl } from "@/lib/seo/config";
+import { breadcrumbsJsonLd, faqJsonLd, organizationJsonLd, serializeJsonLd } from "@/lib/seo/structured-data";
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import {
@@ -18,19 +21,34 @@ export async function generateMetadata({
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "Faq" });
 
-  return {
+  return getPageMetadata({
+    locale,
+    path: "/faq",
     title: t("metaTitle"),
     description: t("metaDescription"),
-  };
+  });
 }
 
 export default async function FaqPage({ params }: FaqPageProps) {
   const { locale } = await params;
+  const isAr = locale === "ar";
   const t = await getTranslations({ locale, namespace: "Faq" });
   const faqData = getFaqData((key) => t(key));
+  const allFaqItems = faqData.topicGroups.flatMap((group) => group.items);
 
   return (
     <PageGuard slug="faq" locale={locale}>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd({
+        "@context": "https://schema.org",
+        "@graph": [
+          organizationJsonLd(),
+          faqJsonLd(allFaqItems),
+          breadcrumbsJsonLd([
+            { name: isAr ? "الرئيسية" : "Home", url: localizedUrl(locale, "/") },
+            { name: t("title"), url: localizedUrl(locale, "/faq") },
+          ]),
+        ],
+      }) }} />
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 w-full flex-1 pb-16 sm:pb-24">
         {/* 1. Page Header & Intro */}
         <FaqIntro />

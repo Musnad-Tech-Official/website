@@ -1,3 +1,4 @@
+import { getPageMetadata } from "@/lib/seo/page-metadata";
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { getProjectsAction } from "@/lib/projects/actions";
@@ -19,10 +20,12 @@ export async function generateMetadata({
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "Projects" });
 
-  return {
+  return getPageMetadata({
+    locale,
+    path: "/projects",
     title: t("metaTitle"),
     description: t("metaDescription"),
-  };
+  });
 }
 
 export default async function ProjectsPage({ params }: ProjectsPageProps) {

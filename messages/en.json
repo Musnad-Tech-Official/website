@@ -1,4 +1,13 @@
 {
+  "SEO": {
+    "homeTitle": "Musnad Tech | Software Engineering, Platforms & AI",
+    "homeDescription": "Musnad Tech builds software products, scalable platforms, data solutions, and AI integrations. Explore our services, projects, and engineering insights.",
+    "signInTitle": "Sign In",
+    "signUpTitle": "Create an Account",
+    "socialTitle": "Engineering digital experiences.",
+    "socialDescription": "Software · Platforms · Data · AI",
+    "keywords": "Software Engineering, AI Solutions, Scalable Platforms, Data Engineering, Web Development, Cloud Architecture, Musnad Tech"
+  },
   "Brand": {
     "name": "Musnad Tech",
     "tagline": "Empowering Next-Generation Digital Experiences"

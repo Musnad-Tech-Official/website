@@ -1,4 +1,8 @@
 import type { Metadata } from "next";
+import { cache } from "react";
+import { getPageMetadata } from "@/lib/seo/page-metadata";
+import { localizedUrl } from "@/lib/seo/config";
+import { articleJsonLd, breadcrumbsJsonLd, organizationJsonLd, serializeJsonLd } from "@/lib/seo/structured-data";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import type { ArticleDetailData } from "@/components/blog/detail/article-detail-types";
@@ -18,6 +22,8 @@ import {
 interface ArticleDetailPageProps {
   params: Promise<{ locale: string; slug: string }>;
 }
+
+const getArticle = cache(getArticleBySlugAction);
 
 function processHtmlHeadings(html: string) {
   let counter = 0;
@@ -46,10 +52,10 @@ export async function generateMetadata({
   params,
 }: ArticleDetailPageProps): Promise<Metadata> {
   const { locale, slug } = await params;
-  const dbArticle = await getArticleBySlugAction(slug);
+  const dbArticle = await getArticle(slug);
 
   if (!dbArticle) {
-    return {};
+    notFound();
   }
 
   const title = locale === "ar"
@@ -61,17 +67,28 @@ export async function generateMetadata({
 
   const t = await getTranslations({ locale, namespace: "ArticleDetail" });
 
-  return {
+  return getPageMetadata({
+    locale,
+    path: `/blog/${encodeURIComponent(dbArticle.slug)}`,
     title: t("meta.titleTemplate", { title }),
     description: excerpt || t("meta.defaultDescription"),
-  };
+    image: dbArticle.coverImage,
+    index: dbArticle.status === "published",
+    article: {
+      publishedTime: dbArticle.publishedAt,
+      modifiedTime: dbArticle.updatedAt,
+      author: dbArticle.authorName,
+      tags: dbArticle.tags,
+      section: dbArticle.category,
+    },
+  });
 }
 
 export default async function ArticleDetailPage({
   params,
 }: ArticleDetailPageProps) {
   const { locale, slug } = await params;
-  const dbArticle = await getArticleBySlugAction(slug);
+  const dbArticle = await getArticle(slug);
 
   if (!dbArticle) {
     notFound();
@@ -141,6 +158,20 @@ export default async function ArticleDetailPage({
 
   return (
     <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 w-full flex-1">
+      {dbArticle.status === "published" && (
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd({
+          "@context": "https://schema.org",
+          "@graph": [
+            organizationJsonLd(),
+            articleJsonLd(dbArticle, locale),
+            breadcrumbsJsonLd([
+              { name: t("breadcrumb.home"), url: localizedUrl(locale, "/") },
+              { name: t("breadcrumb.blog"), url: localizedUrl(locale, "/blog") },
+              { name: article.title, url: localizedUrl(locale, `/blog/${encodeURIComponent(dbArticle.slug)}`) },
+            ]),
+          ],
+        }) }} />
+      )}
       {/* 1. Header & Breadcrumbs with optional Metadata & Actions */}
       <ArticleDetailHeader
         title={article.title}

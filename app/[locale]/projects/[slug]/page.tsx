@@ -1,4 +1,8 @@
 import type { Metadata } from "next";
+import { cache } from "react";
+import { getPageMetadata } from "@/lib/seo/page-metadata";
+import { localizedUrl } from "@/lib/seo/config";
+import { breadcrumbsJsonLd, organizationJsonLd, projectJsonLd, serializeJsonLd } from "@/lib/seo/structured-data";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { getProjectBySlugAction, getProjectsAction } from "@/lib/projects/actions";
@@ -16,6 +20,8 @@ import { CTA } from "@/components/ui";
 interface ProjectDetailPageProps {
   params: Promise<{ locale: string; slug: string }>;
 }
+
+const getProject = cache(getProjectBySlugAction);
 
 function processProjectHtmlHeadings(html: string) {
   let counter = 0;
@@ -45,10 +51,10 @@ export async function generateMetadata({
 }: ProjectDetailPageProps): Promise<Metadata> {
   const { locale, slug } = await params;
   const isAr = locale === "ar";
-  const dbProject = await getProjectBySlugAction(slug);
+  const dbProject = await getProject(slug);
 
   if (!dbProject) {
-    return {};
+    notFound();
   }
 
   const title = isAr
@@ -60,10 +66,14 @@ export async function generateMetadata({
 
   const t = await getTranslations({ locale, namespace: "ProjectDetail" });
 
-  return {
+  return getPageMetadata({
+    locale,
+    path: `/projects/${encodeURIComponent(dbProject.slug)}`,
     title: t("meta.titleTemplate", { title }),
     description: subtitle || t("meta.defaultDescription"),
-  };
+    image: dbProject.image || dbProject.coverImage,
+    index: dbProject.status === "published",
+  });
 }
 
 export default async function ProjectDetailPage({
@@ -71,7 +81,7 @@ export default async function ProjectDetailPage({
 }: ProjectDetailPageProps) {
   const { locale, slug } = await params;
   const isAr = locale === "ar";
-  const dbProject = await getProjectBySlugAction(slug);
+  const dbProject = await getProject(slug);
 
   if (!dbProject) {
     notFound();
@@ -141,6 +151,20 @@ export default async function ProjectDetailPage({
 
   return (
     <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 w-full flex-1">
+      {dbProject.status === "published" && (
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd({
+          "@context": "https://schema.org",
+          "@graph": [
+            organizationJsonLd(),
+            projectJsonLd(dbProject, locale),
+            breadcrumbsJsonLd([
+              { name: t("breadcrumb.home"), url: localizedUrl(locale, "/") },
+              { name: t("breadcrumb.projects"), url: localizedUrl(locale, "/projects") },
+              { name: projectTitle, url: localizedUrl(locale, `/projects/${encodeURIComponent(dbProject.slug)}`) },
+            ]),
+          ],
+        }) }} />
+      )}
       {/* 1. Clean Header with Category, Title, Short Description, Cover & Techs */}
       <ProjectDetailHeader
         title={projectTitle}
