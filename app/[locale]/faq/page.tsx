@@ -45,7 +45,7 @@ export default async function FaqPage({ params }: FaqPageProps) {
           faqJsonLd(allFaqItems),
           breadcrumbsJsonLd([
             { name: isAr ? "الرئيسية" : "Home", url: localizedUrl(locale, "/") },
-            { name: t("title"), url: localizedUrl(locale, "/faq") },
+            { name: t("breadcrumb.faq"), url: localizedUrl(locale, "/faq") },
           ]),
         ],
       }) }} />

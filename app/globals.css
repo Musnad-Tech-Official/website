@@ -160,31 +160,86 @@ body:has(.admin-portal-wrapper) > footer[role="contentinfo"] {
 }
 
 /* Horizontal Infinite Marquee Animations */
-@keyframes marquee-left {
-  from {
-    transform: translateX(0%);
+@keyframes marquee-ltr {
+  0% {
+    transform: translate3d(0, 0, 0);
   }
-  to {
-    transform: translateX(-100%);
-  }
-}
-
-@keyframes marquee-right {
-  from {
-    transform: translateX(-100%);
-  }
-  to {
-    transform: translateX(0%);
+  100% {
+    transform: translate3d(-50%, 0, 0);
   }
 }
 
+@keyframes marquee-rtl {
+  0% {
+    transform: translate3d(-50%, 0, 0);
+  }
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+/* In RTL document context: elements flow right-to-left, so overflow extends into negative space (left).
+   To move elements forward in RTL: translateX from 0 to 50%.
+   To move elements in reverse in RTL: translateX from 50% to 0. */
+@keyframes marquee-ltr-in-rtl {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  100% {
+    transform: translate3d(50%, 0, 0);
+  }
+}
+
+@keyframes marquee-rtl-in-rtl {
+  0% {
+    transform: translate3d(50%, 0, 0);
+  }
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+.animate-marquee-ltr,
 .animate-marquee-left {
-  animation: marquee-left 50s linear infinite;
+  animation: marquee-ltr 45s linear infinite;
   will-change: transform;
 }
 
+.animate-marquee-rtl,
 .animate-marquee-right {
-  animation: marquee-right 50s linear infinite;
+  animation: marquee-rtl 45s linear infinite;
   will-change: transform;
+}
+
+[dir="rtl"] .animate-marquee-ltr,
+[dir="rtl"] .animate-marquee-left,
+html[dir="rtl"] .animate-marquee-ltr,
+html[dir="rtl"] .animate-marquee-left {
+  animation-name: marquee-ltr-in-rtl;
+}
+
+[dir="rtl"] .animate-marquee-rtl,
+[dir="rtl"] .animate-marquee-right,
+html[dir="rtl"] .animate-marquee-rtl,
+html[dir="rtl"] .animate-marquee-right {
+  animation-name: marquee-rtl-in-rtl;
+}
+
+/* Pause on hover */
+.animate-marquee-ltr:hover,
+.animate-marquee-rtl:hover,
+.animate-marquee-left:hover,
+.animate-marquee-right:hover {
+  animation-play-state: paused;
+}
+
+/* Accessibility: reduce motion */
+@media (prefers-reduced-motion: reduce) {
+  .animate-marquee-ltr,
+  .animate-marquee-rtl,
+  .animate-marquee-left,
+  .animate-marquee-right {
+    animation-play-state: paused !important;
+  }
 }
 

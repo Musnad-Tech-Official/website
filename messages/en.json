@@ -1360,6 +1360,7 @@
     }
   },
   "Faq": {
+    "title": "Frequently Asked Questions",
     "metaTitle": "Frequently Asked Questions — Musnad Tech",
     "metaDescription": "Quick answers about working with Musnad Tech, our engagement models, Riyadh base, account requirements, and inquiry process.",
     "breadcrumb": {
@@ -1626,22 +1627,34 @@
         "empty": "No recent actions recorded."
       },
       "analytics": {
-        "title": "Vercel Web Analytics & Telemetry",
-        "subtitle": "Real-time audience analytics, edge network performance, and Core Web Vitals for musnad-tech.",
-        "badge": "Production Checklist",
+        "title": "Web Analytics & Performance",
+        "subtitle": "Audience traffic metrics, route distribution, and Core Web Vitals telemetry.",
         "openConsole": "Open Vercel Live Console",
-        "environment": "All Environments (Prod, Preview)",
-        "statusActive": "Active & Ingesting",
-        "beaconLabel": "Web Analytics Beacon",
-        "beaconDetail": "@vercel/analytics (Cookieless)",
-        "vitalsLabel": "Speed Insights & Vitals",
-        "vitalsDetail": "LCP, FID & CLS real user monitoring",
-        "privacyLabel": "Privacy Compliance",
-        "privacyDetail": "GDPR / PECR compliant by design",
-        "edgeLabel": "Edge Telemetry",
-        "edgeDetail": "Low-latency global edge network",
         "viewSpeedInsights": "Speed Insights Console",
-        "tip": "Telemetry beacons are actively streaming to Vercel Analytics across all public routes without intrusive cookie banners."
+        "visitors": "Total Visitors",
+        "visitorsDelta": "+18.4% vs last 30 days",
+        "pageviews": "Pageviews",
+        "pageviewsDelta": "+24.1% vs last 30 days",
+        "avgDuration": "Avg. Session Duration",
+        "avgDurationDelta": "+12s vs last period",
+        "bounceRate": "Bounce Rate",
+        "bounceRateDelta": "-4.2% improvement",
+        "topRoutes": "Top Performing Pages",
+        "trafficSources": "Acquisition Channels",
+        "deviceBreakdown": "Devices & Platforms",
+        "regions": "Audience Geography",
+        "coreWebVitals": "Core Web Vitals (Real User Monitoring)",
+        "views": "views",
+        "route": "Route",
+        "share": "Share",
+        "channel": "Channel",
+        "device": "Device",
+        "country": "Region",
+        "statusGood": "Good",
+        "lcpDesc": "Largest Contentful Paint",
+        "inpDesc": "Interaction to Next Paint",
+        "clsDesc": "Cumulative Layout Shift",
+        "ttfbDesc": "Time to First Byte"
       }
     }
   }
