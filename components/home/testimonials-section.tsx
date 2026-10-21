@@ -25,12 +25,19 @@ export function TestimonialsSection({
   // Base list of dynamic items
   const baseItems = testimonials;
 
-  // Prepare full-width duplicated card sets for seamless infinite tracks
-  const row1Base = [...baseItems, ...baseItems];
-  const row2Base =
-    baseItems.length > 3
-      ? [...baseItems.slice(3), ...baseItems.slice(0, 3), ...baseItems]
-      : [...baseItems, ...baseItems];
+  // Ensure base set has enough cards to cover large screens seamlessly before repeating
+  let sequence = [...baseItems];
+  while (sequence.length < 5) {
+    sequence = [...sequence, ...baseItems];
+  }
+
+  // Row 2 is offset by half so Row 1 and Row 2 show different testimonials at any moment
+  const halfOffset = Math.floor(sequence.length / 2);
+  const row2Sequence = [...sequence.slice(halfOffset), ...sequence.slice(0, halfOffset)];
+
+  // Seamless infinite loop tracks: duplicate the exact sequence once
+  const row1Base = [...sequence, ...sequence];
+  const row2Base = [...row2Sequence, ...row2Sequence];
 
   const renderCard = (
     item: TestimonialItem,
@@ -133,12 +140,12 @@ export function TestimonialsSection({
         />
 
         {/* Track 1: Normal Direction */}
-        <div className="group flex w-max gap-6 sm:gap-8 animate-marquee-ltr rtl:animate-marquee-rtl hover:[animation-play-state:paused]">
+        <div className="group flex w-max gap-6 sm:gap-8 animate-marquee-ltr hover:[animation-play-state:paused]">
           {row1Base.map((item, idx) => renderCard(item, "r1", idx))}
         </div>
 
         {/* Track 2: Reverse Direction */}
-        <div className="group flex w-max gap-6 sm:gap-8 animate-marquee-rtl rtl:animate-marquee-ltr hover:[animation-play-state:paused]">
+        <div className="group flex w-max gap-6 sm:gap-8 animate-marquee-rtl hover:[animation-play-state:paused]">
           {row2Base.map((item, idx) => renderCard(item, "r2", idx))}
         </div>
       </div>
