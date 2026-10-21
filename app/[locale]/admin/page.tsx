@@ -22,6 +22,10 @@ import {
   LuPlus,
   LuClock,
   LuLayers,
+  LuActivity,
+  LuGlobe,
+  LuZap,
+  LuExternalLink,
 } from "react-icons/lu";
 
 import { getInquiriesAction } from "@/lib/inquiries/actions";
@@ -112,6 +116,8 @@ export default async function AdminDashboardPage({ params }: AdminPageProps) {
     { name: "Postgres Database (Supabase)", status: "Connected", health: "Optimal" },
     { name: "Row Level Security (RLS)", status: "Enforced", health: "Secure" },
     { name: "Auth Provider (Clerk)", status: "Active", health: "Ready" },
+    { name: "Vercel Web Analytics", status: "Active", health: "Tracking" },
+    { name: "Vercel Speed Insights", status: "Active", health: "Optimal" },
     { name: "Global CDN & Edge Routing", status: "Operational", health: "99.9%" },
   ];
 
@@ -138,7 +144,19 @@ export default async function AdminDashboardPage({ params }: AdminPageProps) {
             </p>
           </div>
 
-          <div className="flex items-center gap-3 shrink-0 w-full sm:w-auto">
+          <div className="flex flex-wrap items-center gap-2.5 shrink-0 w-full sm:w-auto">
+            <a
+              href="https://vercel.com/sabrideveloper2-9600s-projects/musnad-tech/analytics?source=prod-checklist&environment=all"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full sm:w-auto"
+            >
+              <Button variant="outline" size="md" className="w-full sm:w-auto gap-2 justify-center border-primary/30 hover:bg-primary/5">
+                <LuActivity className="w-4 h-4 text-primary" />
+                <span>{t("cockpit.analytics.openConsole")}</span>
+                <LuExternalLink className="w-3.5 h-3.5 opacity-70" />
+              </Button>
+            </a>
             <Link href="/admin/articles" className="w-full sm:w-auto">
               <Button variant="primary" size="md" className="w-full sm:w-auto gap-2 justify-center">
                 <LuPlus className="w-4 h-4" />
@@ -187,6 +205,104 @@ export default async function AdminDashboardPage({ params }: AdminPageProps) {
           );
         })}
       </div>
+
+      {/* Vercel Web Analytics & Telemetry Hub */}
+      <Card className="relative overflow-hidden border-primary/20 bg-gradient-to-br from-card via-card to-primary/[0.03] shadow-sm">
+        <div className="absolute top-0 right-0 w-48 h-48 bg-primary/5 rounded-full blur-3xl pointer-events-none" />
+        <CardHeader className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4">
+          <div className="space-y-1.5">
+            <div className="flex flex-wrap items-center gap-2">
+              <Badge variant="accent" size="sm" className="font-mono text-[11px] gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                {t("cockpit.analytics.statusActive")}
+              </Badge>
+              <Badge variant="outline" size="sm" className="font-mono text-[11px]">
+                {t("cockpit.analytics.badge")}
+              </Badge>
+              <Badge variant="default" size="sm" className="font-mono text-[11px]">
+                {t("cockpit.analytics.environment")}
+              </Badge>
+            </div>
+            <CardTitle className="text-base sm:text-lg font-bold flex items-center gap-2 text-foreground">
+              <LuActivity className="w-5 h-5 text-primary" />
+              {t("cockpit.analytics.title")}
+            </CardTitle>
+            <CardDescription className="text-xs sm:text-sm text-muted-foreground max-w-2xl">
+              {t("cockpit.analytics.subtitle")}
+            </CardDescription>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2.5 shrink-0">
+            <a
+              href="https://vercel.com/sabrideveloper2-9600s-projects/musnad-tech/analytics?source=prod-checklist&environment=all"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <Button variant="primary" size="sm" className="gap-2 font-medium text-xs">
+                <span>{t("cockpit.analytics.openConsole")}</span>
+                <LuArrowUpRight className="w-3.5 h-3.5" />
+              </Button>
+            </a>
+            <a
+              href="https://vercel.com/sabrideveloper2-9600s-projects/musnad-tech/speed-insights"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <Button variant="outline" size="sm" className="gap-2 text-xs font-mono">
+                <LuZap className="w-3.5 h-3.5 text-amber-500" />
+                <span>{t("cockpit.analytics.viewSpeedInsights")}</span>
+              </Button>
+            </a>
+          </div>
+        </CardHeader>
+
+        <CardContent className="space-y-4 pt-0">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+            <div className="p-3.5 rounded-xl border border-border/60 bg-muted/30 space-y-1">
+              <div className="flex items-center justify-between text-xs text-muted-foreground">
+                <span>{t("cockpit.analytics.beaconLabel")}</span>
+                <div className="w-2 h-2 rounded-full bg-emerald-500" />
+              </div>
+              <p className="font-mono text-sm font-bold text-foreground">Live Ingestion</p>
+              <p className="text-[11px] text-muted-foreground">{t("cockpit.analytics.beaconDetail")}</p>
+            </div>
+
+            <div className="p-3.5 rounded-xl border border-border/60 bg-muted/30 space-y-1">
+              <div className="flex items-center justify-between text-xs text-muted-foreground">
+                <span>{t("cockpit.analytics.vitalsLabel")}</span>
+                <LuZap className="w-3.5 h-3.5 text-amber-500" />
+              </div>
+              <p className="font-mono text-sm font-bold text-emerald-600 dark:text-emerald-400">Optimal (Good)</p>
+              <p className="text-[11px] text-muted-foreground">{t("cockpit.analytics.vitalsDetail")}</p>
+            </div>
+
+            <div className="p-3.5 rounded-xl border border-border/60 bg-muted/30 space-y-1">
+              <div className="flex items-center justify-between text-xs text-muted-foreground">
+                <span>{t("cockpit.analytics.privacyLabel")}</span>
+                <LuShieldCheck className="w-3.5 h-3.5 text-blue-500" />
+              </div>
+              <p className="font-mono text-sm font-bold text-foreground">100% Compliant</p>
+              <p className="text-[11px] text-muted-foreground">{t("cockpit.analytics.privacyDetail")}</p>
+            </div>
+
+            <div className="p-3.5 rounded-xl border border-border/60 bg-muted/30 space-y-1">
+              <div className="flex items-center justify-between text-xs text-muted-foreground">
+                <span>{t("cockpit.analytics.edgeLabel")}</span>
+                <LuGlobe className="w-3.5 h-3.5 text-purple-500" />
+              </div>
+              <p className="font-mono text-sm font-bold text-foreground">Worldwide (Anycast)</p>
+              <p className="text-[11px] text-muted-foreground">{t("cockpit.analytics.edgeDetail")}</p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2 p-3 rounded-lg bg-primary/5 border border-primary/10 text-xs text-muted-foreground">
+            <span className="w-2 h-2 rounded-full bg-primary shrink-0" />
+            <p className="leading-relaxed">
+              {t("cockpit.analytics.tip")}
+            </p>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Main Cockpit Split: Quick Actions & System Status */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
