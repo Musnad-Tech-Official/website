@@ -16,6 +16,8 @@ import { headers } from "next/headers";
 import { getPageControlsAction } from "@/lib/page-control/actions";
 import { QueryProvider } from "@/components/providers/query-provider";
 import { getSiteUrl, isSiteIndexable } from "@/lib/seo/config";
+import { Analytics } from "@vercel/analytics/next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -153,6 +155,8 @@ export default async function LocaleLayout({
                     />
                   </>
                 )}
+                <Analytics />
+                <SpeedInsights />
               </QueryProvider>
             </ThemeProvider>
           </NextIntlClientProvider>
