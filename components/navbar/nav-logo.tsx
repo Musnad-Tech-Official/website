@@ -36,6 +36,7 @@ export function NavLogo({
         width={1024}
         height={341}
         priority
+        style={{ width: "auto" }}
         className="h-8 sm:h-9 w-auto object-contain dark:hidden"
       />
 
@@ -46,6 +47,7 @@ export function NavLogo({
         width={1024}
         height={341}
         priority
+        style={{ width: "auto" }}
         className="h-8 sm:h-9 w-auto object-contain hidden dark:block"
       />
     </Link>

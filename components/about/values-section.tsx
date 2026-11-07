@@ -3,9 +3,40 @@ import { Card } from "@/components/ui/card";
 import { ABOUT_VALUES } from "./about-data";
 import type { ValuesSectionProps } from "./about-types";
 import { cn } from "@/lib/utils";
+import {
+  LuTarget,
+  LuSlidersHorizontal,
+  LuShieldCheck,
+  LuLanguages,
+} from "react-icons/lu";
 
-export function ValuesSection({ className = "" }: ValuesSectionProps) {
+const ICON_MAP: Record<string, React.ComponentType<{ className?: string }>> = {
+  LuTarget,
+  LuSlidersHorizontal,
+  LuShieldCheck,
+  LuLanguages,
+  proof: LuTarget,
+  flexibility: LuSlidersHorizontal,
+  security: LuShieldCheck,
+  bilingual: LuLanguages,
+};
+
+export function ValuesSection({ className = "", values }: ValuesSectionProps) {
   const t = useTranslations("About.values");
+
+  const items = values && values.length > 0
+    ? values.map((v) => ({
+        id: v.id,
+        title: v.title,
+        description: v.description,
+        Icon: (v.icon && ICON_MAP[v.icon]) || ICON_MAP[v.id] || LuTarget,
+      }))
+    : ABOUT_VALUES.map((val) => ({
+        id: val.id,
+        title: t(`items.${val.id}.title`),
+        description: t(`items.${val.id}.description`),
+        Icon: val.icon,
+      }));
 
   return (
     <section
@@ -28,12 +59,10 @@ export function ValuesSection({ className = "" }: ValuesSectionProps) {
         </p>
       </div>
 
-      {/* 4 Cards Grid: 1 col on mobile, 2 cols on tablet, 4 cols on desktop */}
+      {/* 4 Cards Grid */}
       <div className="mt-8 sm:mt-10 lg:mt-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-6">
-        {ABOUT_VALUES.map((val) => {
-          const Icon = val.icon;
-          const title = t(`items.${val.id}.title`);
-          const description = t(`items.${val.id}.description`);
+        {items.map((val) => {
+          const Icon = val.Icon;
 
           return (
             <Card
@@ -48,11 +77,11 @@ export function ValuesSection({ className = "" }: ValuesSectionProps) {
               </div>
 
               <h3 className="text-lg font-bold tracking-tight text-foreground">
-                {title}
+                {val.title}
               </h3>
 
               <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
-                {description}
+                {val.description}
               </p>
             </Card>
           );

@@ -309,7 +309,7 @@ function AnnouncementModalContent({
                 dir="rtl"
               />
             </div>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div className="space-y-1">
                 <label className="text-[11px] font-medium text-muted-foreground">شارة التمييز (Tag)</label>
                 <Input
@@ -350,7 +350,7 @@ function AnnouncementModalContent({
                 dir="ltr"
               />
             </div>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div className="space-y-1">
                 <label className="text-[11px] font-medium text-muted-foreground">Badge Tag</label>
                 <Input

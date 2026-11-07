@@ -183,6 +183,7 @@ function CompanyEditorModalContent({
                     width={100}
                     height={40}
                     unoptimized
+                    style={{ width: "auto", height: "auto" }}
                     className="max-h-10 max-w-full object-contain filter grayscale hover:grayscale-0 transition-all"
                   />
                 </div>

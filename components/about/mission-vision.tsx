@@ -4,8 +4,13 @@ import { Card } from "@/components/ui/card";
 import type { MissionVisionProps } from "./about-types";
 import { cn } from "@/lib/utils";
 
-export function MissionVision({ className = "" }: MissionVisionProps) {
+export function MissionVision({ className = "", data }: MissionVisionProps) {
   const t = useTranslations("About.missionVision");
+
+  const missionTitle = data?.missionTitle || t("missionTitle");
+  const missionDescription = data?.missionDescription || t("missionDescription");
+  const visionTitle = data?.visionTitle || t("visionTitle");
+  const visionDescription = data?.visionDescription || t("visionDescription");
 
   return (
     <section
@@ -13,7 +18,7 @@ export function MissionVision({ className = "" }: MissionVisionProps) {
       className={cn("w-full", className)}
     >
       <h2 id="mission-vision-heading" className="sr-only">
-        {t("missionTitle")} &amp; {t("visionTitle")}
+        {missionTitle} &amp; {visionTitle}
       </h2>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
@@ -27,11 +32,11 @@ export function MissionVision({ className = "" }: MissionVisionProps) {
           </div>
 
           <h3 className="text-xl sm:text-2xl font-bold tracking-tight text-foreground">
-            {t("missionTitle")}
+            {missionTitle}
           </h3>
 
           <p className="mt-3 text-sm sm:text-base text-muted-foreground leading-relaxed max-w-lg">
-            {t("missionDescription")}
+            {missionDescription}
           </p>
         </Card>
 
@@ -51,11 +56,11 @@ export function MissionVision({ className = "" }: MissionVisionProps) {
           </div>
 
           <h3 className="relative z-10 text-xl sm:text-2xl font-bold tracking-tight text-foreground">
-            {t("visionTitle")}
+            {visionTitle}
           </h3>
 
           <p className="relative z-10 mt-3 text-sm sm:text-base text-muted-foreground leading-relaxed max-w-lg">
-            {t("visionDescription")}
+            {visionDescription}
           </p>
         </Card>
       </div>

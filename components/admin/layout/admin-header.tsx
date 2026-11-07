@@ -52,7 +52,12 @@ export function AdminHeader({ locale, onOpenMobileMenu }: AdminHeaderProps) {
           <LuMenu className="w-5 h-5" />
         </button>
 
-        {/* Breadcrumbs */}
+        {/* Mobile Page Title */}
+        <span className="sm:hidden font-bold text-sm text-foreground truncate max-w-[130px] xs:max-w-[190px]">
+          {pageTitle}
+        </span>
+
+        {/* Desktop Breadcrumbs */}
         <nav
           aria-label="Breadcrumb"
           className="hidden sm:flex items-center gap-2 text-sm min-w-0"

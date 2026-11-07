@@ -21,22 +21,51 @@ export interface AboutIntroProps {
 
 export interface MissionVisionProps {
   className?: string;
+  data?: {
+    missionTitle?: string;
+    missionDescription?: string;
+    visionTitle?: string;
+    visionDescription?: string;
+  };
 }
 
 export interface ValuesSectionProps {
   className?: string;
+  values?: {
+    id: string;
+    title: string;
+    description: string;
+    icon?: string;
+  }[];
 }
 
 export interface ApproachSectionProps {
   className?: string;
+  steps?: {
+    id: string;
+    stepNumber: string;
+    title: string;
+    description: string;
+  }[];
 }
 
 export interface StorySectionProps {
   className?: string;
+  data?: {
+    title?: string;
+    p1?: string;
+    p2?: string;
+  };
 }
 
 export interface MilestonesSectionProps {
   className?: string;
+  milestones?: {
+    id: string;
+    year: string;
+    title: string;
+    description: string;
+  }[];
 }
 
 export interface AboutCtaProps {

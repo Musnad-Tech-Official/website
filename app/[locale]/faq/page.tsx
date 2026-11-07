@@ -10,6 +10,7 @@ import {
   getFaqData,
 } from "@/components/faq";
 import { PageGuard } from "@/lib/page-control/guard";
+import { getFaqTopicsAction, getFaqQuestionsAction } from "@/lib/faqs/actions";
 
 interface FaqPageProps {
   params: Promise<{ locale: string }>;
@@ -33,8 +34,43 @@ export default async function FaqPage({ params }: FaqPageProps) {
   const { locale } = await params;
   const isAr = locale === "ar";
   const t = await getTranslations({ locale, namespace: "Faq" });
-  const faqData = getFaqData((key) => t(key));
-  const allFaqItems = faqData.topicGroups.flatMap((group) => group.items);
+
+  const [dbTopics, dbQuestions] = await Promise.all([
+    getFaqTopicsAction(false),
+    getFaqQuestionsAction(undefined, false),
+  ]);
+
+  const fallbackData = getFaqData((key) => t(key));
+
+  const topicGroups = dbTopics.length > 0 && dbQuestions.length > 0
+    ? dbTopics.map((topic) => {
+        const items = dbQuestions
+          .filter((q) => q.topicId === topic.id)
+          .map((q) => ({
+            id: q.id,
+            question: isAr ? q.questionAr : q.questionEn,
+            answer: isAr ? q.answerAr : q.answerEn,
+          }));
+
+        return {
+          id: topic.slug,
+          title: isAr ? topic.titleAr : topic.titleEn,
+          count: items.length,
+          items,
+        };
+      }).filter((g) => g.items.length > 0)
+    : fallbackData.topicGroups;
+
+  const sidebarTopics = dbTopics.length > 0
+    ? dbTopics.map((topic) => ({
+        id: topic.slug,
+        title: isAr ? topic.titleAr : topic.titleEn,
+        count: dbQuestions.filter((q) => q.topicId === topic.id).length,
+        href: `#${topic.slug}`,
+      }))
+    : fallbackData.sidebarTopics;
+
+  const allFaqItems = topicGroups.flatMap((group) => group.items);
 
   return (
     <PageGuard slug="faq" locale={locale}>
@@ -57,7 +93,7 @@ export default async function FaqPage({ params }: FaqPageProps) {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start mt-6 sm:mt-8">
           {/* Left Column: FAQ Groups */}
           <div className="lg:col-span-8 space-y-10 sm:space-y-12">
-            {faqData.topicGroups.map((group) => (
+            {topicGroups.map((group) => (
               <FaqTopicGroup key={group.id} group={group} />
             ))}
           </div>
@@ -65,11 +101,11 @@ export default async function FaqPage({ params }: FaqPageProps) {
           {/* Right Column: Sidebar */}
           <div className="lg:col-span-4 lg:sticky lg:top-24">
             <FaqSidebar
-              sidebarTopics={faqData.sidebarTopics}
+              sidebarTopics={sidebarTopics}
               browseTitle={t("sidebar.browseTitle")}
               quickLinksTitle={t("sidebar.quickLinks.title")}
-              quickLinks={faqData.quickLinks}
-              stillHaveQuestions={faqData.stillHaveQuestions}
+              quickLinks={fallbackData.quickLinks}
+              stillHaveQuestions={fallbackData.stillHaveQuestions}
             />
           </div>
         </div>

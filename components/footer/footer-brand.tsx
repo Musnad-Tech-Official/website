@@ -39,6 +39,7 @@ export function FooterBrand({
           width={1024}
           height={341}
           priority={false}
+          style={{ width: "auto" }}
           className="h-8 sm:h-9 w-auto object-contain dark:hidden"
         />
 
@@ -49,6 +50,7 @@ export function FooterBrand({
           width={1024}
           height={341}
           priority={false}
+          style={{ width: "auto" }}
           className="h-8 sm:h-9 w-auto object-contain hidden dark:block"
         />
       </Link>

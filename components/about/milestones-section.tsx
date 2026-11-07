@@ -11,8 +11,22 @@ import { cn } from "@/lib/utils";
  * (Sahim, Naft, Rakeen) mapped to a chronological UI progression and are classified
  * as frontend mock content pending verified corporate documentation.
  */
-export function MilestonesSection({ className = "" }: MilestonesSectionProps) {
+export function MilestonesSection({ className = "", milestones }: MilestonesSectionProps) {
   const t = useTranslations("About.milestones");
+
+  const items = milestones && milestones.length > 0
+    ? milestones.map((m) => ({
+        id: m.id,
+        year: m.year,
+        title: m.title,
+        description: m.description,
+      }))
+    : MILESTONES.map((item) => ({
+        id: item.id,
+        year: t(`items.${item.id}.year`),
+        title: t(`items.${item.id}.title`),
+        description: t(`items.${item.id}.description`),
+      }));
 
   return (
     <section
@@ -35,48 +49,39 @@ export function MilestonesSection({ className = "" }: MilestonesSectionProps) {
         />
 
         <ol className="grid grid-cols-5 gap-8 xl:gap-10 relative z-10 list-none p-0 m-0">
-          {MILESTONES.map((item) => {
-            const year = t(`items.${item.id}.year`);
-            const title = t(`items.${item.id}.title`);
-            const description = t(`items.${item.id}.description`);
+          {items.map((item) => (
+            <li key={item.id} className="flex flex-col text-start">
+              {/* Timeline Dot */}
+              <div className="mb-6 flex items-center select-none">
+                <div
+                  aria-hidden="true"
+                  className="h-3 w-3 rounded-full bg-foreground ring-4 ring-background"
+                />
+              </div>
 
-            return (
-              <li key={item.id} className="flex flex-col text-start">
-                {/* Timeline Dot */}
-                <div className="mb-6 flex items-center select-none">
-                  <div
-                    aria-hidden="true"
-                    className="h-3 w-3 rounded-full bg-foreground ring-4 ring-background"
-                  />
-                </div>
+              {/* Year */}
+              <span className="text-2xl xl:text-3xl font-black tracking-tight text-foreground font-mono">
+                {item.year}
+              </span>
 
-                {/* Year */}
-                <span className="text-2xl xl:text-3xl font-black tracking-tight text-foreground font-mono">
-                  {year}
-                </span>
+              {/* Milestone Title */}
+              <h3 className="mt-2 text-base font-bold tracking-tight text-foreground">
+                {item.title}
+              </h3>
 
-                {/* Milestone Title */}
-                <h3 className="mt-2 text-base font-bold tracking-tight text-foreground">
-                  {title}
-                </h3>
-
-                {/* Milestone Description */}
-                <p className="mt-1.5 text-xs sm:text-sm text-muted-foreground leading-relaxed">
-                  {description}
-                </p>
-              </li>
-            );
-          })}
+              {/* Milestone Description */}
+              <p className="mt-1.5 text-xs sm:text-sm text-muted-foreground leading-relaxed">
+                {item.description}
+              </p>
+            </li>
+          ))}
         </ol>
       </div>
 
       {/* Mobile & Tablet Vertical Timeline (Clean stacked, zero horizontal scrolling) */}
       <ol className="lg:hidden space-y-6 sm:space-y-8 list-none p-0 m-0">
-        {MILESTONES.map((item, index) => {
-          const isLast = index === MILESTONES.length - 1;
-          const year = t(`items.${item.id}.year`);
-          const title = t(`items.${item.id}.title`);
-          const description = t(`items.${item.id}.description`);
+        {items.map((item, index) => {
+          const isLast = index === items.length - 1;
 
           return (
             <li key={item.id} className="flex gap-4 sm:gap-6">
@@ -97,13 +102,13 @@ export function MilestonesSection({ className = "" }: MilestonesSectionProps) {
               {/* Milestone Details */}
               <div className="flex flex-col text-start pb-4">
                 <span className="text-xl sm:text-2xl font-black tracking-tight text-foreground font-mono">
-                  {year}
+                  {item.year}
                 </span>
                 <h3 className="mt-1 text-base font-bold tracking-tight text-foreground">
-                  {title}
+                  {item.title}
                 </h3>
                 <p className="mt-1 text-sm text-muted-foreground leading-relaxed max-w-lg">
-                  {description}
+                  {item.description}
                 </p>
               </div>
             </li>

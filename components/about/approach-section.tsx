@@ -3,8 +3,22 @@ import { APPROACH_STEPS } from "./about-data";
 import type { ApproachSectionProps } from "./about-types";
 import { cn } from "@/lib/utils";
 
-export function ApproachSection({ className = "" }: ApproachSectionProps) {
+export function ApproachSection({ className = "", steps }: ApproachSectionProps) {
   const t = useTranslations("About.approach");
+
+  const items = steps && steps.length > 0
+    ? steps.map((s) => ({
+        id: s.id,
+        stepNumber: s.stepNumber,
+        title: s.title,
+        description: s.description,
+      }))
+    : APPROACH_STEPS.map((step) => ({
+        id: step.id,
+        stepNumber: step.stepNumber,
+        title: t(`steps.${step.id}.title`),
+        description: t(`steps.${step.id}.description`),
+      }));
 
   return (
     <section
@@ -27,34 +41,29 @@ export function ApproachSection({ className = "" }: ApproachSectionProps) {
         </p>
       </div>
 
-      {/* Semantic 4-step vertical process */}
+      {/* Semantic vertical process */}
       <ol className="mt-10 sm:mt-12 space-y-8 sm:space-y-10 list-none p-0 m-0">
-        {APPROACH_STEPS.map((step) => {
-          const title = t(`steps.${step.id}.title`);
-          const description = t(`steps.${step.id}.description`);
+        {items.map((step) => (
+          <li key={step.id} className="flex items-start gap-4 sm:gap-6">
+            {/* Numbered marker */}
+            <div
+              className="flex h-10 w-10 sm:h-11 sm:w-11 shrink-0 items-center justify-center rounded-full bg-foreground text-background font-mono font-bold text-xs sm:text-sm select-none"
+              aria-hidden="true"
+            >
+              {step.stepNumber}
+            </div>
 
-          return (
-            <li key={step.id} className="flex items-start gap-4 sm:gap-6">
-              {/* Numbered marker */}
-              <div
-                className="flex h-10 w-10 sm:h-11 sm:w-11 shrink-0 items-center justify-center rounded-full bg-foreground text-background font-mono font-bold text-xs sm:text-sm select-none"
-                aria-hidden="true"
-              >
-                {step.stepNumber}
-              </div>
-
-              {/* Step content */}
-              <div className="flex flex-col text-start pt-1 sm:pt-1.5">
-                <h3 className="text-lg sm:text-xl font-bold tracking-tight text-foreground">
-                  {title}
-                </h3>
-                <p className="mt-1.5 text-sm sm:text-base text-muted-foreground max-w-2xl leading-relaxed">
-                  {description}
-                </p>
-              </div>
-            </li>
-          );
-        })}
+            {/* Step content */}
+            <div className="flex flex-col text-start pt-1 sm:pt-1.5">
+              <h3 className="text-lg sm:text-xl font-bold tracking-tight text-foreground">
+                {step.title}
+              </h3>
+              <p className="mt-1.5 text-sm sm:text-base text-muted-foreground max-w-2xl leading-relaxed">
+                {step.description}
+              </p>
+            </div>
+          </li>
+        ))}
       </ol>
     </section>
   );

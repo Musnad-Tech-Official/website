@@ -380,6 +380,7 @@ export function CompaniesClient({
                   width={140}
                   height={50}
                   unoptimized
+                  style={{ width: "auto", height: "auto" }}
                   className="max-h-12 max-w-full object-contain filter grayscale dark:brightness-200 group-hover:grayscale-0 group-hover:scale-105 transition-all duration-300"
                 />
               </div>
