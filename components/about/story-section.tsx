@@ -10,8 +10,12 @@ import { cn } from "@/lib/utils";
  * unverified origin claims are maintained as frontend layout copy and are not certified
  * as verified corporate records.
  */
-export function StorySection({ className = "" }: StorySectionProps) {
+export function StorySection({ className = "", data }: StorySectionProps) {
   const t = useTranslations("About.story");
+
+  const title = data?.title || t("title");
+  const p1 = data?.p1 || t("p1");
+  const p2 = data?.p2 || t("p2");
 
   return (
     <section
@@ -22,12 +26,12 @@ export function StorySection({ className = "" }: StorySectionProps) {
         id="story-heading"
         className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight text-foreground mb-6 sm:mb-8"
       >
-        {t("title")}
+        {title}
       </h2>
 
       <div className="space-y-6 text-base sm:text-lg text-muted-foreground leading-relaxed max-w-3xl">
-        <p>{t("p1")}</p>
-        <p>{t("p2")}</p>
+        <p>{p1}</p>
+        <p>{p2}</p>
       </div>
     </section>
   );

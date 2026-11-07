@@ -68,6 +68,7 @@ export function TrustedCompanies({
                     width={130}
                     height={44}
                     unoptimized
+                    style={{ width: "auto", height: "auto" }}
                     className="max-h-9 sm:max-h-11 max-w-[120px] object-contain filter grayscale dark:brightness-200 opacity-80 transition-all duration-300 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-105"
                   />
                 </div>

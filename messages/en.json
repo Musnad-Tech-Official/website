@@ -313,8 +313,8 @@
     "companyTitle": "Company",
     "legalTitle": "Legal",
     "contactEmail": "hello@musnad.tech",
-    "location": "Riyadh, Saudi Arabia",
-    "builtInRiyadh": "Built in Riyadh",
+    "location": "Taiz, Yemen",
+    "builtInRiyadh": "Built in Taiz",
     "nav": {
       "home": "Home",
       "projects": "Projects",
@@ -1580,6 +1580,9 @@
     "nav": {
       "dashboard": "Overview",
       "pages": "Pages Management",
+      "about": "About Page CMS",
+      "careers": "Careers & Jobs",
+      "faqs": "FAQs Management",
       "services": "Engineering Services",
       "projects": "Projects",
       "technologies": "Technologies",

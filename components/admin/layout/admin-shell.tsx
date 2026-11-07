@@ -29,15 +29,15 @@ export function AdminShell({ children, locale }: AdminShellProps) {
       <div
         className={cn(
           "flex-1 flex flex-col min-w-0 transition-all duration-300",
-          isCollapsed ? "lg:ms-18" : "lg:ms-64"
+          isCollapsed ? "lg:ms-20" : "lg:ms-64"
         )}
       >
         <AdminHeader
           locale={locale}
           onOpenMobileMenu={() => setIsMobileOpen(true)}
         />
-        <main className="flex-1 p-3.5 sm:p-5 md:p-6 lg:p-8">
-          <div className="max-w-7xl mx-auto w-full space-y-6">
+        <main className="flex-1 p-3 sm:p-5 md:p-6 lg:p-8 min-w-0 overflow-x-clip">
+          <div className="max-w-7xl mx-auto w-full space-y-6 min-w-0">
             {children}
           </div>
         </main>

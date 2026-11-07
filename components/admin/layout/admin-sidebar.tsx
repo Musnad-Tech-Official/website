@@ -21,6 +21,9 @@ import {
   LuMegaphone,
   LuQuote,
   LuLayers,
+  LuTarget,
+  LuBriefcase,
+  LuCircleHelp,
   LuChevronLeft,
   LuChevronRight,
   LuX,
@@ -68,6 +71,21 @@ export function AdminSidebar({
       title: t("nav.pages"),
       href: "/admin/pages",
       icon: LuGlobe,
+    },
+    {
+      title: t("nav.about"),
+      href: "/admin/about",
+      icon: LuTarget,
+    },
+    {
+      title: t("nav.careers"),
+      href: "/admin/careers",
+      icon: LuBriefcase,
+    },
+    {
+      title: t("nav.faqs"),
+      href: "/admin/faqs",
+      icon: LuCircleHelp,
     },
     {
       title: t("nav.services"),
@@ -153,8 +171,9 @@ export function AdminSidebar({
       <aside
         className={cn(
           "fixed top-0 bottom-0 start-0 z-40 flex flex-col bg-card border-e border-border transition-all duration-300 select-none h-screen",
-          // Width based on collapsed state
-          isCollapsed ? "w-18" : "w-64",
+          // Mobile always comfortable drawer width; desktop responds to collapse toggle
+          "w-72 max-w-[85vw]",
+          isCollapsed ? "lg:w-20" : "lg:w-64",
           // Mobile responsive slide-over & desktop fixed positioning
           isRtl
             ? isMobileOpen
@@ -168,12 +187,12 @@ export function AdminSidebar({
         {/* Brand / Logo Header */}
         <div
           className={cn(
-            "flex items-center h-16 border-b border-border transition-all duration-300",
-            isCollapsed ? "justify-center px-2" : "justify-between px-4"
+            "flex items-center h-16 border-b border-border transition-all duration-300 px-4",
+            isCollapsed ? "lg:justify-center lg:px-2" : "justify-between"
           )}
         >
-          {/* Real Brand Logo (shown only when NOT collapsed) */}
-          {!isCollapsed && (
+          {/* Real Brand Logo */}
+          <div className={cn("min-w-0 flex-1", isCollapsed ? "lg:hidden" : "block")}>
             <Link
               href="/admin"
               className="flex items-center gap-2 overflow-hidden transition-all select-none min-w-0"
@@ -186,6 +205,7 @@ export function AdminSidebar({
                 width={1024}
                 height={341}
                 priority
+                style={{ width: "auto" }}
                 className="h-7 w-auto object-contain dark:hidden"
               />
               {/* Dark Mode Logo */}
@@ -195,10 +215,11 @@ export function AdminSidebar({
                 width={1024}
                 height={341}
                 priority
+                style={{ width: "auto" }}
                 className="h-7 w-auto object-contain hidden dark:block"
               />
             </Link>
-          )}
+          </div>
 
           {/* Desktop Collapse Toggle Button (Top next to logo when expanded, centered alone when collapsed) */}
           <button
@@ -229,7 +250,7 @@ export function AdminSidebar({
             <button
               type="button"
               onClick={onMobileClose}
-              className="lg:hidden flex items-center justify-center w-8 h-8 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-pointer"
+              className="lg:hidden flex items-center justify-center w-8 h-8 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-pointer shrink-0"
               title="Close sidebar"
               aria-label="Close sidebar"
             >
@@ -254,7 +275,7 @@ export function AdminSidebar({
                   isActive
                     ? "bg-primary text-primary-foreground shadow-xs font-semibold"
                     : "text-muted-foreground hover:text-foreground hover:bg-muted/70",
-                  isCollapsed && "justify-center px-2"
+                  isCollapsed && "lg:justify-center lg:px-2"
                 )}
                 title={isCollapsed ? item.title : undefined}
               >
@@ -265,15 +286,18 @@ export function AdminSidebar({
                   )}
                 />
 
-                {!isCollapsed && (
-                  <span className="truncate flex-1">{item.title}</span>
-                )}
+                <span className={cn("truncate flex-1", isCollapsed ? "lg:hidden" : "block")}>
+                  {item.title}
+                </span>
 
-                {!isCollapsed && item.badge && (
+                {item.badge && (
                   <Badge
                     variant={isActive ? "secondary" : "outline"}
                     size="sm"
-                    className="text-[10px] px-1.5 py-0 h-4.5 font-mono"
+                    className={cn(
+                      "text-[10px] px-1.5 py-0 h-4.5 font-mono",
+                      isCollapsed ? "lg:hidden" : "inline-flex"
+                    )}
                   >
                     {item.badge}
                   </Badge>
@@ -290,12 +314,14 @@ export function AdminSidebar({
             href="/"
             className={cn(
               "flex items-center gap-3 px-3 py-2 text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-colors",
-              isCollapsed && "justify-center px-2"
+              isCollapsed && "lg:justify-center lg:px-2"
             )}
             title={isCollapsed ? t("nav.viewSite") : undefined}
           >
             <LuGlobe className="w-4 h-4 shrink-0" />
-            {!isCollapsed && <span className="truncate">{t("nav.viewSite")}</span>}
+            <span className={cn("truncate", isCollapsed ? "lg:hidden" : "inline")}>
+              {t("nav.viewSite")}
+            </span>
           </Link>
         </div>
       </aside>

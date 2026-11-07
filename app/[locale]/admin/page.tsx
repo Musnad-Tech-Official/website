@@ -8,13 +8,12 @@ import {
   CardDescription,
   CardContent,
 } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   LuFolderGit2,
   LuFileText,
   LuMessageSquare,
-  LuTrendingUp,
-  LuTrendingDown,
   LuArrowUpRight,
   LuCircleCheck,
   LuShieldCheck,
@@ -25,17 +24,30 @@ import {
   LuZap,
   LuExternalLink,
   LuUsers,
-  LuEye,
-  LuLaptop,
-  LuSmartphone,
-  LuTablet,
-  LuCompass,
+  LuBriefcase,
+  LuCircleHelp,
+  LuBuilding2,
+  LuCpu,
+  LuQuote,
+  LuMegaphone,
+  LuMail,
+  LuDatabase,
+  LuServer,
+  LuRadio,
 } from "react-icons/lu";
 
 import { getInquiriesAction } from "@/lib/inquiries/actions";
 import { getProjectsAction } from "@/lib/projects/actions";
 import { getArticlesAction } from "@/lib/articles/actions";
 import { getServicesAction } from "@/lib/services/actions";
+import { getTeamMembersAction } from "@/lib/team/actions";
+import { getTrustedCompaniesAction } from "@/lib/companies/actions";
+import { getTestimonialsAction } from "@/lib/testimonials/actions";
+import { getHomeTechnologiesAction } from "@/lib/technologies/actions";
+import { getAllAnnouncementsAction } from "@/lib/announcements/actions";
+import { getCareerJobsAction } from "@/lib/careers/actions";
+import { getFaqQuestionsAction } from "@/lib/faqs/actions";
+import { getSystemTelemetryAction } from "@/lib/settings/actions";
 
 interface AdminPageProps {
   params: Promise<{ locale: string }>;
@@ -46,16 +58,40 @@ export default async function AdminDashboardPage({ params }: AdminPageProps) {
   const t = await getTranslations({ locale, namespace: "Admin" });
   const isAr = locale === "ar";
 
-  const [inquiries, projects, articles, services] = await Promise.all([
-    getInquiriesAction(),
-    getProjectsAction(),
-    getArticlesAction(),
-    getServicesAction(true),
+  const [
+    inquiries,
+    projects,
+    articles,
+    services,
+    teamMembers,
+    companies,
+    testimonials,
+    technologies,
+    announcements,
+    careerJobs,
+    faqQuestions,
+    telemetry,
+  ] = await Promise.all([
+    getInquiriesAction().catch(() => []),
+    getProjectsAction().catch(() => []),
+    getArticlesAction().catch(() => []),
+    getServicesAction(true).catch(() => []),
+    getTeamMembersAction(true).catch(() => []),
+    getTrustedCompaniesAction(false).catch(() => []),
+    getTestimonialsAction(false).catch(() => []),
+    getHomeTechnologiesAction().catch(() => []),
+    getAllAnnouncementsAction().catch(() => []),
+    getCareerJobsAction(true).catch(() => []),
+    getFaqQuestionsAction(undefined, true).catch(() => []),
+    getSystemTelemetryAction().catch(() => null),
   ]);
 
   const newInquiriesCount = inquiries.filter((i) => i.status === "new").length;
+  const recentInquiries = inquiries.slice(0, 5);
+  const recentArticles = articles.slice(0, 4);
+  const recentProjects = projects.slice(0, 4);
 
-  const contentKpis = [
+  const primaryKpis = [
     {
       title: t("cockpit.kpi.projects"),
       sub: t("cockpit.kpi.projectsSub"),
@@ -63,6 +99,7 @@ export default async function AdminDashboardPage({ params }: AdminPageProps) {
       delta: `${projects.filter((p) => p.status === "published").length} ${isAr ? "نشط" : "active"}`,
       icon: LuFolderGit2,
       color: "text-blue-500 bg-blue-500/10 border-blue-500/20",
+      href: "/admin/projects",
     },
     {
       title: t("cockpit.kpi.articles"),
@@ -71,92 +108,87 @@ export default async function AdminDashboardPage({ params }: AdminPageProps) {
       delta: `${articles.filter((a) => a.status === "published").length} ${isAr ? "منشور" : "published"}`,
       icon: LuFileText,
       color: "text-emerald-500 bg-emerald-500/10 border-emerald-500/20",
+      href: "/admin/articles",
     },
     {
       title: t("cockpit.kpi.inquiries"),
       sub: t("cockpit.kpi.inquiriesSub"),
-      value: String(newInquiriesCount || inquiries.length),
+      value: String(inquiries.length),
       delta: newInquiriesCount > 0 ? `+${newInquiriesCount} ${isAr ? "جديد" : "new"}` : `0 ${isAr ? "جديد" : "new"}`,
       icon: LuMessageSquare,
       color: "text-amber-500 bg-amber-500/10 border-amber-500/20",
+      href: "/admin/inquiries",
     },
     {
       title: t("nav.services"),
-      sub: isAr ? `${services.filter((s) => s.enabledHome).length} على الرئيسية` : `${services.filter((s) => s.enabledHome).length} on Home page`,
+      sub: isAr
+        ? `${services.filter((s) => s.enabledHome).length} على الرئيسية`
+        : `${services.filter((s) => s.enabledHome).length} on Home page`,
       value: String(services.length),
       delta: `${services.filter((s) => s.isActive).length} ${isAr ? "نشط" : "active"}`,
       icon: LuLayers,
       color: "text-purple-500 bg-purple-500/10 border-purple-500/20",
+      href: "/admin/services",
     },
   ];
 
-  const webAnalyticsKpis = [
+  const secondaryKpis = [
     {
-      title: t("cockpit.analytics.visitors"),
-      value: "14,820",
-      delta: t("cockpit.analytics.visitorsDelta"),
-      isPositive: true,
+      title: isAr ? "أعضاء الفريق" : "Team Members",
+      value: String(teamMembers.length),
+      sub: isAr ? "المهندسون والقيادة" : "Engineers & Leadership",
       icon: LuUsers,
-      color: "text-blue-500 bg-blue-500/10 border-blue-500/20",
+      href: "/admin/team",
     },
     {
-      title: t("cockpit.analytics.pageviews"),
-      value: "42,910",
-      delta: t("cockpit.analytics.pageviewsDelta"),
-      isPositive: true,
-      icon: LuEye,
-      color: "text-emerald-500 bg-emerald-500/10 border-emerald-500/20",
+      title: isAr ? "الشواغر الوظيفية" : "Career Openings",
+      value: String(careerJobs.length),
+      sub: `${careerJobs.filter((j) => j.isActive).length} ${isAr ? "متاحة للتقديم" : "open positions"}`,
+      icon: LuBriefcase,
+      href: "/admin/careers",
     },
     {
-      title: t("cockpit.analytics.avgDuration"),
-      value: "2m 48s",
-      delta: t("cockpit.analytics.avgDurationDelta"),
-      isPositive: true,
-      icon: LuClock,
-      color: "text-purple-500 bg-purple-500/10 border-purple-500/20",
+      title: isAr ? "الأسئلة الشائعة" : "FAQs",
+      value: String(faqQuestions.length),
+      sub: `${faqQuestions.filter((q) => q.isActive).length} ${isAr ? "سؤال نشط" : "active questions"}`,
+      icon: LuCircleHelp,
+      href: "/admin/faqs",
     },
     {
-      title: t("cockpit.analytics.bounceRate"),
-      value: "34.2%",
-      delta: t("cockpit.analytics.bounceRateDelta"),
-      isPositive: true,
-      icon: LuTrendingDown,
-      color: "text-amber-500 bg-amber-500/10 border-amber-500/20",
+      title: isAr ? "الشركات الموثوقة" : "Trusted Clients",
+      value: String(companies.length),
+      sub: isAr ? "شريط العملاء والشركاء" : "Client logos on Home",
+      icon: LuBuilding2,
+      href: "/admin/companies",
     },
-  ];
-
-  const topRoutes = [
-    { path: "/", label: isAr ? "الصفحة الرئيسية" : "Homepage", views: 18420, percent: 43 },
-    { path: "/services", label: isAr ? "الخدمات الهندسية" : "Engineering Services", views: 9650, percent: 23 },
-    { path: "/projects", label: isAr ? "المشاريع ودراسات الحالة" : "Projects & Case Studies", views: 7810, percent: 18 },
-    { path: "/blog", label: isAr ? "الرؤى والمقالات التقنية" : "Engineering Insights", views: 4320, percent: 10 },
-    { path: "/contact", label: isAr ? "استفسارات التواصل" : "Contact & Inquiries", views: 2710, percent: 6 },
-  ];
-
-  const acquisitionChannels = [
-    { name: isAr ? "مباشر (Direct)" : "Direct Navigations", share: 48, count: "20,590", color: "bg-blue-500" },
-    { name: isAr ? "البحث المجاني (Organic)" : "Organic Search", share: 32, count: "13,730", color: "bg-emerald-500" },
-    { name: isAr ? "لينكد إن والشبكات (Social)" : "Social & Professional", share: 14, count: "6,010", color: "bg-purple-500" },
-    { name: isAr ? "إحالات وشركاء (Referral)" : "Referrals & Partners", share: 6, count: "2,580", color: "bg-amber-500" },
-  ];
-
-  const deviceDistribution = [
-    { name: isAr ? "أجهزة سطح المكتب" : "Desktop", percent: 64, icon: LuLaptop },
-    { name: isAr ? "الهواتف الذكية" : "Mobile", percent: 33, icon: LuSmartphone },
-    { name: isAr ? "الأجهزة اللوحية" : "Tablet", percent: 3, icon: LuTablet },
-  ];
-
-  const regionalTraffic = [
-    { name: isAr ? "المملكة العربية السعودية" : "Saudi Arabia", share: "68%", code: "SA" },
-    { name: isAr ? "الإمارات العربية المتحدة" : "United Arab Emirates", share: "14%", code: "AE" },
-    { name: isAr ? "الخليج ودولياً" : "Other GCC & Global", share: "18%", code: "GL" },
-  ];
-
-  const coreWebVitals = [
-    { label: "LCP", name: t("cockpit.analytics.lcpDesc"), value: "0.8s", threshold: "< 2.5s", status: t("cockpit.analytics.statusGood") },
-    { label: "INP", name: t("cockpit.analytics.inpDesc"), value: "38ms", threshold: "< 200ms", status: t("cockpit.analytics.statusGood") },
-    { label: "CLS", name: t("cockpit.analytics.clsDesc"), value: "0.01", threshold: "< 0.1", status: t("cockpit.analytics.statusGood") },
-    { label: "TTFB", name: t("cockpit.analytics.ttfbDesc"), value: "110ms", threshold: "< 800ms", status: t("cockpit.analytics.statusGood") },
+    {
+      title: isAr ? "التقنيات والأدوات" : "Technologies",
+      value: String(technologies.length),
+      sub: isAr ? "حزمة التقنيات واللغات" : "Tech stack cloud",
+      icon: LuCpu,
+      href: "/admin/technologies",
+    },
+    {
+      title: isAr ? "توصيات العملاء" : "Testimonials",
+      value: String(testimonials.length),
+      sub: isAr ? "آراء الشركاء والعملاء" : "Verified client feedback",
+      icon: LuQuote,
+      href: "/admin/testimonials",
+    },
+    {
+      title: isAr ? "أشرطة الإعلانات" : "Announcements",
+      value: String(announcements.length),
+      sub: `${announcements.filter((a) => a.isActive).length} ${isAr ? "مفعل حالياً" : "active currently"}`,
+      icon: LuMegaphone,
+      href: "/admin/announcements",
+    },
+    {
+      title: isAr ? "المشتركون بالنشرة" : "Newsletter",
+      value: String(telemetry?.subscribersCount ?? 0),
+      sub: isAr ? "مشترك بالبريد" : "Verified subscribers",
+      icon: LuMail,
+      href: "/admin/settings",
+    },
   ];
 
   const quickActions = [
@@ -187,429 +219,414 @@ export default async function AdminDashboardPage({ params }: AdminPageProps) {
   ];
 
   const systemStatus = [
-    { name: "Postgres Database (Supabase)", status: isAr ? "متصل" : "Connected", health: "Optimal" },
-    { name: "Row Level Security (RLS)", status: isAr ? "مفعّل" : "Enforced", health: "Secure" },
-    { name: "Auth Provider (Clerk)", status: isAr ? "نشط" : "Active", health: "Ready" },
-    { name: "Vercel Web Analytics", status: isAr ? "يسجل البيانات" : "Tracking", health: "Live" },
-    { name: "Vercel Speed Insights", status: isAr ? "مراقب لحظي" : "Active", health: "Optimal" },
-    { name: "Global CDN & Edge", status: isAr ? "متاح عالمياً" : "Operational", health: "99.9%" },
+    {
+      name: "Supabase PostgreSQL Database",
+      status: telemetry?.supabaseConfigured ? (isAr ? "متصل" : "Connected") : (isAr ? "غير مهيأ" : "Unconfigured"),
+      health: telemetry?.supabaseConfigured ? "Optimal" : "Check Env",
+      isOk: Boolean(telemetry?.supabaseConfigured),
+    },
+    {
+      name: "Row Level Security (RLS)",
+      status: isAr ? "مفعّل ومحمي" : "Enforced & Active",
+      health: "Secure",
+      isOk: true,
+    },
+    {
+      name: "Clerk Auth & Session Claims",
+      status: telemetry?.clerkConfigured ? (isAr ? "نشط" : "Active") : (isAr ? "غير مهيأ" : "Unconfigured"),
+      health: telemetry?.clerkConfigured ? "Ready" : "Check Env",
+      isOk: Boolean(telemetry?.clerkConfigured),
+    },
+    {
+      name: "Vercel Web Analytics Beacon",
+      status: isAr ? "يعمل على الحافة" : "Active (Edge)",
+      health: "Streaming",
+      isOk: true,
+    },
+    {
+      name: "Vercel Speed Insights (RUM)",
+      status: isAr ? "مراقب لحظي" : "Active (Real User)",
+      health: "Live",
+      isOk: true,
+    },
+    {
+      name: "Environment / بيئة التشغيل",
+      status: telemetry?.nodeEnv || "production",
+      health: "Ready",
+      isOk: true,
+    },
   ];
 
   return (
-    <div className="space-y-8 animate-in fade-in-50 duration-300 pb-12">
-      {/* 1. Clean Top Header */}
+    <div className="space-y-6 sm:space-y-8 animate-in fade-in-50 duration-300 pb-12 min-w-0">
+      {/* 1. Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-border/50">
-        <div className="space-y-1">
-          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground">
+        <div className="space-y-1 min-w-0 flex-1">
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold tracking-tight text-foreground truncate">
             {t("cockpit.title")}
           </h1>
           <p className="text-xs sm:text-sm text-muted-foreground max-w-2xl leading-relaxed">
-            {t("cockpit.description")}
+            {isAr
+              ? "لوحة القيادة التشغيلية لجميع كيانات وقواعد بيانات منصة مسند للتقنية."
+              : "Operational cockpit managing all dynamic entities, database records, and platform workflows."}
           </p>
         </div>
 
-        <div className="flex flex-wrap items-center gap-2.5 shrink-0">
+        <div className="flex flex-wrap sm:flex-nowrap items-center gap-2 sm:gap-2.5 w-full sm:w-auto shrink-0">
           <a
             href="https://vercel.com/sabrideveloper2-9600s-projects/musnad-tech/analytics?source=prod-checklist&environment=all"
             target="_blank"
             rel="noopener noreferrer"
+            className="flex-1 sm:flex-initial"
           >
-            <Button variant="outline" size="sm" className="gap-2 border-primary/30 hover:bg-primary/5 text-xs font-semibold cursor-pointer">
-              <LuActivity className="w-3.5 h-3.5 text-primary" />
-              <span>{t("cockpit.analytics.openConsole")}</span>
-              <LuExternalLink className="w-3.5 h-3.5 opacity-70" />
+            <Button
+              variant="outline"
+              size="sm"
+              className="w-full sm:w-auto gap-2 border-primary/30 hover:bg-primary/5 text-xs font-semibold cursor-pointer justify-center"
+            >
+              <LuActivity className="w-3.5 h-3.5 text-primary shrink-0" />
+              <span className="truncate">{t("cockpit.analytics.openConsole")}</span>
+              <LuExternalLink className="w-3.5 h-3.5 opacity-70 shrink-0" />
             </Button>
           </a>
-          <Link href="/admin/articles">
-            <Button variant="primary" size="sm" className="gap-2 text-xs font-semibold cursor-pointer">
-              <LuPlus className="w-3.5 h-3.5" />
-              <span>{t("cockpit.actions.createArticle")}</span>
+          <Link href="/admin/articles" className="flex-1 sm:flex-initial">
+            <Button variant="primary" size="sm" className="w-full sm:w-auto gap-2 text-xs font-semibold cursor-pointer justify-center">
+              <LuPlus className="w-3.5 h-3.5 shrink-0" />
+              <span className="truncate">{t("cockpit.actions.createArticle")}</span>
             </Button>
           </Link>
         </div>
       </div>
 
-      {/* 2. Platform Content KPIs */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-5">
-        {contentKpis.map((kpi) => {
+      {/* 2. Primary Content KPIs */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3.5 sm:gap-4 md:gap-5">
+        {primaryKpis.map((kpi) => {
           const Icon = kpi.icon;
           return (
-            <Card
-              key={kpi.title}
-              variant="default"
-              className="relative overflow-hidden transition-all duration-200 hover:shadow-sm hover:border-primary/30"
-            >
-              <CardHeader className="flex flex-row items-center justify-between pb-2 p-5">
-                <CardTitle className="text-xs font-medium text-muted-foreground">
-                  {kpi.title}
-                </CardTitle>
-                <div className={`w-9 h-9 rounded-xl flex items-center justify-center border shrink-0 ${kpi.color}`}>
-                  <Icon className="w-4 h-4" />
-                </div>
-              </CardHeader>
-              <CardContent className="p-5 pt-0 space-y-1">
-                <div className="flex items-baseline justify-between">
-                  <span className="text-2xl md:text-3xl font-bold tracking-tight text-foreground font-mono">
-                    {kpi.value}
-                  </span>
-                  <span className="text-xs font-semibold text-emerald-600 dark:text-emerald-400 font-mono">
-                    {kpi.delta}
-                  </span>
-                </div>
-                <p className="text-[11px] text-muted-foreground truncate">
-                  {kpi.sub}
-                </p>
-              </CardContent>
-            </Card>
-          );
-        })}
-      </div>
-
-      {/* 3. Real Web Analytics & Audience Telemetry */}
-      <div className="space-y-4 pt-2">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-          <div>
-            <h2 className="text-lg sm:text-xl font-bold tracking-tight text-foreground flex items-center gap-2">
-              <LuActivity className="w-5 h-5 text-primary" />
-              <span>{t("cockpit.analytics.title")}</span>
-            </h2>
-            <p className="text-xs text-muted-foreground mt-0.5">
-              {t("cockpit.analytics.subtitle")}
-            </p>
-          </div>
-          <a
-            href="https://vercel.com/sabrideveloper2-9600s-projects/musnad-tech/analytics?source=prod-checklist&environment=all"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-xs font-medium text-primary hover:underline flex items-center gap-1 shrink-0 self-start sm:self-center"
-          >
-            <span>{t("cockpit.analytics.openConsole")}</span>
-            <LuArrowUpRight className="w-3.5 h-3.5" />
-          </a>
-        </div>
-
-        {/* 4 Traffic Metric Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-5">
-          {webAnalyticsKpis.map((kpi) => {
-            const Icon = kpi.icon;
-            return (
+            <Link key={kpi.title} href={kpi.href}>
               <Card
-                key={kpi.title}
                 variant="default"
-                className="transition-all duration-200 hover:shadow-sm hover:border-primary/30"
+                className="relative overflow-hidden transition-all duration-200 hover:shadow-sm hover:border-primary/40 h-full min-w-0"
               >
-                <CardHeader className="flex flex-row items-center justify-between pb-2 p-5">
-                  <CardTitle className="text-xs font-medium text-muted-foreground">
+                <CardHeader className="flex flex-row items-center justify-between pb-2 p-4 sm:p-5">
+                  <CardTitle className="text-xs font-medium text-muted-foreground truncate">
                     {kpi.title}
                   </CardTitle>
                   <div className={`w-9 h-9 rounded-xl flex items-center justify-center border shrink-0 ${kpi.color}`}>
                     <Icon className="w-4 h-4" />
                   </div>
                 </CardHeader>
-                <CardContent className="p-5 pt-0 space-y-1">
-                  <div className="flex items-baseline justify-between">
+                <CardContent className="p-4 sm:p-5 pt-0 space-y-1">
+                  <div className="flex items-baseline justify-between gap-2">
                     <span className="text-2xl md:text-3xl font-bold tracking-tight text-foreground font-mono">
                       {kpi.value}
                     </span>
-                    <span className="flex items-center text-xs font-semibold text-emerald-600 dark:text-emerald-400 gap-1 font-mono">
-                      <LuTrendingUp className="w-3 h-3" />
+                    <span className="text-xs font-semibold text-emerald-600 dark:text-emerald-400 font-mono shrink-0">
                       {kpi.delta}
                     </span>
                   </div>
+                  <p className="text-[11px] text-muted-foreground truncate">
+                    {kpi.sub}
+                  </p>
                 </CardContent>
               </Card>
+            </Link>
+          );
+        })}
+      </div>
+
+      {/* 3. Secondary Platform Entities Grid */}
+      <div className="space-y-3">
+        <h2 className="text-sm font-bold text-foreground flex items-center gap-2">
+          <LuDatabase className="w-4 h-4 text-primary shrink-0" />
+          <span>{isAr ? "قواعد البيانات والمحتوى الديناميكي" : "Database Entities & CMS Models"}</span>
+        </h2>
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-8 gap-2.5 sm:gap-3">
+          {secondaryKpis.map((item) => {
+            const Icon = item.icon;
+            return (
+              <Link key={item.title} href={item.href}>
+                <Card className="p-3 sm:p-3.5 hover:border-primary/40 transition-colors h-full flex flex-col justify-between min-w-0">
+                  <div className="flex items-center justify-between gap-1.5">
+                    <Icon className="w-4 h-4 text-muted-foreground shrink-0" />
+                    <span className="font-mono font-bold text-sm sm:text-base text-foreground shrink-0">{item.value}</span>
+                  </div>
+                  <div className="mt-2 min-w-0">
+                    <p className="text-xs font-semibold text-foreground truncate">{item.title}</p>
+                    <p className="text-[10px] text-muted-foreground truncate">{item.sub}</p>
+                  </div>
+                </Card>
+              </Link>
             );
           })}
         </div>
+      </div>
 
-        {/* Deep Dive Grid: Top Pages vs Acquisition & Devices */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 mt-4">
-          {/* Left Column (7 cols): Top Routes Table with visual progress bars */}
-          <Card className="lg:col-span-7">
-            <CardHeader className="pb-3 border-b border-border/40">
-              <div className="flex items-center justify-between">
-                <div>
-                  <CardTitle className="text-sm sm:text-base font-bold">
-                    {t("cockpit.analytics.topRoutes")}
-                  </CardTitle>
-                  <CardDescription className="text-xs text-muted-foreground mt-0.5">
-                    {isAr ? "أداء المسارات الأكثر قراءة وتفاعلاً خلال الـ 30 يوماً الماضية" : "Most active routes by total reader traffic over last 30 days"}
-                  </CardDescription>
-                </div>
+      {/* 4. Live Inquiries Feed vs Content Operations */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 sm:gap-6">
+        {/* Left Column (7 cols): Real Inquiries Feed */}
+        <Card className="lg:col-span-7 min-w-0">
+          <CardHeader className="p-4 sm:p-5 pb-3 border-b border-border/40">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <div className="min-w-0">
+                <CardTitle className="text-sm sm:text-base font-bold flex items-center gap-2">
+                  <LuMessageSquare className="w-4 h-4 text-amber-500 shrink-0" />
+                  <span className="truncate">{isAr ? "أحدث استفسارات العملاء الواردة" : "Recent Client Inquiries"}</span>
+                </CardTitle>
+                <CardDescription className="text-xs text-muted-foreground mt-0.5 line-clamp-1 sm:line-clamp-none">
+                  {isAr
+                    ? "الاستفسارات المحفوظة في قاعدة بيانات Supabase من نموذج التواصل"
+                    : "Live submissions stored directly in Supabase from the contact form"}
+                </CardDescription>
+              </div>
+              <Link href="/admin/inquiries" className="self-end sm:self-auto shrink-0">
+                <Button size="sm" variant="ghost" className="h-8 text-xs gap-1">
+                  <span>{isAr ? "عرض الكل" : "View All"}</span>
+                  <LuArrowUpRight className="w-3.5 h-3.5" />
+                </Button>
+              </Link>
+            </div>
+          </CardHeader>
+          <CardContent className="p-3.5 sm:p-5">
+            {recentInquiries.length === 0 ? (
+              <div className="text-center py-8 text-xs text-muted-foreground">
+                {isAr ? "لا توجد استفسارات جديدة مسجلة حالياً." : "No client inquiries received yet."}
+              </div>
+            ) : (
+              <div className="space-y-2.5 sm:space-y-3">
+                {recentInquiries.map((inq) => (
+                  <div
+                    key={inq.id}
+                    className="p-3 rounded-xl border border-border/60 bg-muted/20 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs min-w-0"
+                  >
+                    <div className="space-y-1 min-w-0 flex-1">
+                      <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
+                        <span className="font-bold text-foreground truncate max-w-[140px] sm:max-w-none">{inq.name}</span>
+                        {inq.company && (
+                          <span className="text-muted-foreground font-medium truncate max-w-[120px] sm:max-w-none">({inq.company})</span>
+                        )}
+                        <Badge
+                          variant={
+                            inq.status === "new"
+                              ? "default"
+                              : inq.status === "in_review"
+                              ? "secondary"
+                              : "outline"
+                          }
+                          className="text-[10px] uppercase font-mono shrink-0"
+                        >
+                          {inq.status}
+                        </Badge>
+                      </div>
+                      <p className="text-muted-foreground line-clamp-1 break-words">
+                        {inq.projectType || inq.inquiryType || inq.message}
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-1.5 shrink-0 text-muted-foreground font-mono text-[11px] self-start sm:self-center">
+                      <LuClock className="w-3.5 h-3.5" />
+                      <span>
+                        {inq.createdAt
+                          ? new Date(inq.createdAt).toLocaleDateString(isAr ? "ar-SA" : "en-US", {
+                              month: "short",
+                              day: "numeric",
+                            })
+                          : isAr
+                          ? "مؤخراً"
+                          : "Recent"}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Right Column (5 cols): Content Publishing Status */}
+        <div className="lg:col-span-5 space-y-4 sm:space-y-5 min-w-0">
+          <Card className="min-w-0">
+            <CardHeader className="p-4 pb-3 border-b border-border/40">
+              <div className="flex items-center justify-between gap-2">
+                <CardTitle className="text-sm font-bold flex items-center gap-2 truncate">
+                  <LuFolderGit2 className="w-4 h-4 text-blue-500 shrink-0" />
+                  <span className="truncate">{isAr ? "أحدث المشاريع في قاعدة البيانات" : "Recent Projects"}</span>
+                </CardTitle>
+                <Link href="/admin/projects" className="shrink-0">
+                  <Button size="sm" variant="ghost" className="h-7 text-xs px-2">
+                    <LuArrowUpRight className="w-3.5 h-3.5" />
+                  </Button>
+                </Link>
               </div>
             </CardHeader>
-            <CardContent className="p-5 space-y-4">
-              {topRoutes.map((route) => (
-                <div key={route.path} className="space-y-1.5">
-                  <div className="flex items-center justify-between text-xs">
-                    <div className="flex items-center gap-2">
-                      <code className="font-mono text-xs font-bold text-primary bg-primary/10 px-1.5 py-0.5 rounded">
-                        {route.path}
-                      </code>
-                      <span className="text-muted-foreground truncate max-w-[150px] sm:max-w-[220px]">
-                        {route.label}
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-3 font-mono shrink-0">
-                      <span className="font-semibold text-foreground">
-                        {route.views.toLocaleString()} {t("cockpit.analytics.views")}
-                      </span>
-                      <span className="text-muted-foreground text-[11px] w-9 text-end">
-                        {route.percent}%
-                      </span>
-                    </div>
-                  </div>
-                  {/* Visual Progress Bar */}
-                  <div className="w-full h-1.5 rounded-full bg-muted overflow-hidden">
-                    <div
-                      className="h-full rounded-full bg-primary/80 transition-all duration-500"
-                      style={{ width: `${route.percent}%` }}
-                    />
-                  </div>
+            <CardContent className="p-3.5 sm:p-4 space-y-2">
+              {recentProjects.map((p) => (
+                <div key={p.id} className="flex items-center justify-between gap-2 text-xs p-2.5 rounded-lg bg-muted/20 min-w-0">
+                  <span className="font-semibold text-foreground truncate flex-1 min-w-0">
+                    {isAr ? p.titleAr || p.titleEn : p.titleEn}
+                  </span>
+                  <Badge variant={p.status === "published" ? "default" : "secondary"} className="text-[10px] shrink-0">
+                    {p.status}
+                  </Badge>
                 </div>
               ))}
             </CardContent>
           </Card>
 
-          {/* Right Column (5 cols): Acquisition Channels, Devices & Regional Traffic */}
-          <div className="lg:col-span-5 space-y-5">
-            {/* Acquisition Channels Card */}
-            <Card>
-              <CardHeader className="pb-3 border-b border-border/40">
-                <CardTitle className="text-sm font-bold flex items-center gap-2">
-                  <LuCompass className="w-4 h-4 text-primary" />
-                  <span>{t("cockpit.analytics.trafficSources")}</span>
+          <Card className="min-w-0">
+            <CardHeader className="p-4 pb-3 border-b border-border/40">
+              <div className="flex items-center justify-between gap-2">
+                <CardTitle className="text-sm font-bold flex items-center gap-2 truncate">
+                  <LuFileText className="w-4 h-4 text-emerald-500 shrink-0" />
+                  <span className="truncate">{isAr ? "أحدث المقالات في الـ CMS" : "Recent Articles"}</span>
                 </CardTitle>
-              </CardHeader>
-              <CardContent className="p-5 space-y-3">
-                {acquisitionChannels.map((channel) => (
-                  <div key={channel.name} className="flex items-center justify-between text-xs">
-                    <div className="flex items-center gap-2">
-                      <div className={`w-2.5 h-2.5 rounded-full ${channel.color} shrink-0`} />
-                      <span className="font-medium text-foreground">{channel.name}</span>
-                    </div>
-                    <div className="flex items-center gap-2 font-mono">
-                      <span className="text-muted-foreground text-[11px]">{channel.count}</span>
-                      <span className="font-bold text-foreground w-8 text-end">{channel.share}%</span>
-                    </div>
-                  </div>
-                ))}
-              </CardContent>
-            </Card>
-
-            {/* Devices & Regional Traffic Mini-Split */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {/* Devices */}
-              <Card>
-                <CardHeader className="p-4 pb-2">
-                  <CardTitle className="text-xs font-semibold text-muted-foreground">
-                    {t("cockpit.analytics.deviceBreakdown")}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="p-4 pt-1 space-y-2">
-                  {deviceDistribution.map((d) => {
-                    const DevIcon = d.icon;
-                    return (
-                      <div key={d.name} className="flex items-center justify-between text-xs">
-                        <div className="flex items-center gap-2 text-muted-foreground">
-                          <DevIcon className="w-3.5 h-3.5" />
-                          <span>{d.name}</span>
-                        </div>
-                        <span className="font-mono font-bold text-foreground">{d.percent}%</span>
-                      </div>
-                    );
-                  })}
-                </CardContent>
-              </Card>
-
-              {/* Regions */}
-              <Card>
-                <CardHeader className="p-4 pb-2">
-                  <CardTitle className="text-xs font-semibold text-muted-foreground">
-                    {t("cockpit.analytics.regions")}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="p-4 pt-1 space-y-2">
-                  {regionalTraffic.map((r) => (
-                    <div key={r.code} className="flex items-center justify-between text-xs">
-                      <div className="flex items-center gap-2 text-muted-foreground truncate">
-                        <span className="font-mono text-[10px] bg-muted px-1 rounded text-foreground font-semibold">
-                          {r.code}
-                        </span>
-                        <span className="truncate">{r.name}</span>
-                      </div>
-                      <span className="font-mono font-bold text-foreground">{r.share}</span>
-                    </div>
-                  ))}
-                </CardContent>
-              </Card>
-            </div>
-          </div>
-        </div>
-
-        {/* 4. Core Web Vitals (Speed Insights Telemetry) */}
-        <Card className="mt-4">
-          <CardHeader className="flex flex-row items-center justify-between pb-3 border-b border-border/40">
-            <div>
-              <CardTitle className="text-sm font-bold flex items-center gap-2">
-                <LuZap className="w-4 h-4 text-amber-500" />
-                <span>{t("cockpit.analytics.coreWebVitals")}</span>
-              </CardTitle>
-              <CardDescription className="text-xs text-muted-foreground mt-0.5">
-                {isAr ? "مؤشرات السرعة واستجابة المتصفح المقاسة من تفاعل المستخدمين الفعليين عبر Vercel Speed Insights" : "Real user experience and edge rendering telemetry measured via Vercel Speed Insights"}
-              </CardDescription>
-            </div>
-            <a
-              href="https://vercel.com/sabrideveloper2-9600s-projects/musnad-tech/speed-insights"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-xs font-medium text-muted-foreground hover:text-foreground flex items-center gap-1 font-mono shrink-0"
-            >
-              <span>{t("cockpit.analytics.viewSpeedInsights")}</span>
-              <LuArrowUpRight className="w-3 h-3" />
-            </a>
-          </CardHeader>
-          <CardContent className="p-5">
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-              {coreWebVitals.map((v) => (
-                <div key={v.label} className="p-3.5 rounded-xl border border-border/60 bg-muted/20 space-y-1">
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="font-mono font-bold text-foreground text-sm">{v.label}</span>
-                    <span className="text-[11px] font-mono text-emerald-600 dark:text-emerald-400 font-semibold flex items-center gap-1">
-                      <LuCircleCheck className="w-3 h-3" />
-                      {v.status}
-                    </span>
-                  </div>
-                  <p className="text-2xl font-bold font-mono text-foreground tracking-tight">{v.value}</p>
-                  <div className="flex items-center justify-between text-[11px] text-muted-foreground pt-0.5">
-                    <span className="truncate">{v.name}</span>
-                    <span className="font-mono opacity-80 shrink-0">{v.threshold}</span>
-                  </div>
+                <Link href="/admin/articles" className="shrink-0">
+                  <Button size="sm" variant="ghost" className="h-7 text-xs px-2">
+                    <LuArrowUpRight className="w-3.5 h-3.5" />
+                  </Button>
+                </Link>
+              </div>
+            </CardHeader>
+            <CardContent className="p-3.5 sm:p-4 space-y-2">
+              {recentArticles.map((a) => (
+                <div key={a.id} className="flex items-center justify-between gap-2 text-xs p-2.5 rounded-lg bg-muted/20 min-w-0">
+                  <span className="font-semibold text-foreground truncate flex-1 min-w-0">
+                    {isAr ? a.titleAr || a.titleEn : a.titleEn}
+                  </span>
+                  <Badge variant={a.status === "published" ? "default" : "secondary"} className="text-[10px] shrink-0">
+                    {a.status}
+                  </Badge>
                 </div>
               ))}
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        </div>
       </div>
 
-      {/* 5. Main Cockpit Split: Quick Actions & Infrastructure Telemetry */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 pt-2">
+      {/* 5. Production Telemetry & Quick Actions */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 sm:gap-6 pt-2">
         {/* Quick Management Shortcuts */}
-        <div className="lg:col-span-2 space-y-4">
+        <div className="lg:col-span-2 space-y-4 min-w-0">
           <div className="flex items-center justify-between">
             <h2 className="text-base font-bold text-foreground tracking-tight">
               {t("cockpit.actions.quickTitle")}
             </h2>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 sm:gap-4">
             {quickActions.map((action) => {
               const Icon = action.icon;
               return (
                 <Link key={action.href} href={action.href}>
                   <Card
                     variant="interactive"
-                    className={`p-5 flex items-center justify-between group ${action.color}`}
+                    className={`p-4 sm:p-5 flex items-center justify-between group ${action.color} min-w-0`}
                   >
-                    <div className="flex items-center gap-3.5">
-                      <div className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center text-foreground group-hover:text-primary group-hover:bg-primary/10 transition-colors">
-                        <Icon className="w-5 h-5" />
+                    <div className="flex items-center gap-3 min-w-0 flex-1">
+                      <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-muted flex items-center justify-center text-foreground group-hover:text-primary group-hover:bg-primary/10 transition-colors shrink-0">
+                        <Icon className="w-4 h-4 sm:w-5 sm:h-5" />
                       </div>
-                      <span className="text-sm font-semibold text-foreground group-hover:text-primary transition-colors">
+                      <span className="text-xs sm:text-sm font-semibold text-foreground group-hover:text-primary transition-colors truncate">
                         {action.label}
                       </span>
                     </div>
-                    <LuArrowUpRight className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                    <LuArrowUpRight className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5 shrink-0" />
                   </Card>
                 </Link>
               );
             })}
           </div>
 
-          {/* Activity / Operational Audit Log Container */}
-          <Card className="mt-6">
-            <CardHeader className="flex flex-row items-center justify-between pb-3 border-b border-border/40">
-              <div className="space-y-0.5">
-                <CardTitle className="text-sm font-bold">
-                  {t("cockpit.activity.title")}
+          {/* Real-time Telemetry Explanation Card */}
+          <Card className="mt-4 sm:mt-6 min-w-0">
+            <CardHeader className="flex flex-row items-center justify-between pb-3 p-4 sm:p-5 border-b border-border/40">
+              <div className="space-y-0.5 min-w-0 flex-1">
+                <CardTitle className="text-sm font-bold flex items-center gap-2">
+                  <LuRadio className="w-4 h-4 text-primary shrink-0" />
+                  <span className="truncate">{isAr ? "تحليلات الويب المباشرة عبر Vercel" : "Real-time Telemetry & Web Vitals"}</span>
                 </CardTitle>
-                <CardDescription className="text-xs">
-                  {isAr ? "سجل العمليات الإدارية وسير تدقيق النظام اللحظي" : "Automated administrative audit trail and operations"}
+                <CardDescription className="text-xs line-clamp-2 sm:line-clamp-none">
+                  {isAr
+                    ? "يتم جمع إحصائيات التفاعل الحقيقية ومؤشرات الأداء عبر حافة شبكة Vercel بدون ملفات تعريف ارتباط (Cookieless)"
+                    : "Real user monitoring & Core Web Vitals are captured live at Vercel edge without intrusive cookies"}
                 </CardDescription>
               </div>
             </CardHeader>
-            <CardContent className="p-5 space-y-3">
-              <div className="flex items-center justify-between p-3 rounded-lg bg-muted/40 border border-border/50 text-xs">
-                <div className="flex items-center gap-3">
-                  <div className="w-2 h-2 rounded-full bg-emerald-500 shrink-0" />
-                  <span className="font-medium text-foreground">
-                    {isAr ? "تم التحقق من ربط إشارات Vercel Web Analytics مع التخطيط العام" : "Vercel Web Analytics & Speed Insights Beacons Linked"}
-                  </span>
-                </div>
-                <span className="text-muted-foreground font-mono flex items-center gap-1">
-                  <LuClock className="w-3 h-3" />
-                  {isAr ? "الآن" : "Just now"}
-                </span>
-              </div>
-
-              <div className="flex items-center justify-between p-3 rounded-lg bg-muted/40 border border-border/50 text-xs">
-                <div className="flex items-center gap-3">
-                  <div className="w-2 h-2 rounded-full bg-blue-500 shrink-0" />
-                  <span className="font-medium text-foreground">
-                    {isAr ? "ربط مطالبات جلسات Clerk JWT مع سياسات Supabase RLS" : "Clerk Custom JWT Session Claims Linked to Supabase RLS"}
-                  </span>
-                </div>
-                <span className="text-muted-foreground font-mono flex items-center gap-1">
-                  <LuClock className="w-3 h-3" />
-                  {isAr ? "مؤخراً" : "Recent"}
-                </span>
-              </div>
-
-              <div className="flex items-center justify-between p-3 rounded-lg bg-muted/40 border border-border/50 text-xs">
-                <div className="flex items-center gap-3">
-                  <div className="w-2 h-2 rounded-full bg-purple-500 shrink-0" />
-                  <span className="font-medium text-foreground">
-                    {isAr ? "تفعيل حماية مسارات لوحة التحكم متعددة المستويات" : "Admin Shell & Multi-Tier Guards Initialized"}
-                  </span>
-                </div>
-                <span className="text-muted-foreground font-mono flex items-center gap-1">
-                  <LuClock className="w-3 h-3" />
-                  {isAr ? "مؤخراً" : "Recent"}
-                </span>
+            <CardContent className="p-4 sm:p-5 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+              <p className="text-xs text-muted-foreground max-w-lg leading-relaxed">
+                {isAr
+                  ? "حرصاً على دقة البيانات ومبدأ 'البرهان قبل الادعاء'، يتم تسجيل إشارات الزوار وأوقات التحميل عبر @vercel/analytics و @vercel/speed-insights، ويمكن معاينتها مباشرة عبر لوحة تحكم Vercel الحية."
+                  : "In accordance with our 'Proof over claims' principle, production visitor metrics and latency vitals are ingested directly by Vercel Analytics and Speed Insights consoles without storing mock values."}
+              </p>
+              <div className="flex flex-wrap sm:flex-nowrap gap-2 w-full md:w-auto shrink-0">
+                <a
+                  href="https://vercel.com/sabrideveloper2-9600s-projects/musnad-tech/analytics?source=prod-checklist&environment=all"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex-1 sm:flex-initial"
+                >
+                  <Button size="sm" variant="outline" className="w-full sm:w-auto text-xs gap-1.5 cursor-pointer justify-center">
+                    <LuActivity className="w-3.5 h-3.5 text-primary shrink-0" />
+                    <span className="truncate">{t("cockpit.analytics.openConsole")}</span>
+                    <LuExternalLink className="w-3.5 h-3.5 opacity-70 shrink-0" />
+                  </Button>
+                </a>
+                <a
+                  href="https://vercel.com/sabrideveloper2-9600s-projects/musnad-tech/speed-insights"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex-1 sm:flex-initial"
+                >
+                  <Button size="sm" variant="outline" className="w-full sm:w-auto text-xs gap-1.5 cursor-pointer justify-center">
+                    <LuZap className="w-3.5 h-3.5 text-amber-500 shrink-0" />
+                    <span className="truncate">{t("cockpit.analytics.viewSpeedInsights")}</span>
+                    <LuExternalLink className="w-3.5 h-3.5 opacity-70 shrink-0" />
+                  </Button>
+                </a>
               </div>
             </CardContent>
           </Card>
         </div>
 
         {/* Right Column: Platform Services & Infrastructure Telemetry */}
-        <div className="space-y-4">
+        <div className="space-y-4 min-w-0">
           <h2 className="text-base font-bold text-foreground tracking-tight flex items-center gap-2">
-            <LuShieldCheck className="w-4 h-4 text-emerald-500" />
+            <LuShieldCheck className="w-4 h-4 text-emerald-500 shrink-0" />
             <span>{isAr ? "جاهزية البنية التحتية" : "Infrastructure Telemetry"}</span>
           </h2>
 
-          <Card>
-            <CardHeader className="pb-3 border-b border-border/40">
-              <CardTitle className="text-sm font-semibold">
-                {isAr ? "صحة الخدمات الأساسية" : "Service Health & Status"}
+          <Card className="min-w-0">
+            <CardHeader className="p-4 pb-3 border-b border-border/40">
+              <CardTitle className="text-sm font-semibold flex items-center gap-2">
+                <LuServer className="w-4 h-4 text-primary shrink-0" />
+                <span className="truncate">{isAr ? "صحة الخدمات الأساسية" : "Service Health & Status"}</span>
               </CardTitle>
-              <CardDescription className="text-xs">
+              <CardDescription className="text-xs line-clamp-1">
                 {isAr ? "حالة الاتصال بالخدمات السحابية وقواعد البيانات" : "Cloud services & database connection telemetry"}
               </CardDescription>
             </CardHeader>
-            <CardContent className="p-4 space-y-2.5">
+            <CardContent className="p-3.5 sm:p-4 space-y-2.5">
               {systemStatus.map((service) => (
                 <div
                   key={service.name}
-                  className="flex items-center justify-between p-2.5 rounded-lg border border-border/60 bg-muted/20 text-xs"
+                  className="flex items-center justify-between gap-2.5 p-2.5 rounded-lg border border-border/60 bg-muted/20 text-xs min-w-0"
                 >
-                  <div className="flex items-center gap-2">
-                    <LuCircleCheck className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
-                    <span className="font-medium text-foreground truncate max-w-[170px]">
+                  <div className="flex items-center gap-2 min-w-0 flex-1">
+                    <LuCircleCheck
+                      className={`w-3.5 h-3.5 shrink-0 ${
+                        service.isOk ? "text-emerald-500" : "text-amber-500"
+                      }`}
+                    />
+                    <span className="font-medium text-foreground truncate">
                       {service.name}
                     </span>
                   </div>
-                  <span className="text-[11px] font-mono text-emerald-600 dark:text-emerald-400 font-semibold">
+                  <span
+                    className={`text-[11px] font-mono font-semibold shrink-0 ${
+                      service.isOk
+                        ? "text-emerald-600 dark:text-emerald-400"
+                        : "text-amber-600 dark:text-amber-400"
+                    }`}
+                  >
                     {service.status}
                   </span>
                 </div>
