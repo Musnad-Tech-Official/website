@@ -321,8 +321,15 @@ test("job postings never fabricate a date or remote-work classification", () => 
   assert.equal(job.jobLocationType, undefined);
 });
 
+// The lightweight TS loader does not enable esModuleInterop; mock default Node imports.
+const inquiryNodeMocks = {
+  fs: { default: { existsSync: () => false } },
+  path: { default: { join: (...parts) => parts.join("/") } },
+};
+
 test("inquiry reads fail closed when Clerk denies administrator access", async () => {
   const { getInquiriesAction } = loadTs("lib/inquiries/actions.ts", {
+    ...inquiryNodeMocks,
     "@clerk/nextjs/server": { auth: async () => ({ userId: null, sessionClaims: {} }) },
     "@/utils/supabase/server": { createClient: async () => { throw new Error("must not query DB"); } },
     "next/cache": { revalidatePath: () => {} },
@@ -332,6 +339,7 @@ test("inquiry reads fail closed when Clerk denies administrator access", async (
 
 test("failed inquiry persistence never reports a successful submission", async () => {
   const { submitInquiryAction } = loadTs("lib/inquiries/actions.ts", {
+    ...inquiryNodeMocks,
     "@clerk/nextjs/server": { auth: async () => ({ userId: null }) },
     "@/utils/supabase/server": { createClient: async () => { throw new Error("database unavailable"); } },
     "next/cache": { revalidatePath: () => {} },
