@@ -221,8 +221,8 @@ test("structured data covers website, breadcrumbs, projects, services, team, faq
   assert.equal(website.inLanguage, "en");
 
   const breadcrumbs = breadcrumbsJsonLd([
-    { name: "Home", url: "https://musnad.tech/en" },
-    { name: "Blog", url: "https://musnad.tech/en/blog" },
+    { name: "Home", url: "https://musnadtech.com/en" },
+    { name: "Blog", url: "https://musnadtech.com/en/blog" },
   ]);
   assert.equal(breadcrumbs["@type"], "BreadcrumbList");
   assert.equal(breadcrumbs.itemListElement.length, 2);
@@ -295,7 +295,7 @@ test("page metadata includes authors, creator, publisher, and keywords when prov
   assert.deepEqual(metadata.keywords, ["AI", "Cloud"]);
   assert.equal(metadata.creator, "Musnad Tech");
   assert.equal(metadata.publisher, "Musnad Tech");
-  assert.deepEqual(metadata.authors, [{ name: "Musnad Tech", url: "https://musnad.tech" }]);
+  assert.deepEqual(metadata.authors, [{ name: "Musnad Tech", url: "https://musnadtech.com" }]);
 });
 
 test("web manifest specifies standalone display, branding icons, and metadata", () => {
@@ -304,4 +304,19 @@ test("web manifest specifies standalone display, branding icons, and metadata", 
   assert.ok(manifest.icons.length >= 2);
   assert.ok(manifest.icons.some((i) => i.src.endsWith(".ico")));
   assert.ok(manifest.icons.some((i) => i.src.endsWith(".png")));
+});
+
+test("production fallback domain and public organization links are real", () => {
+  withEnv({ NEXT_PUBLIC_SITE_URL: undefined }, () => {
+    assert.equal(config.getSiteUrl().origin, "https://musnadtech.com");
+  });
+  const organization = loadTs("lib/seo/structured-data.ts").organizationJsonLd();
+  assert.ok(organization.sameAs.includes("https://github.com/Musnad-Tech-Official"));
+  assert.ok(!organization.sameAs.some((url) => url.includes("github.com/musnad-tech")));
+});
+
+test("job postings never fabricate a date or remote-work classification", () => {
+  const job = jobPostingJsonLd({ title: "Designer", description: "Design", location: "Taiz" }, "ar");
+  assert.equal(job.datePosted, undefined);
+  assert.equal(job.jobLocationType, undefined);
 });
