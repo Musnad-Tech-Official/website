@@ -322,7 +322,8 @@ export function ContactForm({ className }: ContactFormProps) {
           </div>
         )}
 
-        {/* Attachment Upload Field */}
+        {/* Attachments remain hidden until private storage and authorized downloads are implemented. */}
+        {false && (
         <div>
           <label className="block text-xs font-semibold text-foreground mb-2">
             {t("attachment.label")}
@@ -366,6 +367,7 @@ export function ContactForm({ className }: ContactFormProps) {
             )}
           </div>
         </div>
+        )}
 
         {/* Message Textarea */}
         <div>
