@@ -104,8 +104,19 @@ export async function submitInquiryAction(input: SubmitInquiryInput): Promise<{
   error?: string;
 }> {
   try {
-    if (!input.name?.trim() || !input.email?.trim() || !input.message?.trim()) {
+    if (!input || typeof input.name !== "string" || typeof input.email !== "string" || typeof input.message !== "string" ||
+        !input.name.trim() || !input.email.trim() || !input.message.trim()) {
       return { success: false, error: "Please provide your name, email, and message." };
+    }
+    if (input.name.trim().length > 120 || input.email.trim().length > 254 ||
+        input.message.trim().length > 5000 ||
+        !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(input.email.trim()) ||
+        [input.company, input.phone, input.inquiryType, input.projectType, input.budget, input.timeline, input.currentProduct, input.attachmentName]
+          .some((value) => value !== undefined && (typeof value !== "string" || value.length > 255)) ||
+        (input.attachmentSize !== undefined && (!Number.isSafeInteger(input.attachmentSize) || input.attachmentSize < 0 || input.attachmentSize > 10 * 1024 * 1024)) ||
+        (input.attachmentUrl !== undefined &&
+          (typeof input.attachmentUrl !== "string" || !/^https:\/\//i.test(input.attachmentUrl)))) {
+      return { success: false, error: "Invalid or oversized inquiry details." };
     }
 
     // Optional user ID if authenticated
@@ -119,7 +130,7 @@ export async function submitInquiryAction(input: SubmitInquiryInput): Promise<{
       // Ignored for anonymous users
     }
 
-    const id = `inq-${Date.now()}`;
+    const id = `inq-${crypto.randomUUID()}`;
     const now = new Date().toISOString();
 
     const newInquiry: InquiryItem = {
@@ -167,14 +178,15 @@ export async function submitInquiryAction(input: SubmitInquiryInput): Promise<{
         });
 
       if (error) {
-        console.warn("Supabase inquiry insert note (will use persistent fallback):", error.message);
+        console.error("Inquiry storage failed:", error.code);
+        return { success: false, error: "Unable to save your inquiry. Please try again later." };
       }
-    } catch (dbErr) {
-      console.warn("Supabase inquiry insert exception (using persistent fallback):", dbErr);
+    } catch {
+      return { success: false, error: "Unable to save your inquiry. Please try again later." };
     }
 
+    // Never claim success or persist private inquiries to an ephemeral production disk on DB failure.
     memoryInquiriesCache = [newInquiry, ...memoryInquiriesCache.filter((i) => i.id !== newInquiry.id)];
-    writeDiskInquiries(memoryInquiriesCache);
     revalidatePath("/[locale]/admin/inquiries", "page");
     return { success: true, inquiryId: newInquiry.id };
   } catch (err: unknown) {
@@ -186,13 +198,8 @@ export async function submitInquiryAction(input: SubmitInquiryInput): Promise<{
  * Admin action: Retrieves all client inquiries
  */
 export async function getInquiriesAction(status?: InquiryStatus): Promise<InquiryItem[]> {
-  try {
-    await verifyAdminAuth();
-  } catch {
-    // If auth check fails in SSR context, return memory/disk cache
-    const current = memoryInquiriesCache.length > 0 ? memoryInquiriesCache : readDiskInquiries();
-    return status ? current.filter((i) => i.status === status) : current;
-  }
+  // Fail closed: this exported Server Action must never disclose cached inquiries.
+  await verifyAdminAuth();
 
   const now = Date.now();
   if (lastFetch > 0 && now - lastFetch < CACHE_TTL_MS && memoryInquiriesCache.length > 0) {
