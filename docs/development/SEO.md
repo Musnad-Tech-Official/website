@@ -7,7 +7,7 @@ home and auth metadata use the `SEO` message namespace.
 ## Configuration
 
 Set `NEXT_PUBLIC_SITE_URL` to the canonical HTTP(S) origin, such as
-`https://musnad.tech`, without a path, query, or fragment. It defaults to the
+`https://musnadtech.com`, without a path, query, or fragment. It defaults to the
 production domain already used in this repository. All canonical URLs, language
 alternates, structured data, and sitemap URLs use this origin, never request headers.
 
