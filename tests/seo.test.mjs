@@ -345,7 +345,7 @@ test("comments policies never allow unrestricted public moderation", () => {
   const sql = readFileSync(resolve(testDirectory, "../supabase/sql/comments_and_newsletter.sql"), "utf8");
   const commentsSection = sql.slice(sql.indexOf("-- 2. Create Article Comments Table"));
   assert.doesNotMatch(commentsSection, /CREATE POLICY "Allow (select|insert|update|delete) comments"/);
-  assert.doesNotMatch(commentsSection, /(?:USING|WITH CHECK)\\s*\\(true\\)/i);
+  assert.doesNotMatch(commentsSection, /(?:USING|WITH CHECK)\s*\(true\)/i);
   assert.match(commentsSection, /status = 'approved'/);
-  assert.match(commentsSection, /user_id = \\(auth\\.jwt\\(\\) ->> 'sub'\\)/);
+  assert.match(commentsSection, /user_id = \(auth\.jwt\(\) ->> 'sub'\)/);
 });
