@@ -114,8 +114,7 @@ export async function submitInquiryAction(input: SubmitInquiryInput): Promise<{
         [input.company, input.phone, input.inquiryType, input.projectType, input.budget, input.timeline, input.currentProduct, input.attachmentName]
           .some((value) => value !== undefined && (typeof value !== "string" || value.length > 255)) ||
         (input.attachmentSize !== undefined && (!Number.isSafeInteger(input.attachmentSize) || input.attachmentSize < 0 || input.attachmentSize > 10 * 1024 * 1024)) ||
-        (input.attachmentUrl !== undefined &&
-          (typeof input.attachmentUrl !== "string" || !/^https:\/\//i.test(input.attachmentUrl)))) {
+        (input.attachmentUrl !== undefined && input.attachmentUrl !== "")) {
       return { success: false, error: "Invalid or oversized inquiry details." };
     }
 
@@ -218,7 +217,7 @@ export async function getInquiriesAction(status?: InquiryStatus): Promise<Inquir
     }
 
     const { data, error } = await query;
-    if (!error && data && data.length > 0) {
+    if (!error && data) {
       const dbInquiries = (data as unknown as InquiryDbRow[]).map(mapRowToInquiry);
       memoryInquiriesCache = dbInquiries;
       writeDiskInquiries(dbInquiries);
@@ -263,12 +262,13 @@ export async function updateInquiryStatusAction(
         updatePayload.admin_notes = adminNotes;
       }
 
-      await supabase
+      const { error } = await supabase
         .from("inquiries")
         .update(updatePayload)
         .eq("id", id);
+      if (error) return { success: false, error: "Unable to update inquiry." };
     } catch {
-      // Supabase table pending
+      return { success: false, error: "Unable to update inquiry." };
     }
 
     memoryInquiriesCache = memoryInquiriesCache.map((i) => {
@@ -302,9 +302,10 @@ export async function deleteInquiryAction(id: string): Promise<{
 
     try {
       const supabase = await createClient();
-      await supabase.from("inquiries").delete().eq("id", id);
+      const { error } = await supabase.from("inquiries").delete().eq("id", id);
+      if (error) return { success: false, error: "Unable to delete inquiry." };
     } catch {
-      // Supabase table pending
+      return { success: false, error: "Unable to delete inquiry." };
     }
 
     memoryInquiriesCache = memoryInquiriesCache.filter((i) => i.id !== id);
