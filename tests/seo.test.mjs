@@ -320,3 +320,32 @@ test("job postings never fabricate a date or remote-work classification", () => 
   assert.equal(job.datePosted, undefined);
   assert.equal(job.jobLocationType, undefined);
 });
+
+test("inquiry reads fail closed when Clerk denies administrator access", async () => {
+  const { getInquiriesAction } = loadTs("lib/inquiries/actions.ts", {
+    "@clerk/nextjs/server": { auth: async () => ({ userId: null, sessionClaims: {} }) },
+    "@/utils/supabase/server": { createClient: async () => { throw new Error("must not query DB"); } },
+    "next/cache": { revalidatePath: () => {} },
+  });
+  await assert.rejects(getInquiriesAction(), /Unauthorized/);
+});
+
+test("failed inquiry persistence never reports a successful submission", async () => {
+  const { submitInquiryAction } = loadTs("lib/inquiries/actions.ts", {
+    "@clerk/nextjs/server": { auth: async () => ({ userId: null }) },
+    "@/utils/supabase/server": { createClient: async () => { throw new Error("database unavailable"); } },
+    "next/cache": { revalidatePath: () => {} },
+  });
+  const result = await submitInquiryAction({ name: "Example", email: "person@example.com", message: "Hello" });
+  assert.equal(result.success, false);
+  assert.equal(result.inquiryId, undefined);
+});
+
+test("comments policies never allow unrestricted public moderation", () => {
+  const sql = readFileSync(resolve(testDirectory, "../supabase/sql/comments_and_newsletter.sql"), "utf8");
+  const commentsSection = sql.slice(sql.indexOf("-- 2. Create Article Comments Table"));
+  assert.doesNotMatch(commentsSection, /CREATE POLICY "Allow (select|insert|update|delete) comments"/);
+  assert.doesNotMatch(commentsSection, /(?:USING|WITH CHECK)\\s*\\(true\\)/i);
+  assert.match(commentsSection, /status = 'approved'/);
+  assert.match(commentsSection, /user_id = \\(auth\\.jwt\\(\\) ->> 'sub'\\)/);
+});
