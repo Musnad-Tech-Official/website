@@ -92,9 +92,15 @@ export function ContactForm({ className }: ContactFormProps) {
         const uploadRes = await uploadInquiryAttachmentAction(formData);
         if (uploadRes.success && uploadRes.url) {
           attachmentUrl = uploadRes.url;
+        } else {
+          setErrorAlert(uploadRes.error || "Could not upload the attachment.");
+          setIsSubmitting(false);
+          return;
         }
       } catch {
-        // Non-blocking attachment upload
+        setErrorAlert("Could not upload the attachment.");
+        setIsSubmitting(false);
+        return;
       }
     }
 
@@ -329,7 +335,7 @@ export function ContactForm({ className }: ContactFormProps) {
               ref={fileInputRef}
               type="file"
               onChange={handleFileChange}
-              accept=".pdf,.doc,.docx,.zip,image/*"
+              accept=".pdf,.png,.jpg,.jpeg,.webp"
               className="hidden"
             />
             {attachment ? (
