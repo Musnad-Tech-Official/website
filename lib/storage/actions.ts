@@ -112,43 +112,13 @@ export async function uploadInquiryAttachmentAction(
       return { success: false, error: "Attachment must be between 1 byte and 10MB." };
     }
 
-    const arrayBuffer = await file.arrayBuffer();
-    const buffer = Buffer.from(arrayBuffer);
-    const signatureValid =
-      (file.type === "application/pdf" && buffer.subarray(0, 5).toString() === "%PDF-") ||
-      (file.type === "image/png" && buffer.subarray(0, 8).equals(Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]))) ||
-      (file.type === "image/jpeg" && buffer[0] === 255 && buffer[1] === 216 && buffer[2] === 255) ||
-      (file.type === "image/webp" && buffer.subarray(0, 4).toString() === "RIFF" && buffer.subarray(8, 12).toString() === "WEBP");
-    if (!signatureValid) {
-      return { success: false, error: "Attachment file content does not match its type." };
-    }
-
-    const now = new Date();
-    const year = now.getFullYear();
-    const month = String(now.getMonth() + 1).padStart(2, "0");
-    const randomSuffix = Math.random().toString(36).substring(2, 8);
-    const cleanName = file.name.replace(/[^a-zA-Z0-9.-]/g, "_").toLowerCase();
-    const storagePath = `inquiries/${year}/${month}/${Date.now()}-${randomSuffix}-${cleanName}`;
-
-    try {
-      const supabase = await createClient();
-      const { error: uploadError } = await supabase.storage
-        .from("inquiry-attachments")
-        .upload(storagePath, buffer, {
-          contentType: file.type || "application/octet-stream",
-          upsert: false,
-        });
-
-      if (uploadError) {
-        return { success: false, error: "Secure attachment storage is unavailable." };
-      }
-
-      // This bucket must be private. A public URL is not a safe retrieval mechanism
-      // for confidential client documents; implement authenticated signed reads first.
-      return { success: false, error: "Private attachment retrieval is not configured yet." };
-    } catch {
-      return { success: false, error: "Secure attachment storage is unavailable." };
-    }
+    // Disabled until the private inquiry bucket, malware screening, upload
+    // throttling and authenticated administrator retrieval are available.
+    // Never write an orphaned object or produce a publicly accessible link.
+    return {
+      success: false,
+      error: "Attachments are temporarily unavailable. Please send your inquiry without a file.",
+    };
   } catch (err: unknown) {
     return {
       success: false,
