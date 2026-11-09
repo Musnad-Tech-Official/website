@@ -35,9 +35,9 @@ export async function uploadImageAction(
     }
 
     // Validate mime type
-    const validMimes = ["image/png", "image/jpeg", "image/gif", "image/webp", "image/svg+xml"];
+    const validMimes = ["image/png", "image/jpeg", "image/gif", "image/webp"];
     if (!validMimes.includes(file.type)) {
-      return { success: false, error: "Unsupported image format. Allowed: PNG, JPEG, GIF, WebP, SVG." };
+      return { success: false, error: "Unsupported image format. Allowed: PNG, JPEG, GIF, WebP." };
     }
 
     // Limit to 10MB
@@ -75,10 +75,8 @@ export async function uploadImageAction(
 
       return { success: true, url: publicUrl };
     } catch {
-      // Fallback for local dev when bucket is offline: generate base64 data URL so editor doesn't break
-      const base64 = buffer.toString("base64");
-      const fallbackDataUrl = `data:${file.type};base64,${base64}`;
-      return { success: true, url: fallbackDataUrl };
+      // Never misrepresent an unsaved upload as successful or embed untrusted data URLs.
+      return { success: false, error: "Media storage is temporarily unavailable." };
     }
   } catch (err: unknown) {
     return { success: false, error: (err as Error).message || "Failed to upload image." };
@@ -98,13 +96,32 @@ export async function uploadInquiryAttachmentAction(
       return { success: false, error: "No attachment file provided." };
     }
 
-    // Limit to 10MB
-    if (file.size > 10 * 1024 * 1024) {
-      return { success: false, error: "Attachment exceeds 10MB limit." };
+    // Avoid arbitrary public uploads, including executable documents and archives.
+    const allowedTypes: Record<string, string> = {
+      ".pdf": "application/pdf",
+      ".png": "image/png",
+      ".jpg": "image/jpeg",
+      ".jpeg": "image/jpeg",
+      ".webp": "image/webp",
+    };
+    const extension = file.name.toLowerCase().match(/\.[a-z0-9]+$/)?.[0] || "";
+    if (allowedTypes[extension] !== file.type) {
+      return { success: false, error: "Only PDF, PNG, JPEG and WebP attachments are supported." };
+    }
+    if (file.size === 0 || file.size > 10 * 1024 * 1024) {
+      return { success: false, error: "Attachment must be between 1 byte and 10MB." };
     }
 
     const arrayBuffer = await file.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
+    const signatureValid =
+      (file.type === "application/pdf" && buffer.subarray(0, 5).toString() === "%PDF-") ||
+      (file.type === "image/png" && buffer.subarray(0, 8).equals(Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]))) ||
+      (file.type === "image/jpeg" && buffer[0] === 255 && buffer[1] === 216 && buffer[2] === 255) ||
+      (file.type === "image/webp" && buffer.subarray(0, 4).toString() === "RIFF" && buffer.subarray(8, 12).toString() === "WEBP");
+    if (!signatureValid) {
+      return { success: false, error: "Attachment file content does not match its type." };
+    }
 
     const now = new Date();
     const year = now.getFullYear();
@@ -122,20 +139,16 @@ export async function uploadInquiryAttachmentAction(
           upsert: false,
         });
 
-      if (!uploadError) {
-        const {
-          data: { publicUrl },
-        } = supabase.storage.from("inquiry-attachments").getPublicUrl(storagePath);
-        return { success: true, url: publicUrl };
+      if (uploadError) {
+        return { success: false, error: "Secure attachment storage is unavailable." };
       }
-    } catch {
-      // Storage bucket fallback
-    }
 
-    // Fallback data URL if bucket is pending or offline
-    const base64 = buffer.toString("base64");
-    const mime = file.type || "application/octet-stream";
-    return { success: true, url: `data:${mime};base64,${base64}` };
+      // This bucket must be private. A public URL is not a safe retrieval mechanism
+      // for confidential client documents; implement authenticated signed reads first.
+      return { success: false, error: "Private attachment retrieval is not configured yet." };
+    } catch {
+      return { success: false, error: "Secure attachment storage is unavailable." };
+    }
   } catch (err: unknown) {
     return {
       success: false,
