@@ -46,27 +46,16 @@ export async function subscribeNewsletterAction(
     );
 
     if (error) {
-      // If table doesn't exist yet, gracefully store in fallback cache
-      console.warn("Supabase newsletter_subscribers notice:", error.message);
-      fallbackSubscribers.add(normalizedEmail);
-      return {
-        success: true,
-        message: "subscribed",
-      };
+      console.error("Newsletter persistence failed:", error.code);
+      return { success: false, error: "subscription_unavailable" };
     }
 
     return {
       success: true,
       message: "subscribed",
     };
-  } catch (err) {
-    console.error("subscribeNewsletterAction exception:", err);
-    // Graceful fallback
-    fallbackSubscribers.add(normalizedEmail);
-    return {
-      success: true,
-      message: "subscribed",
-    };
+  } catch {
+    return { success: false, error: "subscription_unavailable" };
   }
 }
 

@@ -10,12 +10,8 @@ import { Select } from "@/components/ui/select";
 import { Card } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { submitInquiryAction } from "@/lib/inquiries/actions";
-import { uploadInquiryAttachmentAction } from "@/lib/storage/actions";
 import {
   LuSend,
-  LuPaperclip,
-  LuFileCheck,
-  LuTrash2,
   LuCircleCheck,
   LuLoader,
   LuTriangleAlert,
@@ -39,40 +35,11 @@ export function ContactForm({ className }: ContactFormProps) {
   const [budget, setBudget] = React.useState<string>("");
   const [timeline, setTimeline] = React.useState<string>("");
   const [currentProduct, setCurrentProduct] = React.useState<string>("");
-  const [attachment, setAttachment] = React.useState<File | null>(null);
   const [message, setMessage] = React.useState<string>("");
 
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const [submissionSuccess, setSubmissionSuccess] = React.useState<{ inquiryId: string } | null>(null);
   const [errorAlert, setErrorAlert] = React.useState<string | null>(null);
-
-  const fileInputRef = React.useRef<HTMLInputElement>(null);
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      if (file.size <= 10 * 1024 * 1024) {
-        setAttachment(file);
-        setErrorAlert(null);
-      } else {
-        setErrorAlert("File exceeds 10MB limit. Please upload a smaller document.");
-      }
-    }
-  };
-
-  const handleRemoveFile = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    setAttachment(null);
-    if (fileInputRef.current) {
-      fileInputRef.current.value = "";
-    }
-  };
-
-  const formatFileSize = (bytes: number): string => {
-    if (bytes < 1024) return `${bytes} B`;
-    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
-    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -83,20 +50,6 @@ export function ContactForm({ className }: ContactFormProps) {
 
     setIsSubmitting(true);
     setErrorAlert(null);
-
-    let attachmentUrl: string | undefined;
-    if (attachment) {
-      try {
-        const formData = new FormData();
-        formData.append("file", attachment);
-        const uploadRes = await uploadInquiryAttachmentAction(formData);
-        if (uploadRes.success && uploadRes.url) {
-          attachmentUrl = uploadRes.url;
-        }
-      } catch {
-        // Non-blocking attachment upload
-      }
-    }
 
     const res = await submitInquiryAction({
       name,
@@ -109,9 +62,6 @@ export function ContactForm({ className }: ContactFormProps) {
       timeline,
       currentProduct,
       message,
-      attachmentUrl,
-      attachmentName: attachment?.name,
-      attachmentSize: attachment?.size,
     });
 
     setIsSubmitting(false);
@@ -134,7 +84,6 @@ export function ContactForm({ className }: ContactFormProps) {
     setTimeline("");
     setCurrentProduct("");
     setMessage("");
-    setAttachment(null);
     setErrorAlert(null);
   };
 
@@ -315,51 +264,6 @@ export function ContactForm({ className }: ContactFormProps) {
             </div>
           </div>
         )}
-
-        {/* Attachment Upload Field */}
-        <div>
-          <label className="block text-xs font-semibold text-foreground mb-2">
-            {t("attachment.label")}
-          </label>
-          <div
-            onClick={() => fileInputRef.current?.click()}
-            className="flex flex-col items-center justify-center border-2 border-dashed border-border/80 hover:border-primary/50 bg-muted/20 hover:bg-muted/30 rounded-xl p-5 cursor-pointer transition-colors"
-          >
-            <input
-              ref={fileInputRef}
-              type="file"
-              onChange={handleFileChange}
-              accept=".pdf,.doc,.docx,.zip,image/*"
-              className="hidden"
-            />
-            {attachment ? (
-              <div className="flex items-center gap-3 w-full justify-between px-2">
-                <div className="flex items-center gap-2.5 truncate">
-                  <LuFileCheck className="h-5 w-5 text-emerald-600 shrink-0" />
-                  <span className="text-xs font-medium text-foreground truncate">{attachment.name}</span>
-                  <span className="text-[11px] text-muted-foreground font-mono">
-                    ({formatFileSize(attachment.size)})
-                  </span>
-                </div>
-                <button
-                  type="button"
-                  onClick={handleRemoveFile}
-                  className="text-muted-foreground hover:text-destructive p-1 rounded-md transition-colors"
-                >
-                  <LuTrash2 className="h-4 w-4" />
-                </button>
-              </div>
-            ) : (
-              <div className="flex flex-col items-center gap-1.5 text-center">
-                <LuPaperclip className="h-5 w-5 text-muted-foreground mb-1" />
-                <span className="text-xs font-medium text-foreground">
-                  {t("attachment.hint") || "Click to upload project brief or document"}
-                </span>
-                <span className="text-[10px] text-muted-foreground">PDF, DOC, ZIP up to 10MB</span>
-              </div>
-            )}
-          </div>
-        </div>
 
         {/* Message Textarea */}
         <div>

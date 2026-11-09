@@ -35,9 +35,9 @@ export async function uploadImageAction(
     }
 
     // Validate mime type
-    const validMimes = ["image/png", "image/jpeg", "image/gif", "image/webp", "image/svg+xml"];
+    const validMimes = ["image/png", "image/jpeg", "image/gif", "image/webp"];
     if (!validMimes.includes(file.type)) {
-      return { success: false, error: "Unsupported image format. Allowed: PNG, JPEG, GIF, WebP, SVG." };
+      return { success: false, error: "Unsupported image format. Allowed: PNG, JPEG, GIF, WebP." };
     }
 
     // Limit to 10MB
@@ -75,10 +75,8 @@ export async function uploadImageAction(
 
       return { success: true, url: publicUrl };
     } catch {
-      // Fallback for local dev when bucket is offline: generate base64 data URL so editor doesn't break
-      const base64 = buffer.toString("base64");
-      const fallbackDataUrl = `data:${file.type};base64,${base64}`;
-      return { success: true, url: fallbackDataUrl };
+      // Never misrepresent an unsaved upload as successful or embed untrusted data URLs.
+      return { success: false, error: "Media storage is temporarily unavailable." };
     }
   } catch (err: unknown) {
     return { success: false, error: (err as Error).message || "Failed to upload image." };
@@ -98,44 +96,29 @@ export async function uploadInquiryAttachmentAction(
       return { success: false, error: "No attachment file provided." };
     }
 
-    // Limit to 10MB
-    if (file.size > 10 * 1024 * 1024) {
-      return { success: false, error: "Attachment exceeds 10MB limit." };
+    // Avoid arbitrary public uploads, including executable documents and archives.
+    const allowedTypes: Record<string, string> = {
+      ".pdf": "application/pdf",
+      ".png": "image/png",
+      ".jpg": "image/jpeg",
+      ".jpeg": "image/jpeg",
+      ".webp": "image/webp",
+    };
+    const extension = file.name.toLowerCase().match(/\.[a-z0-9]+$/)?.[0] || "";
+    if (allowedTypes[extension] !== file.type) {
+      return { success: false, error: "Only PDF, PNG, JPEG and WebP attachments are supported." };
+    }
+    if (file.size === 0 || file.size > 10 * 1024 * 1024) {
+      return { success: false, error: "Attachment must be between 1 byte and 10MB." };
     }
 
-    const arrayBuffer = await file.arrayBuffer();
-    const buffer = Buffer.from(arrayBuffer);
-
-    const now = new Date();
-    const year = now.getFullYear();
-    const month = String(now.getMonth() + 1).padStart(2, "0");
-    const randomSuffix = Math.random().toString(36).substring(2, 8);
-    const cleanName = file.name.replace(/[^a-zA-Z0-9.-]/g, "_").toLowerCase();
-    const storagePath = `inquiries/${year}/${month}/${Date.now()}-${randomSuffix}-${cleanName}`;
-
-    try {
-      const supabase = await createClient();
-      const { error: uploadError } = await supabase.storage
-        .from("inquiry-attachments")
-        .upload(storagePath, buffer, {
-          contentType: file.type || "application/octet-stream",
-          upsert: false,
-        });
-
-      if (!uploadError) {
-        const {
-          data: { publicUrl },
-        } = supabase.storage.from("inquiry-attachments").getPublicUrl(storagePath);
-        return { success: true, url: publicUrl };
-      }
-    } catch {
-      // Storage bucket fallback
-    }
-
-    // Fallback data URL if bucket is pending or offline
-    const base64 = buffer.toString("base64");
-    const mime = file.type || "application/octet-stream";
-    return { success: true, url: `data:${mime};base64,${base64}` };
+    // Disabled until the private inquiry bucket, malware screening, upload
+    // throttling and authenticated administrator retrieval are available.
+    // Never write an orphaned object or produce a publicly accessible link.
+    return {
+      success: false,
+      error: "Attachments are temporarily unavailable. Please send your inquiry without a file.",
+    };
   } catch (err: unknown) {
     return {
       success: false,

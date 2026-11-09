@@ -2,7 +2,7 @@ import { routing } from "@/i18n/routing";
 
 /** The canonical origin must be stable across requests and deployment previews. */
 export function getSiteUrl(): URL {
-  const url = new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://musnad.tech");
+  const url = new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://musnadtech.com");
 
   if (!["http:", "https:"].includes(url.protocol) || url.username || url.password ||
       url.pathname !== "/" || url.search || url.hash) {
