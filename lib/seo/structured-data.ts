@@ -195,7 +195,7 @@ export function jobPostingJsonLd(job: JobPostingData, locale: string) {
         },
       },
     } : {}),
-    ...(/\\bremote\\b/i.test(job.location || "") ? {
+    ...(/\bremote\b/i.test(job.location || "") ? {
       jobLocationType: "TELECOMMUTE",
       applicantLocationRequirements: { "@type": "Country", name: "Yemen" },
     } : {}),
