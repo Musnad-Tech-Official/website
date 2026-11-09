@@ -18,11 +18,8 @@ export function organizationJsonLd() {
     alternateName: "مسند للتقنية",
     url: origin,
     logo: new URL("/brand/logo-light.png", origin).href,
-    sameAs: [
-      "https://github.com/musnad-tech",
-      "https://x.com/musnadtech",
-      "https://linkedin.com/company/musnad-tech",
-    ],
+    // Only verified official profiles; do not publish guessed social accounts.
+    sameAs: ["https://github.com/Musnad-Tech-Official"],
   };
 }
 
@@ -183,24 +180,21 @@ export function jobPostingJsonLd(job: JobPostingData, locale: string) {
     "@type": "JobPosting",
     title: job.title,
     description: job.description,
-    datePosted: job.datePosted || "2026-01-01",
+    ...(job.datePosted ? { datePosted: job.datePosted } : {}),
     ...(job.validThrough ? { validThrough: job.validThrough } : {}),
     employmentType: job.employmentType || "FULL_TIME",
     hiringOrganization: { "@id": `${origin}/#organization` },
     inLanguage: locale,
-    jobLocation: {
-      "@type": "Place",
-      address: {
-        "@type": "PostalAddress",
-        addressLocality: job.location || "Sana'a / Remote",
-        addressCountry: "YE",
+    ...(job.location ? {
+      jobLocation: {
+        "@type": "Place",
+        address: {
+          "@type": "PostalAddress",
+          addressLocality: job.location,
+          addressCountry: "YE",
+        },
       },
-    },
-    applicantLocationRequirements: {
-      "@type": "Country",
-      name: "Yemen",
-    },
-    jobLocationType: "TELECOMMUTE",
+    } : {}),
   };
 }
 
