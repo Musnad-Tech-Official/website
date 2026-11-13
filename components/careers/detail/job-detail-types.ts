@@ -1,4 +1,5 @@
 import type { JobWorkMode } from "@/data/careers";
+import type { CareerJobRecord } from "@/lib/careers/types";
 
 export interface JobDetailConfig {
   slug: string;
@@ -63,7 +64,7 @@ export interface JobApplicationFormProps {
 }
 
 export interface OtherOpenPositionsProps {
-  otherPositionsSlugs: string[];
+  positions: CareerJobRecord[];
   locale?: string;
   className?: string;
 }
