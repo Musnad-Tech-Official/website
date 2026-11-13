@@ -1,0 +1,309 @@
+schema_version: 1
+updated: "2026-11-06"
+policy: source_policy.md
+description: >
+  سجل المراجع المعتمدة في مهارة النحو. كل تصحيح «قاطع» يجب أن يحيل إلى
+  معرّف من هذا الملف. والطبقة (tier) تحدد وزن المصدر، لا مجرد وجوده.
+  و`verified_at` تاريخ تحقق بشري، و`status: needs_review` يعني أن الرابط
+  لم يُفتح آلياً بعد أو تعذر الوصول إليه، ولا يُعتمد حتى يُراجع.
+
+tiers:
+  1:
+    name: كتب النحو المحققة
+    weight: highest
+    use_for: [grammar, irab, khilaf, shawahid]
+    rule: "المرجع الأول. يُقدَّم على كل ما دونه، ويُستشهد بالكتاب والجزء والصفحة."
+  2:
+    name: المجامع اللغوية الرسمية
+    weight: high
+    use_for: [modern_usage, decisions, terminology, fatwa]
+    rule: "يُقدَّم في القرارات اللغوية والمصطلحات الحديثة، ولا يُلغي نصاً نحوياً صريحاً."
+  3:
+    name: الموسوعات المنهجية
+    weight: medium_high
+    use_for: [orientation, taxonomy, definition]
+    rule: "للوصول إلى الباب وتلخيصه، ثم يُرجع إلى الطبقة الأولى للتثبيت."
+  4:
+    name: المعاجم
+    weight: medium
+    use_for: [meaning, attestation, lexical_difference]
+    rule: "للدلالة والمعنى، لا للقاعدة النحوية إلا إذا نصّ المعجم على القاعدة."
+  5:
+    name: مواقع تعليمية ومنتديات
+    weight: low
+    use_for: [explanation, debate, orientation]
+    rule: "مساندة فقط. لا تُنتج تصحيحاً قاطعاً بمفردها."
+  6:
+    name: غير معتمد
+    weight: none
+    use_for: []
+    rule: "لا يُستشهد به: إجابات الذكاء الاصطناعي، والمدونات المجهولة، وويكيبيديا وحدها، والسوشيال ميديا."
+
+sources:
+  - id: nahw_wafi
+    title: "النحو الوافي"
+    author: "عباس حسن"
+    type: book
+    tier: 1
+    use_for: [grammar, irab, khilaf]
+    url: "https://shamela.ws/book/10641"
+    citation: "النحو الوافي، ج١، ص٢٧٩، المسألة الحادية والعشرون: نون الوقاية"
+    verified_at: "2026-11-06"
+    notes: "المرجع الأول في التفصيل النحوي. يُرجع إليه في نون الوقاية، والمصادر المؤولة، والخلاف."
+
+  - id: jami_durus
+    title: "جامع الدروس العربية"
+    author: "مصطفى الغلاييني"
+    type: book
+    tier: 1
+    use_for: [grammar, irab]
+    url: "https://shamela.ws/book/3284"
+    citation: "جامع الدروس العربية، باب الإضافة"
+    verified_at: "2026-11-06"
+    notes: "تلخيص منهجي clear، مناسب للتحقق السريع قبل الرجوع إلى النحو الوافي."
+
+  - id: mu_jam_qawaid
+    title: "معجم القواعد العربية"
+    author: "عبد الغني الدقر"
+    type: book
+    tier: 1
+    use_for: [grammar, tools, definition]
+    url: "https://shamela.ws/book/12933"
+    citation: "معجم القواعد العربية، مادة «عندما»"
+    verified_at: "2026-11-06"
+    notes: "مرتب بالمصطلحات والأدوات. جيد لضبط «عندما»، و«لا»، و«ما»."
+
+  - id: adawat_irab
+    title: "أدوات الإعراب"
+    author: "مصطفى الغلاييني"
+    type: book
+    tier: 1
+    use_for: [grammar, tools]
+    url: "https://shamela.ws/book/17418"
+    citation: "أدوات الإعراب، نون الوقاية"
+    verified_at: null
+    status: needs_review
+    notes: "مرجع مساعد في الأدوات والحروف."
+
+  - id: maani_nahw
+    title: "معاني النحو"
+    author: "فاضل صالح السامرائي"
+    type: book
+    tier: 1
+    use_for: [grammar, meaning, quran]
+    url: "https://shamela.ws/book/17801"
+    citation: "معاني النحو، نون الوقاية"
+    verified_at: null
+    status: needs_review
+    notes: "يربط القاعدة بالمعنى، مفيد في الفروق الدلالية."
+
+  - id: sharh_alfiyya_uthaymin
+    title: "شرح ألفية ابن مالك"
+    author: "محمد بن صالح العثيمين"
+    type: book
+    tier: 1
+    use_for: [grammar, irab]
+    url: "https://shamela.ws/book/36954"
+    citation: "شرح ألفية ابن مالك، حذف نون الأفعال الخمسة"
+    verified_at: null
+    status: needs_review
+    notes: "مفيد في الأفعال الخمسة ونون الوقاية."
+
+  - id: dorar_arabia
+    title: "موسوعة اللغة العربية — الدرر السنية"
+    author: "مشروع الدرر السنية"
+    type: encyclopedia
+    tier: 3
+    use_for: [orientation, taxonomy, definition]
+    url: "https://dorar.net/arabia"
+    citation: "موسوعة اللغة العربية، علم النحو، باب ..."
+    verified_at: "2026-11-06"
+    notes: "أفضل فهرس رقمي منظم لأبواب النحو. لا يُغني عن الكتاب المحقق."
+
+  - id: arabic_academy_cairo
+    title: "مجمع اللغة العربية بالقاهرة"
+    author: "مجمع اللغة العربية بالقاهرة"
+    type: academy
+    tier: 2
+    use_for: [modern_usage, decisions, terminology, fatwa]
+    url: "https://www.arabicacademy.gov.eg/"
+    citation: "مجمع اللغة العربية بالقاهرة، قرار/فتوى ..."
+    verified_at: "2026-11-06"
+    notes: "الموقع الرسمي. منه الفتاوى اللغوية والمعاجم والقرارات."
+
+  - id: arabic_academy_fatwa
+    title: "الفتاوى اللغوية — مجمع اللغة العربية بالقاهرة"
+    author: "مجمع اللغة العربية بالقاهرة"
+    type: academy_fatwa
+    tier: 2
+    use_for: [fatwa, modern_usage, dispute]
+    url: "https://www.arabicacademy.gov.eg/ar/categories/الردود_والإجابات"
+    citation: "مجمع اللغة العربية بالقاهرة، الفتوى اللغوية ..."
+    verified_at: "2026-11-06"
+    notes: "إجابات أعضاء المجمع. تُقدَّم على المنتديات، ولا تُقدَّم على نص نحوي صريح."
+
+  - id: ksaa
+    title: "مجمع الملك سلمان العالمي للغة العربية"
+    author: "مجمع الملك سلمان العالمي للغة العربية"
+    type: academy
+    tier: 2
+    use_for: [modern_usage, terminology, corpora]
+    url: "https://ksaa.gov.sa/"
+    citation: "مجمع الملك سلمان العالمي للغة العربية، ..."
+    verified_at: "2026-11-06"
+    notes: "الموقع الرسمي. يضم منصات سوار وفلك ومعجم الرياض."
+
+  - id: siwar
+    title: "منصة سوار للمعاجم اللغوية"
+    author: "مجمع الملك سلمان العالمي للغة العربية"
+    type: dictionary_platform
+    tier: 2
+    use_for: [meaning, terminology, lexical_difference]
+    url: "https://siwar.ksaa.gov.sa/"
+    citation: "سوار، معجم ...، مادة ..."
+    verified_at: "2026-11-06"
+    notes: "أكثر من ٢٠ معجماً و٣٣٠ ألف مدخل. جيد للتحقق من الدلالة."
+
+  - id: riyadh_dict
+    title: "معجم الرياض للغة العربية المعاصرة"
+    author: "مجمع الملك سلمان العالمي للغة العربية"
+    type: dictionary
+    tier: 2
+    use_for: [meaning, modern_usage]
+    url: "https://dictionary.ksaa.gov.sa/"
+    citation: "معجم الرياض، مادة ..."
+    verified_at: "2026-11-06"
+    notes: "مرجع قوي للعربية المعاصرة."
+
+  - id: doha_dict
+    title: "معجم الدوحة التاريخي للغة العربية"
+    author: "المركز العربي للأبحاث ودراسة السياسات"
+    type: historical_dictionary
+    tier: 2
+    use_for: [meaning, history, attestation]
+    url: "https://dohadictionary.org/"
+    citation: "معجم الدوحة التاريخي، مادة ..."
+    verified_at: "2026-11-06"
+    notes: "أكثر من ٣٠٠ ألف مدخل ومدونة تتجاوز مليار كلمة. مرجع تاريخ الدلالة."
+
+  - id: arabic_terminology
+    title: "المعجم العربي الجامع"
+    author: "المعجم العربي الجامع"
+    type: dictionary
+    tier: 4
+    use_for: [meaning, contemporary_usage]
+    url: "https://www.arabicterminology.com/"
+    citation: "المعجم العربي الجامع، مادة ..."
+    verified_at: "2026-11-06"
+    notes: "معجم حديث جيد للدلالة المعاصرة، مع إحالة إلى معجم اللغة العربية المعاصرة."
+
+  - id: almougem
+    title: "المعجم — معاجم عربية مجمعة"
+    author: "المعجم"
+    type: dictionary_aggregator
+    tier: 4
+    use_for: [meaning, attestation]
+    url: "https://www.almougem.com/"
+    citation: "المعجم، مادة ..."
+    verified_at: "2026-11-06"
+    notes: "يجمع معاجم كلاسيكية. جيد للاستشهاد اللغوي."
+
+  - id: almaany
+    title: "المعاني — قاموس عربي عربي"
+    author: "المعاني"
+    type: dictionary_aggregator
+    tier: 4
+    use_for: [quick_lookup]
+    url: "https://www.almaany.com/"
+    citation: "المعاني، مادة ..."
+    verified_at: null
+    status: needs_review
+    notes: "بحث سريع فقط. لا يُعتمد عليه وحده في القاعدة أو الدلالة الدقيقة."
+
+  - id: baheth
+    title: "الباحث العربي"
+    author: "الباحث العربي"
+    type: dictionary_search
+    tier: 4
+    use_for: [meaning, attestation]
+    url: "https://www.baheth.info/"
+    citation: "الباحث العربي، لسان العرب، مادة ..."
+    verified_at: null
+    status: needs_review
+    notes: "بحث في لسان العرب والصحاح وغيرهما. قد يتعذر الوصول أحياناً."
+
+  - id: islamweb_library
+    title: "المكتبة — إسلام ويب"
+    author: "إسلام ويب"
+    type: book_library
+    tier: 4
+    use_for: [meaning, attestation, book_text]
+    url: "https://www.islamweb.net/ar/library/"
+    citation: "لسان العرب، مادة ..."
+    verified_at: null
+    status: needs_review
+    notes: "نصوص معاجم وكتب لغة. قد يحجب الوصول الآلي؛ يُفتح في المتصفح."
+
+  - id: alukah_language
+    title: "الألوكة — اللغة والقلم"
+    author: "شبكة الألوكة"
+    type: articles
+    tier: 5
+    use_for: [explanation, orientation, debate]
+    url: "https://www.alukah.net/literature_language/"
+    citation: "الألوكة، مقال ..."
+    verified_at: "2026-11-06"
+    notes: "مقالات تتفاوت جودتها. لا تُنتج تصحيحاً قاطعاً بمفردها."
+
+  - id: m_a_arabia
+    title: "مجمع اللغة العربية على الشبكة العالمية"
+    author: "مجمع اللغة العربية على الشبكة العالمية"
+    type: forum_fatwa
+    tier: 5
+    use_for: [fatwa, debate, orientation]
+    url: "https://www.m-a-arabia.com/"
+    citation: "مجمع اللغة العربية على الشبكة، الفتوى ..."
+    verified_at: "2026-11-06"
+    notes: "ليس مجمعاً حكومياً. فتاواه ومقالاته مساندة، لا أساس."
+
+  - id: alnahw
+    title: "نحو دوت كوم"
+    author: "يسري سلال"
+    type: educational
+    tier: 5
+    use_for: [explanation, teaching]
+    url: "https://alnahw.com/"
+    citation: "نحو دوت كوم، ..."
+    verified_at: "2026-11-06"
+    notes: "شرح تعليمي جيد، ليس مرجعاً أولياً."
+
+  - id: shamela
+    title: "المكتبة الشاملة"
+    author: "مشروع المكتبة الشاملة"
+    type: book_library
+    tier: 1
+    use_for: [book_text, verification]
+    url: "https://shamela.ws/"
+    citation: "المكتبة الشاملة، كتاب ...، ج ...، ص ..."
+    verified_at: "2026-11-06"
+    notes: "بوابة الكتب. المرجع الحقيقي هو الكتاب نفسه، لا الموقع."
+
+  - id: archive_org
+    title: "أرشيف الإنترنت"
+    author: "Internet Archive"
+    type: book_library
+    tier: 1
+    use_for: [pdf, page_verification]
+    url: "https://archive.org/"
+    citation: "نسخة أرشيف الإنترنت، ص ..."
+    verified_at: null
+    status: needs_review
+    notes: "للنسخ المصورة والتحقق من الصفحة والطبعة."
+
+forbidden_as_sole_source:
+  - "إجابات الذكاء الاصطناعي في نتائج البحث"
+  - "ويكيبيديا وحدها"
+  - "المدونات المجهولة"
+  - "السوشيال ميديا"
+  - "المنتديات المهجورة أو المخترقة"
+  - "المواقع التي تنسخ الكتب بلا تحقيق أو طبعة"

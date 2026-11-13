@@ -1,0 +1,193 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/specailm5/arabic-editing-skill/change_manifest.schema.json",
+  "title": "Qalam Change Manifest",
+  "description": "سجل آلي لكل تعديل في مهارة التحرير. لا يُقبل نص مصحح بلا هذا السجل.",
+  "type": "object",
+  "required": [
+    "mode",
+    "source_text_sha256",
+    "candidates",
+    "accepted",
+    "rejected",
+    "changes",
+    "unresolved"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "mode": {
+      "type": "string",
+      "enum": ["proofread", "edit", "rewrite", "translation-review"]
+    },
+    "scope": {
+      "type": "string",
+      "enum": ["grammar", "meaning", "style", "all"]
+    },
+    "report": {
+      "type": "string",
+      "enum": ["none", "brief", "full"],
+      "description": "وضع العرض. الافتراضي none في المهام الإبداعية، ونسأل في مهام التصحيح."
+    },
+    "report_requested": {
+      "type": "boolean",
+      "description": "هل طلب المستخدم تقريراً صريحاً؟"
+    },
+    "source_text_sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$",
+      "description": "بصمة النص الأصلي قبل التعديل."
+    },
+    "no_change_reason": {
+      "type": "string",
+      "minLength": 1,
+      "description": "يُملأ فقط إذا لم يوجد أي تغيير مقبول."
+    },
+    "candidates": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/candidate" }
+    },
+    "accepted": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "معرّفات المرشحين المقبولين."
+    },
+    "rejected": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/rejection" }
+    },
+    "changes": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/change" }
+    },
+    "unresolved": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/unresolved" }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": { "changes": { "maxItems": 0 } },
+        "required": ["changes"]
+      },
+      "then": {
+        "required": ["no_change_reason"]
+      }
+    }
+  ],
+  "$defs": {
+    "candidate": {
+      "type": "object",
+      "required": [
+        "id",
+        "span",
+        "category",
+        "problem",
+        "proposed_fix",
+        "source_id",
+        "confidence",
+        "severity"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string", "pattern": "^C[0-9]+$" },
+        "span": { "type": "string", "minLength": 1 },
+        "category": {
+          "type": "string",
+          "enum": [
+            "tense",
+            "negation",
+            "lexical_meaning",
+            "transitivity",
+            "preposition",
+            "agreement",
+            "case",
+            "reference",
+            "particle",
+            "punctuation",
+            "spelling",
+            "calque",
+            "ambiguity",
+            "style",
+            "other"
+          ]
+        },
+        "problem": { "type": "string", "minLength": 1 },
+        "proposed_fix": { "type": "string", "minLength": 1 },
+        "source_id": { "type": "string", "minLength": 1 },
+        "confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+        "severity": {
+          "type": "string",
+          "enum": ["blocking", "major", "minor", "style"]
+        }
+      }
+    },
+    "change": {
+      "type": "object",
+      "required": [
+        "candidate_id",
+        "before",
+        "after",
+        "category",
+        "severity",
+        "reason",
+        "source_id",
+        "meaning_gates"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "candidate_id": { "type": "string", "pattern": "^C[0-9]+$" },
+        "before": { "type": "string", "minLength": 1 },
+        "after": { "type": "string", "minLength": 1 },
+        "category": { "type": "string" },
+        "severity": {
+          "type": "string",
+          "enum": ["blocking", "major", "minor", "style"]
+        },
+        "reason": { "type": "string", "minLength": 1 },
+        "source_id": { "type": "string", "minLength": 1 },
+        "meaning_gates": {
+          "type": "object",
+          "required": ["tense", "negation", "lexical", "reference", "voice"],
+          "additionalProperties": false,
+          "properties": {
+            "tense": { "$ref": "#/$defs/gate" },
+            "negation": { "$ref": "#/$defs/gate" },
+            "lexical": { "$ref": "#/$defs/gate" },
+            "reference": { "$ref": "#/$defs/gate" },
+            "voice": { "$ref": "#/$defs/gate" },
+            "transitivity": { "$ref": "#/$defs/gate" },
+            "quantity": { "$ref": "#/$defs/gate" },
+            "names": { "$ref": "#/$defs/gate" },
+            "information_structure": { "$ref": "#/$defs/gate" }
+          }
+        }
+      }
+    },
+    "gate": {
+      "type": "string",
+      "enum": ["preserved", "changed_on_purpose", "fixed", "not_applicable"]
+    },
+    "rejection": {
+      "type": "object",
+      "required": ["candidate_id", "reason"],
+      "additionalProperties": false,
+      "properties": {
+        "candidate_id": { "type": "string", "pattern": "^C[0-9]+$" },
+        "reason": { "type": "string", "minLength": 1 },
+        "source_id": { "type": "string" }
+      }
+    },
+    "unresolved": {
+      "type": "object",
+      "required": ["span", "question"],
+      "additionalProperties": false,
+      "properties": {
+        "span": { "type": "string", "minLength": 1 },
+        "question": { "type": "string", "minLength": 1 },
+        "needed_source": { "type": "string" },
+        "note": { "type": "string" }
+      }
+    }
+  }
+}
