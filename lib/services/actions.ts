@@ -5,11 +5,12 @@ import { revalidatePath } from "next/cache";
 import { createClient } from "@/utils/supabase/server";
 import type { ServiceItem, ServiceFormData } from "./types";
 
-const INITIAL_SERVICES: ServiceItem[] = [];
-
-let memoryServicesCache: ServiceItem[] = [...INITIAL_SERVICES];
-let lastFetch = 0;
-const CACHE_TTL_MS = 60 * 1000;
+function revalidateServicePages(): void {
+  revalidatePath("/");
+  revalidatePath("/[locale]", "layout");
+  revalidatePath("/[locale]/services", "page");
+  revalidatePath("/[locale]/admin/services", "page");
+}
 
 async function verifyAdminAuth(): Promise<string> {
   const { userId, sessionClaims } = await auth();
@@ -65,40 +66,18 @@ function mapRowToService(row: ServiceDbRow): ServiceItem {
  * Retrieves all services (for Services Hub or Admin Dashboard)
  */
 export async function getServicesAction(includeInactive = false): Promise<ServiceItem[]> {
-  const now = Date.now();
-  if (lastFetch > 0 && now - lastFetch < CACHE_TTL_MS && memoryServicesCache.length > 0) {
-    return includeInactive
-      ? memoryServicesCache
-      : memoryServicesCache.filter((s) => s.isActive);
+  if (includeInactive) await verifyAdminAuth();
+
+  const supabase = await createClient();
+  let query = supabase.from("services").select("*").order("display_order", { ascending: true });
+  if (!includeInactive) query = query.eq("is_active", true);
+
+  const { data, error } = await query;
+  if (error) {
+    console.error("Failed to load services:", error.code);
+    throw new Error("Unable to load services from the database.");
   }
-
-  try {
-    const supabase = await createClient();
-    const query = supabase
-      .from("services")
-      .select("*")
-      .order("display_order", { ascending: true });
-
-    if (!includeInactive) {
-      query.eq("is_active", true);
-    }
-
-    const { data, error } = await query;
-    if (!error && data && data.length > 0) {
-      const mapped = (data as unknown as ServiceDbRow[]).map(mapRowToService);
-      if (includeInactive) {
-        memoryServicesCache = mapped;
-      }
-      lastFetch = now;
-      return mapped;
-    }
-  } catch (err) {
-    console.warn("Could not query services from Supabase, using cache:", err);
-  }
-
-  return includeInactive
-    ? memoryServicesCache
-    : memoryServicesCache.filter((s) => s.isActive);
+  return ((data ?? []) as ServiceDbRow[]).map(mapRowToService);
 }
 
 /**
@@ -113,7 +92,7 @@ export async function getHomeServicesAction(): Promise<ServiceItem[]> {
  * Retrieves a single service by its slug
  */
 export async function getServiceBySlugAction(slug: string): Promise<ServiceItem | null> {
-  const all = await getServicesAction(true);
+  const all = await getServicesAction(false);
   return all.find((s) => s.slug === slug || s.id === slug) || null;
 }
 
@@ -127,172 +106,74 @@ export async function createServiceAction(formData: ServiceFormData): Promise<{
 }> {
   try {
     await verifyAdminAuth();
-
     const slug =
       formData.slug.trim().toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") ||
-      formData.titleEn.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+      formData.titleEn.trim().toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+    if (!slug) return { success: false, error: "A valid service slug is required." };
 
-    const id = formData.id || slug || `service-${Date.now()}`;
-    const href = formData.href?.trim() || `/services/${slug}`;
-
-    const newService: ServiceItem = {
-      id,
+    const supabase = await createClient();
+    const { data, error } = await supabase.from("services").insert({
+      id: formData.id || slug,
       slug,
-      titleEn: formData.titleEn.trim(),
-      titleAr: formData.titleAr.trim(),
-      descriptionEn: formData.descriptionEn.trim(),
-      descriptionAr: formData.descriptionAr.trim(),
+      title_en: formData.titleEn.trim(),
+      title_ar: formData.titleAr.trim(),
+      description_en: formData.descriptionEn.trim(),
+      description_ar: formData.descriptionAr.trim(),
       icon: formData.icon.trim() || "LuCode",
-      tagsEn: formData.tagsEn || [],
-      tagsAr: formData.tagsAr || [],
-      href,
-      displayOrder: formData.displayOrder ?? memoryServicesCache.length + 1,
-      enabledHome: formData.enabledHome !== false,
-      isActive: formData.isActive !== false,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    };
+      tags_en: formData.tagsEn ?? [],
+      tags_ar: formData.tagsAr ?? [],
+      href: formData.href?.trim() || `/services/${slug}`,
+      display_order: formData.displayOrder ?? (await getServicesAction(true)).length + 1,
+      enabled_home: formData.enabledHome !== false,
+      is_active: formData.isActive !== false,
+    }).select().single();
 
-    try {
-      const supabase = await createClient();
-      const { data, error } = await supabase
-        .from("services")
-        .insert({
-          id: newService.id,
-          slug: newService.slug,
-          title_en: newService.titleEn,
-          title_ar: newService.titleAr,
-          description_en: newService.descriptionEn,
-          description_ar: newService.descriptionAr,
-          icon: newService.icon,
-          tags_en: newService.tagsEn,
-          tags_ar: newService.tagsAr,
-          href: newService.href,
-          display_order: newService.displayOrder,
-          enabled_home: newService.enabledHome,
-          is_active: newService.isActive,
-        })
-        .select()
-        .single();
-
-      if (!error && data) {
-        const created = mapRowToService(data as unknown as ServiceDbRow);
-        memoryServicesCache = [...memoryServicesCache, created].sort(
-          (a, b) => a.displayOrder - b.displayOrder
-        );
-        revalidatePath("/");
-        revalidatePath("/[locale]", "layout");
-        revalidatePath("/[locale]/services", "page");
-        revalidatePath("/[locale]/admin/services", "page");
-        return { success: true, data: created };
-      }
-    } catch {
-      // In-memory fallback
+    if (error || !data) {
+      console.error("Failed to create service:", error?.code || "no-data");
+      return { success: false, error: "Service was not saved. Please try again." };
     }
-
-    memoryServicesCache = [...memoryServicesCache, newService].sort(
-      (a, b) => a.displayOrder - b.displayOrder
-    );
-
-    revalidatePath("/");
-    revalidatePath("/[locale]", "layout");
-    revalidatePath("/[locale]/services", "page");
-    revalidatePath("/[locale]/admin/services", "page");
-
-    return { success: true, data: newService };
+    revalidateServicePages();
+    return { success: true, data: mapRowToService(data as ServiceDbRow) };
   } catch (err: unknown) {
-    return { success: false, error: (err as Error).message || "Failed to create service." };
+    return { success: false, error: err instanceof Error ? err.message : "Failed to create service." };
   }
 }
 
 /**
  * Updates an existing service (Admin only)
  */
-export async function updateServiceAction(
-  id: string,
-  formData: Partial<ServiceFormData>
-): Promise<{
+export async function updateServiceAction(id: string, formData: Partial<ServiceFormData>): Promise<{
   success: boolean;
   data?: ServiceItem;
   error?: string;
 }> {
   try {
     await verifyAdminAuth();
+    const updatePayload: Record<string, unknown> = { updated_at: new Date().toISOString() };
+    if (formData.slug !== undefined) updatePayload.slug = formData.slug.trim();
+    if (formData.titleEn !== undefined) updatePayload.title_en = formData.titleEn.trim();
+    if (formData.titleAr !== undefined) updatePayload.title_ar = formData.titleAr.trim();
+    if (formData.descriptionEn !== undefined) updatePayload.description_en = formData.descriptionEn.trim();
+    if (formData.descriptionAr !== undefined) updatePayload.description_ar = formData.descriptionAr.trim();
+    if (formData.icon !== undefined) updatePayload.icon = formData.icon.trim();
+    if (formData.tagsEn !== undefined) updatePayload.tags_en = formData.tagsEn;
+    if (formData.tagsAr !== undefined) updatePayload.tags_ar = formData.tagsAr;
+    if (formData.href !== undefined) updatePayload.href = formData.href.trim();
+    if (formData.displayOrder !== undefined) updatePayload.display_order = formData.displayOrder;
+    if (formData.enabledHome !== undefined) updatePayload.enabled_home = formData.enabledHome;
+    if (formData.isActive !== undefined) updatePayload.is_active = formData.isActive;
 
-    try {
-      const supabase = await createClient();
-      const updatePayload: Record<string, unknown> = {
-        updated_at: new Date().toISOString(),
-      };
-
-      if (formData.slug !== undefined) updatePayload.slug = formData.slug.trim();
-      if (formData.titleEn !== undefined) updatePayload.title_en = formData.titleEn.trim();
-      if (formData.titleAr !== undefined) updatePayload.title_ar = formData.titleAr.trim();
-      if (formData.descriptionEn !== undefined) updatePayload.description_en = formData.descriptionEn.trim();
-      if (formData.descriptionAr !== undefined) updatePayload.description_ar = formData.descriptionAr.trim();
-      if (formData.icon !== undefined) updatePayload.icon = formData.icon.trim();
-      if (formData.tagsEn !== undefined) updatePayload.tags_en = formData.tagsEn;
-      if (formData.tagsAr !== undefined) updatePayload.tags_ar = formData.tagsAr;
-      if (formData.href !== undefined) updatePayload.href = formData.href.trim();
-      if (formData.displayOrder !== undefined) updatePayload.display_order = formData.displayOrder;
-      if (formData.enabledHome !== undefined) updatePayload.enabled_home = formData.enabledHome;
-      if (formData.isActive !== undefined) updatePayload.is_active = formData.isActive;
-
-      const { data, error } = await supabase
-        .from("services")
-        .update(updatePayload)
-        .eq("id", id)
-        .select()
-        .single();
-
-      if (!error && data) {
-        const updated = mapRowToService(data as unknown as ServiceDbRow);
-        memoryServicesCache = memoryServicesCache
-          .map((s) => (s.id === id ? updated : s))
-          .sort((a, b) => a.displayOrder - b.displayOrder);
-
-        revalidatePath("/");
-        revalidatePath("/[locale]", "layout");
-        revalidatePath("/[locale]/services", "page");
-        revalidatePath("/[locale]/admin/services", "page");
-        return { success: true, data: updated };
-      }
-    } catch {
-      // In-memory fallback
+    const supabase = await createClient();
+    const { data, error } = await supabase.from("services")
+      .update(updatePayload).eq("id", id).select().single();
+    if (error || !data) {
+      console.error("Failed to update service:", error?.code || "no-data");
+      return { success: false, error: "Service changes were not saved. Please try again." };
     }
-
-    memoryServicesCache = memoryServicesCache
-      .map((s) => {
-        if (s.id !== id) return s;
-        return {
-          ...s,
-          slug: formData.slug !== undefined ? formData.slug.trim() : s.slug,
-          titleEn: formData.titleEn !== undefined ? formData.titleEn.trim() : s.titleEn,
-          titleAr: formData.titleAr !== undefined ? formData.titleAr.trim() : s.titleAr,
-          descriptionEn: formData.descriptionEn !== undefined ? formData.descriptionEn.trim() : s.descriptionEn,
-          descriptionAr: formData.descriptionAr !== undefined ? formData.descriptionAr.trim() : s.descriptionAr,
-          icon: formData.icon !== undefined ? formData.icon.trim() : s.icon,
-          tagsEn: formData.tagsEn !== undefined ? formData.tagsEn : s.tagsEn,
-          tagsAr: formData.tagsAr !== undefined ? formData.tagsAr : s.tagsAr,
-          href: formData.href !== undefined ? formData.href.trim() : s.href,
-          displayOrder: formData.displayOrder !== undefined ? formData.displayOrder : s.displayOrder,
-          enabledHome: formData.enabledHome !== undefined ? formData.enabledHome : s.enabledHome,
-          isActive: formData.isActive !== undefined ? formData.isActive : s.isActive,
-          updatedAt: new Date().toISOString(),
-        };
-      })
-      .sort((a, b) => a.displayOrder - b.displayOrder);
-
-    const updated = memoryServicesCache.find((s) => s.id === id);
-
-    revalidatePath("/");
-    revalidatePath("/[locale]", "layout");
-    revalidatePath("/[locale]/services", "page");
-    revalidatePath("/[locale]/admin/services", "page");
-
-    return { success: true, data: updated };
+    revalidateServicePages();
+    return { success: true, data: mapRowToService(data as ServiceDbRow) };
   } catch (err: unknown) {
-    return { success: false, error: (err as Error).message || "Failed to update service." };
+    return { success: false, error: err instanceof Error ? err.message : "Failed to update service." };
   }
 }
 
@@ -331,22 +212,16 @@ export async function deleteServiceAction(id: string): Promise<{
 }> {
   try {
     await verifyAdminAuth();
-
-    try {
-      const supabase = await createClient();
-      await supabase.from("services").delete().eq("id", id);
-    } catch {
-      // In-memory
+    const supabase = await createClient();
+    const { data, error } = await supabase.from("services").delete()
+      .eq("id", id).select("id").single();
+    if (error || !data) {
+      console.error("Failed to delete service:", error?.code || "no-data");
+      return { success: false, error: "Service was not deleted. Please try again." };
     }
-
-    memoryServicesCache = memoryServicesCache.filter((s) => s.id !== id);
-    revalidatePath("/");
-    revalidatePath("/[locale]", "layout");
-    revalidatePath("/[locale]/services", "page");
-    revalidatePath("/[locale]/admin/services", "page");
-
+    revalidateServicePages();
     return { success: true };
   } catch (err: unknown) {
-    return { success: false, error: (err as Error).message || "Failed to delete service." };
+    return { success: false, error: err instanceof Error ? err.message : "Failed to delete service." };
   }
 }
