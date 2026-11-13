@@ -53,6 +53,9 @@ export default async function CareersPage({ params }: CareersPageProps) {
     dateEn: j.createdAt ? new Date(j.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : "Active",
     dateAr: j.createdAt ? new Date(j.createdAt).toLocaleDateString("ar-SA", { month: "short", day: "numeric", year: "numeric" }) : "متاح",
     href: `/careers/${j.slug}`,
+    title: locale === "ar" ? j.titleAr : j.titleEn,
+    workType: locale === "ar" ? j.workTypeAr : j.workTypeEn,
+    location: locale === "ar" ? j.locationAr : j.locationEn,
   }));
 
   const careerValues: CareerValueItem[] = dbValues.map((v) => ({
