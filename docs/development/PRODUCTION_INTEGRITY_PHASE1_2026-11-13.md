@@ -80,3 +80,54 @@ Do not make broad changes to customer/partner records without approval.
 - [ ] Obtain factual approval for all active customer and project claims
 
 The branch is intentionally not merged or deployed to production pending review.
+
+## Admin persistence follow-up — 2026-11-14
+
+The subsequent admin audit found the same false-success pattern in additional
+dashboard modules. The phase-1 branch now addresses:
+
+- `lib/page-control/actions.ts`: no anonymous fallback to in-memory page
+  visibility after failed DB reads; every single, batch, and reset change
+  must be confirmed by Supabase. Protected pages cannot be hidden through
+  these server actions.
+- `lib/technologies/actions.ts`: database-only catalog and CRUD confirmation.
+- `lib/companies/actions.ts`: database-only CRUD; reorder uses one verified
+  bulk upsert rather than silently accepting partial failures.
+- `lib/testimonials/actions.ts`: removes embedded six-person endorsement
+  fixtures and unconfirmed in-memory CRUD success. Existing database records
+  have **not** been deleted or accepted as verified.
+- `lib/announcements/actions.ts`: remove stale cache and check all mutation
+  responses. Activation still requires two statements; best-effort rollback
+  was added for the error path but **atomicity/concurrent activation are not
+  yet guaranteed**. A reviewed database RPC/transaction is a follow-up.
+- `lib/inquiries/actions.ts`: no local filesystem or memory caching of
+  private inquiry records; admin update and delete verify the affected row.
+- `app/[locale]/admin/page.tsx`: stop labeling presence of environment
+  variables and embedded analytics SDKs as a live database, RLS, or
+  telemetry health check.
+
+### Verification
+
+- Vercel preview builds: status `READY` was observed on the updated admin
+  action source prior to the additional test-only commits.
+- GitHub Actions: a new `.github/workflows/quality.yml` runs SEO tests,
+  source-integrity tests, mocked admin-persistence tests, ESLint, and TypeScript.
+  Verify the latest run's **actual outcome** before requesting merge.
+- The mock-based tests exercise failure responses and non-admin rejection;
+  they do not replace live Clerk session, RLS, browser, network, or upload tests.
+
+### Other review findings
+
+Supabase security advisor still warns about a mutable `search_path` on
+`public.handle_updated_at`. The performance advisor reported 27 RLS
+`auth_rls_initplan` warnings; these are optimization opportunities to
+assess with real query plans, not proof of an authorization bypass.
+
+An inconsistent About page configuration was observed: a persisted
+`/about` status of `hidden` coexists with a protected inventory entry
+that forces `live`. This was not silently changed in production. Review the
+expected policy and align the stored setting and UI.
+
+**Do not approve merge based solely on preview build success.**
+Require workflow success plus manual admin/anonymous flows and a factual review
+of public customer, project, and career claims.
