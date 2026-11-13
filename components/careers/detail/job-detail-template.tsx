@@ -88,7 +88,8 @@ export async function JobDetailTemplate({
 
       {/* 3. Other Open Positions Section */}
       <OtherOpenPositions
-        otherPositionsSlugs={openJobs.filter((item) => item.slug !== slug).map((item) => item.slug)}
+        positions={openJobs.filter((item) => item.slug !== slug)}
+        locale={locale}
       />
     </div>
   );
