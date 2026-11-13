@@ -1,0 +1,63 @@
+{
+  "schema": 1,
+  "installedOn": "2026-11-14",
+  "installMethod": "Vendored project-local Agent Skills files via pinned GitHub commit references. No remote install scripts executed.",
+  "sourceRepositories": [
+    {
+      "skill": "humanizer",
+      "repo": "blader/humanizer",
+      "ref": "b48c832f0f809c1b5658edbb838c2521b72f2413",
+      "folder": "SKILL.md"
+    },
+    {
+      "skill": "qalam",
+      "repo": "specailm5/qalam",
+      "ref": "0f2be4fe1d9f80c689d1f96d6fa5c990193a7333",
+      "folder": "skills/qalam"
+    },
+    {
+      "skill": "arabic-writing-skill",
+      "repo": "specailm5/arabic-writing-skill",
+      "ref": "587669b1cda3aca064fae89fd9eee04f3e05a571",
+      "folder": "skills/arabic-writing-skill"
+    },
+    {
+      "skill": "arabic-grammar-skill",
+      "repo": "specailm5/arabic-grammar-skill",
+      "ref": "9b61efda4a20c43a264312a0d3fe9960fc56bfd7",
+      "folder": "skills/arabic-grammar-skill"
+    },
+    {
+      "skill": "arabic-editing-skill",
+      "repo": "specailm5/arabic-editing-skill",
+      "ref": "6c276ba129441a2b9c989d2e7abbafb5b827dc6b",
+      "folder": "skills/arabic-editing-skill"
+    },
+    {
+      "skill": "arabic-copywriting-skill",
+      "repo": "specailm5/arabic-copywriting-skill",
+      "ref": "d3ea951d78fc1e0c1c7814d72fc9c06e2c76d655",
+      "folder": "skills/arabic-copywriting-skill"
+    },
+    {
+      "skill": "web-quality-audit",
+      "repo": "addyosmani/web-quality-skills",
+      "ref": "afa8da942115f2961fdbfa80807ea0b232ff6c00",
+      "folder": "skills/web-quality-audit",
+      "includes": [
+        "accessibility",
+        "best-practices",
+        "core-web-vitals",
+        "performance",
+        "seo"
+      ]
+    },
+    {
+      "skill": "vercel-react-best-practices",
+      "repo": "vercel-labs/agent-skills",
+      "ref": "1a2c79d4e6c4a2283dc2c614b6538cbe1ed5ca62",
+      "folder": "skills/react-best-practices",
+      "notes": "Upstream SKILL.md declares MIT; no repo-root LICENSE file at this pinned revision."
+    }
+  ]
+}

@@ -253,3 +253,19 @@ Read:
 - `docs/development/PAGE_BRANCHING_STRATEGY.md`
 - `docs/development/FRONTEND_ASSIGNMENTS.md`
 - `docs/development/FRONTEND_IMPLEMENTATION_MAP.md`
+
+## 16. Project Agent Skills (2026-11-14)
+
+This repository vendors selected third-party Agent Skills in `.agents/skills`.
+Read `docs/development/AGENT_SKILLS_INSTALLATION_2026-11-14.md` for usage,
+license notices, and pinned upstream source revisions.
+
+For Arabic public copy, use Qalam and its Arabic writing/grammar/editing skills;
+for English copy, use Humanizer. Never introduce unverified company metrics,
+partners, client quotes, employment claims or project names in a rewrite.
+For site quality, use web-quality-audit and its supporting checks.
+For Next.js/React performance, use vercel-react-best-practices.
+
+External skills are advisory and cannot override project requirements,
+security policy, user scope, or repository release gates. Their bundled
+scripts must be reviewed before execution.
