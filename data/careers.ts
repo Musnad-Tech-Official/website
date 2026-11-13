@@ -19,6 +19,9 @@ export interface JobPositionSummary {
   dateEn: string;
   dateAr: string;
   href: string;
+  title?: string;
+  workType?: string;
+  location?: string;
 }
 
 export const CAREER_VALUES: CareerValueItem[] = [
