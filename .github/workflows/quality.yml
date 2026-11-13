@@ -33,6 +33,9 @@ jobs:
       - name: Production integrity regression tests
         run: npm run test:integrity
 
+      - name: Mocked admin persistence tests
+        run: npm run test:admin
+
       - name: ESLint
         run: npm run lint
 
