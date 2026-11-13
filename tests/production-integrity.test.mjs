@@ -8,8 +8,8 @@ const source = (path) => readFileSync(join(root, path), "utf8");
 
 test("career applications never report an unpersisted submission", () => {
   const form = source("components/careers/detail/job-application-form.tsx");
-  assert.match(form, /mailto:hello@musnad\\.tech/);
-  assert.doesNotMatch(form, /setIsSubmitted|setTimeout\\(|type="file"/);
+  assert.match(form, /mailto:hello@musnad\.tech/);
+  assert.doesNotMatch(form, /setIsSubmitted|setTimeout\(|type="file"/);
   for (const locale of ["ar", "en"]) {
     const messages = JSON.parse(source(`messages/${locale}.json`));
     assert.ok(messages.JobDetail.common.form.unavailableTitle);
