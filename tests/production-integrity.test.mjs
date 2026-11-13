@@ -88,3 +88,10 @@ test("dashboard never labels unmeasured security or analytics as healthy", () =>
   assert.match(page, /Verify in Vercel/);
   assert.doesNotMatch(page, /Enforced & Active|Active \(Real User\)|Optimal/);
 });
+
+test("FAQ copy is sourced only from published database records", () => {
+  const actions = source("lib/faqs/actions.ts");
+  assert.doesNotMatch(actions, /FALLBACK_FAQ_TOPICS|FALLBACK_FAQ_QUESTIONS|using fallback/);
+  assert.match(actions, /FAQ topics are unavailable/);
+  assert.match(actions, /FAQ questions are unavailable/);
+});
