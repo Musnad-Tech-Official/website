@@ -37,3 +37,38 @@ test("company profile and careers use only database-backed public data", () => {
   assert.match(jobDetails, /getCareerJobBySlugAction/);
   assert.doesNotMatch(jobDetails, /datePosted: "2026-01-01"|validThrough: config\.deadlineEn/);
 });
+
+test("admin page visibility mutations require confirmed persistence", () => {
+  const actions = source("lib/page-control/actions.ts");
+  assert.doesNotMatch(actions, /memoryCache|lastFetchTime|Non-fatal if DB|in-memory cache first/);
+  assert.match(actions, /Page visibility settings are unavailable/);
+  assert.match(actions, /\.upsert\(toDatabaseRow/);
+  assert.match(actions, /data\.length !== selected\.length/);
+  assert.match(actions, /data\.length !== rows\.length/);
+});
+
+test("client brands, endorsements, and tech catalog do not fall back to synthetic success", () => {
+  const paths = [
+    "lib/companies/actions.ts",
+    "lib/testimonials/actions.ts",
+    "lib/technologies/actions.ts",
+  ];
+  for (const path of paths) {
+    const actions = source(path);
+    assert.doesNotMatch(actions, /In-memory fallback|memoryCompaniesCache|memoryTestimonialsCache|memoryTechCache|INITIAL_TESTIMONIALS/);
+    assert.match(actions, /\.insert\(/);
+    assert.match(actions, /\.delete\(\)/);
+    assert.match(actions, /if \(error \|\| !data\)/);
+    assert.match(actions, /\.select\("id"\)\.single\(\)/);
+  }
+});
+
+test("announcement operations refuse database failures", () => {
+  const actions = source("lib/announcements/actions.ts");
+  assert.doesNotMatch(actions, /memoryAnnouncementsCache|In-memory fallback/);
+  assert.match(actions, /deactivateOtherAnnouncements/);
+  assert.match(actions, /restorePreviousAnnouncements/);
+  assert.match(actions, /Failed to create announcement/);
+  assert.match(actions, /Failed to delete announcement/);
+  assert.match(actions, /\.delete\(\)[\s\S]*?\.select\("id"\)\.single\(\)/);
+});
