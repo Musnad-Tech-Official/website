@@ -51,7 +51,7 @@ function loadAction(path, respond, session = role) {
     },
   }).outputText;
 
-  const module = { exports: {} };
+  const localModule = { exports: {} };
   const mocks = {
     "@clerk/nextjs/server": { auth: async () => session },
     "@/utils/supabase/server": { createClient: async () => database(respond) },
@@ -65,8 +65,8 @@ function loadAction(path, respond, session = role) {
   };
   // Transpiled code is repository-local TypeScript, executed with isolated mocks.
   const run = new Function("require", "module", "exports", "crypto", output);
-  run(mockRequire, module, module.exports, { randomUUID: () => "mock-uuid" });
-  return module.exports;
+  run(mockRequire, localModule, localModule.exports, { randomUUID: () => "mock-uuid" });
+  return localModule.exports;
 }
 
 const denied = () => ({ data: null, error: { code: "RLS_DENIED" } });
