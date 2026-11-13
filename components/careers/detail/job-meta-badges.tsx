@@ -36,11 +36,13 @@ export function JobMetaBadges({
         {modeLabel}
       </span>
 
-      {/* 5. Application Deadline */}
-      <span className="inline-flex items-center gap-1.5 border border-rose-200 dark:border-rose-900/60 bg-rose-50/80 text-rose-700 dark:bg-rose-950/40 dark:text-rose-300 px-2.5 py-1 text-xs rounded-md font-medium select-none">
-        <LuCircleDot className="h-3.5 w-3.5 text-rose-600 dark:text-rose-400 shrink-0" aria-hidden="true" />
-        <span>{deadlinePrefix}{deadlineFormatted}</span>
-      </span>
+      {/* Display a deadline only when backed by a verified published value. */}
+      {deadlineFormatted ? (
+        <span className="inline-flex items-center gap-1.5 border border-rose-200 dark:border-rose-900/60 bg-rose-50/80 text-rose-700 dark:bg-rose-950/40 dark:text-rose-300 px-2.5 py-1 text-xs rounded-md font-medium select-none">
+          <LuCircleDot className="h-3.5 w-3.5 text-rose-600 dark:text-rose-400 shrink-0" aria-hidden="true" />
+          <span>{deadlinePrefix}{deadlineFormatted}</span>
+        </span>
+      ) : null}
     </div>
   );
 }

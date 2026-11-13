@@ -1,41 +1,9 @@
 "use server";
 
-import fs from "fs";
-import path from "path";
 import { auth } from "@clerk/nextjs/server";
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/utils/supabase/server";
 import type { InquiryItem, SubmitInquiryInput, InquiryStatus } from "./types";
-
-const DATA_DIR = path.join(process.cwd(), ".data");
-const INQUIRIES_FILE = path.join(DATA_DIR, "inquiries.json");
-
-function readDiskInquiries(): InquiryItem[] {
-  try {
-    if (fs.existsSync(INQUIRIES_FILE)) {
-      const content = fs.readFileSync(INQUIRIES_FILE, "utf-8");
-      return JSON.parse(content) as InquiryItem[];
-    }
-  } catch {
-    // Disk read fallback
-  }
-  return [];
-}
-
-function writeDiskInquiries(items: InquiryItem[]): void {
-  try {
-    if (!fs.existsSync(DATA_DIR)) {
-      fs.mkdirSync(DATA_DIR, { recursive: true });
-    }
-    fs.writeFileSync(INQUIRIES_FILE, JSON.stringify(items, null, 2), "utf-8");
-  } catch {
-    // Disk write fallback
-  }
-}
-
-let memoryInquiriesCache: InquiryItem[] = readDiskInquiries();
-let lastFetch = 0;
-const CACHE_TTL_MS = 30 * 1000;
 
 async function verifyAdminAuth(): Promise<string> {
   const { userId, sessionClaims } = await auth();
@@ -185,7 +153,6 @@ export async function submitInquiryAction(input: SubmitInquiryInput): Promise<{
     }
 
     // Never claim success or persist private inquiries to an ephemeral production disk on DB failure.
-    memoryInquiriesCache = [newInquiry, ...memoryInquiriesCache.filter((i) => i.id !== newInquiry.id)];
     revalidatePath("/[locale]/admin/inquiries", "page");
     return { success: true, inquiryId: newInquiry.id };
   } catch (err: unknown) {
@@ -197,44 +164,18 @@ export async function submitInquiryAction(input: SubmitInquiryInput): Promise<{
  * Admin action: Retrieves all client inquiries
  */
 export async function getInquiriesAction(status?: InquiryStatus): Promise<InquiryItem[]> {
-  // Fail closed: this exported Server Action must never disclose cached inquiries.
   await verifyAdminAuth();
+  const supabase = await createClient();
+  let query = supabase.from("inquiries").select("*")
+    .order("created_at", { ascending: false });
+  if (status) query = query.eq("status", status);
 
-  const now = Date.now();
-  if (lastFetch > 0 && now - lastFetch < CACHE_TTL_MS && memoryInquiriesCache.length > 0) {
-    return status ? memoryInquiriesCache.filter((i) => i.status === status) : memoryInquiriesCache;
+  const { data, error } = await query;
+  if (error) {
+    console.error("Failed to load inquiries:", error.code);
+    throw new Error("Inquiries cannot be loaded from the database.");
   }
-
-  try {
-    const supabase = await createClient();
-    const query = supabase
-      .from("inquiries")
-      .select("*")
-      .order("created_at", { ascending: false });
-
-    if (status) {
-      query.eq("status", status);
-    }
-
-    const { data, error } = await query;
-    if (!error && data) {
-      const dbInquiries = (data as unknown as InquiryDbRow[]).map(mapRowToInquiry);
-      memoryInquiriesCache = dbInquiries;
-      writeDiskInquiries(dbInquiries);
-      lastFetch = now;
-      return memoryInquiriesCache;
-    }
-  } catch (err) {
-    console.warn("Could not query inquiries from Supabase, using persistent cache:", err);
-  }
-
-  // Fallback to disk persistence
-  const diskItems = readDiskInquiries();
-  if (diskItems.length > 0) {
-    memoryInquiriesCache = diskItems;
-  }
-
-  return status ? memoryInquiriesCache.filter((i) => i.status === status) : memoryInquiriesCache;
+  return ((data ?? []) as InquiryDbRow[]).map(mapRowToInquiry);
 }
 
 /**
@@ -244,75 +185,47 @@ export async function updateInquiryStatusAction(
   id: string,
   status: InquiryStatus,
   adminNotes?: string
-): Promise<{
-  success: boolean;
-  data?: InquiryItem;
-  error?: string;
-}> {
+): Promise<{ success: boolean; data?: InquiryItem; error?: string }> {
   try {
     await verifyAdminAuth();
+    const payload: Record<string, unknown> = {
+      status,
+      updated_at: new Date().toISOString(),
+    };
+    if (adminNotes !== undefined) payload.admin_notes = adminNotes;
 
-    try {
-      const supabase = await createClient();
-      const updatePayload: Record<string, unknown> = {
-        status,
-        updated_at: new Date().toISOString(),
-      };
-      if (adminNotes !== undefined) {
-        updatePayload.admin_notes = adminNotes;
-      }
-
-      const { error } = await supabase
-        .from("inquiries")
-        .update(updatePayload)
-        .eq("id", id);
-      if (error) return { success: false, error: "Unable to update inquiry." };
-    } catch {
+    const supabase = await createClient();
+    const { data, error } = await supabase.from("inquiries")
+      .update(payload).eq("id", id).select().single();
+    if (error || !data) {
+      console.error("Failed to update inquiry:", error?.code || "no-data");
       return { success: false, error: "Unable to update inquiry." };
     }
-
-    memoryInquiriesCache = memoryInquiriesCache.map((i) => {
-      if (i.id !== id) return i;
-      return {
-        ...i,
-        status,
-        adminNotes: adminNotes !== undefined ? adminNotes : i.adminNotes,
-        updatedAt: new Date().toISOString(),
-      };
-    });
-    writeDiskInquiries(memoryInquiriesCache);
-
-    const updated = memoryInquiriesCache.find((i) => i.id === id);
     revalidatePath("/[locale]/admin/inquiries", "page");
-    return { success: true, data: updated };
+    return { success: true, data: mapRowToInquiry(data as InquiryDbRow) };
   } catch (err: unknown) {
-    return { success: false, error: (err as Error).message || "Failed to update inquiry." };
+    return { success: false, error: err instanceof Error ? err.message : "Failed to update inquiry." };
   }
 }
 
 /**
  * Admin action: Deletes an inquiry
  */
-export async function deleteInquiryAction(id: string): Promise<{
-  success: boolean;
-  error?: string;
-}> {
+export async function deleteInquiryAction(
+  id: string
+): Promise<{ success: boolean; error?: string }> {
   try {
     await verifyAdminAuth();
-
-    try {
-      const supabase = await createClient();
-      const { error } = await supabase.from("inquiries").delete().eq("id", id);
-      if (error) return { success: false, error: "Unable to delete inquiry." };
-    } catch {
+    const supabase = await createClient();
+    const { data, error } = await supabase.from("inquiries")
+      .delete().eq("id", id).select("id").single();
+    if (error || !data) {
+      console.error("Failed to delete inquiry:", error?.code || "no-data");
       return { success: false, error: "Unable to delete inquiry." };
     }
-
-    memoryInquiriesCache = memoryInquiriesCache.filter((i) => i.id !== id);
-    writeDiskInquiries(memoryInquiriesCache);
     revalidatePath("/[locale]/admin/inquiries", "page");
     return { success: true };
   } catch (err: unknown) {
-    return { success: false, error: (err as Error).message || "Failed to delete inquiry." };
+    return { success: false, error: err instanceof Error ? err.message : "Failed to delete inquiry." };
   }
 }

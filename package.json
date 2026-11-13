@@ -7,7 +7,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test:seo": "node --test tests/seo.test.mjs"
+    "test:seo": "node --test tests/seo.test.mjs",
+    "test:integrity": "node --test tests/production-integrity.test.mjs",
+    "test:admin": "node --test tests/admin-actions.test.mjs"
   },
   "dependencies": {
     "@clerk/nextjs": "^7.9.4",
