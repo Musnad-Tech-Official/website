@@ -72,3 +72,19 @@ test("announcement operations refuse database failures", () => {
   assert.match(actions, /Failed to delete announcement/);
   assert.match(actions, /\.delete\(\)[\s\S]*?\.select\("id"\)\.single\(\)/);
 });
+
+test("admin inquiries are never disk-cached and mutations check the affected row", () => {
+  const actions = source("lib/inquiries/actions.ts");
+  assert.doesNotMatch(actions, /readDiskInquiries|writeDiskInquiries|memoryInquiriesCache|fs\.writeFileSync/);
+  assert.match(actions, /await verifyAdminAuth\(\)/);
+  assert.match(actions, /Inquiries cannot be loaded from the database/);
+  assert.match(actions, /\.update\(payload\)\.eq\("id", id\)\.select\(\)\.single\(\)/);
+  assert.match(actions, /\.delete\(\)\.eq\("id", id\)\.select\("id"\)\.single\(\)/);
+});
+
+test("dashboard never labels unmeasured security or analytics as healthy", () => {
+  const page = source("app/[locale]/admin/page.tsx");
+  assert.match(page, /Not live-checked/);
+  assert.match(page, /Verify in Vercel/);
+  assert.doesNotMatch(page, /Enforced & Active|Active \(Real User\)|Optimal/);
+});
