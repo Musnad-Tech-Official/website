@@ -6,12 +6,6 @@ import { createClient } from "@/utils/supabase/server";
 import type { AnnouncementBannerProps } from "@/components/navbar/nav-types";
 import type { AnnouncementBannerItem, AnnouncementFormData } from "./types";
 
-const INITIAL_ANNOUNCEMENTS: AnnouncementBannerItem[] = [];
-
-let memoryAnnouncementsCache: AnnouncementBannerItem[] = [...INITIAL_ANNOUNCEMENTS];
-let lastFetch = 0;
-const CACHE_TTL_MS = 60 * 1000;
-
 async function verifyAdminAuth(): Promise<string> {
   const { userId, sessionClaims } = await auth();
   if (!userId) {
@@ -80,273 +74,152 @@ export async function getActiveAnnouncementAction(
   };
 }
 
-/**
- * Retrieves all announcements for dashboard management.
- */
-export async function getAllAnnouncementsAction(): Promise<AnnouncementBannerItem[]> {
-  const now = Date.now();
-  if (lastFetch > 0 && now - lastFetch < CACHE_TTL_MS && memoryAnnouncementsCache.length > 0) {
-    return memoryAnnouncementsCache;
-  }
+function revalidateAnnouncements(): void {
+  revalidatePath("/[locale]", "layout");
+  revalidatePath("/[locale]/admin/announcements", "page");
+}
 
+/** Return only persisted announcements. RLS filters anonymous readers. */
+export async function getAllAnnouncementsAction(): Promise<AnnouncementBannerItem[]> {
+  const supabase = await createClient();
+  const { data, error } = await supabase.from("announcements")
+    .select("*").order("created_at", { ascending: false });
+  if (error) {
+    console.error("Failed to load announcements:", error.code);
+    throw new Error("Announcements are unavailable.");
+  }
+  return ((data ?? []) as AnnouncementDbRow[]).map(mapRowToAnnouncement);
+}
+
+/**
+ * Deactivate previously active announcements before activating another.
+ * Both writes are checked; this is not a transaction and requires an atomic
+ * database RPC for fully race-safe switching (documented release blocker).
+ */
+async function deactivateOtherAnnouncements(id: string): Promise<string[]> {
+  const supabase = await createClient();
+  const { data: active, error: lookupError } = await supabase.from("announcements")
+    .select("id").eq("is_active", true).neq("id", id);
+  if (lookupError) throw new Error("Could not inspect existing announcements.");
+  const previous = (active ?? []).map((record) => record.id as string);
+  if (!previous.length) return [];
+
+  const { data, error } = await supabase.from("announcements")
+    .update({ is_active: false }).in("id", previous).select("id");
+  if (error || !data || data.length !== previous.length) {
+    throw new Error("Could not deactivate previous announcements.");
+  }
+  return previous;
+}
+
+/** A best-effort recovery when the second step of activation fails. */
+async function restorePreviousAnnouncements(ids: string[]): Promise<void> {
+  if (!ids.length) return;
   try {
     const supabase = await createClient();
-    const { data, error } = await supabase
-      .from("announcements")
-      .select("*")
-      .order("created_at", { ascending: false });
-
-    if (!error && data && data.length > 0) {
-      memoryAnnouncementsCache = (data as unknown as AnnouncementDbRow[]).map(
-        mapRowToAnnouncement
-      );
-      lastFetch = now;
-      return memoryAnnouncementsCache;
-    }
-  } catch (err) {
-    console.warn("Could not query announcements from Supabase, using cache:", err);
+    const { error } = await supabase.from("announcements")
+      .update({ is_active: true }).in("id", ids);
+    if (error) console.error("Announcement rollback failed:", error.code);
+  } catch {
+    console.error("Announcement rollback failed after activation error.");
   }
-
-  return memoryAnnouncementsCache;
 }
 
-/**
- * Creates and optionally activates a new announcement banner.
- */
 export async function createAnnouncementAction(
   formData: AnnouncementFormData
-): Promise<{
-  success: boolean;
-  data?: AnnouncementBannerItem;
-  error?: string;
-}> {
+): Promise<{ success: boolean; data?: AnnouncementBannerItem; error?: string }> {
+  let previousIds: string[] = [];
   try {
     await verifyAdminAuth();
+    const id = formData.id || `banner-${crypto.randomUUID()}`;
+    const activate = formData.isActive ?? false;
+    if (activate) previousIds = await deactivateOtherAnnouncements(id);
 
-    const id =
-      formData.id ||
-      `banner-${Date.now()}`;
-
-    const newBanner: AnnouncementBannerItem = {
+    const supabase = await createClient();
+    const { data, error } = await supabase.from("announcements").insert({
       id,
       category: formData.category,
-      textEn: formData.textEn.trim(),
-      textAr: formData.textAr.trim(),
-      tagEn: formData.tagEn?.trim() || "New",
-      tagAr: formData.tagAr?.trim() || "جديد",
-      linkTextEn: formData.linkTextEn?.trim() || "Explore Now",
-      linkTextAr: formData.linkTextAr?.trim() || "استكشف الآن",
+      text_en: formData.textEn.trim(),
+      text_ar: formData.textAr.trim(),
+      tag_en: formData.tagEn?.trim() || "New",
+      tag_ar: formData.tagAr?.trim() || "جديد",
+      link_text_en: formData.linkTextEn?.trim() || "Explore Now",
+      link_text_ar: formData.linkTextAr?.trim() || "استكشف الآن",
       href: formData.href.trim(),
-      isActive: formData.isActive ?? false,
-      isDismissible: formData.isDismissible ?? true,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    };
+      is_active: activate,
+      is_dismissible: formData.isDismissible ?? true,
+    }).select().single();
 
-    try {
-      const supabase = await createClient();
-
-      // If active, deactivate others first
-      if (newBanner.isActive) {
-        await supabase
-          .from("announcements")
-          .update({ is_active: false })
-          .neq("id", id);
-      }
-
-      const { data, error } = await supabase
-        .from("announcements")
-        .insert({
-          id: newBanner.id,
-          category: newBanner.category,
-          text_en: newBanner.textEn,
-          text_ar: newBanner.textAr,
-          tag_en: newBanner.tagEn,
-          tag_ar: newBanner.tagAr,
-          link_text_en: newBanner.linkTextEn,
-          link_text_ar: newBanner.linkTextAr,
-          href: newBanner.href,
-          is_active: newBanner.isActive,
-          is_dismissible: newBanner.isDismissible,
-        })
-        .select()
-        .single();
-
-      if (!error && data) {
-        const created = mapRowToAnnouncement(data as unknown as AnnouncementDbRow);
-        if (created.isActive) {
-          memoryAnnouncementsCache = memoryAnnouncementsCache.map((b) => ({
-            ...b,
-            isActive: false,
-          }));
-        }
-        memoryAnnouncementsCache = [created, ...memoryAnnouncementsCache];
-        revalidatePath("/", "layout");
-        revalidatePath("/[locale]", "layout");
-        revalidatePath("/[locale]/admin/announcements", "page");
-        return { success: true, data: created };
-      }
-    } catch {
-      // In-memory fallback
+    if (error || !data) {
+      console.error("Failed to create announcement:", error?.code || "no-data");
+      await restorePreviousAnnouncements(previousIds);
+      return { success: false, error: "Announcement was not saved." };
     }
-
-    if (newBanner.isActive) {
-      memoryAnnouncementsCache = memoryAnnouncementsCache.map((b) => ({
-        ...b,
-        isActive: false,
-      }));
-    }
-    memoryAnnouncementsCache = [newBanner, ...memoryAnnouncementsCache];
-
-    revalidatePath("/", "layout");
-    revalidatePath("/[locale]", "layout");
-    revalidatePath("/[locale]/admin/announcements", "page");
-
-    return { success: true, data: newBanner };
+    revalidateAnnouncements();
+    return { success: true, data: mapRowToAnnouncement(data as AnnouncementDbRow) };
   } catch (err: unknown) {
-    return { success: false, error: (err as Error).message || "Failed to create announcement." };
+    await restorePreviousAnnouncements(previousIds);
+    return { success: false, error: err instanceof Error ? err.message : "Failed to create announcement." };
   }
 }
 
-/**
- * Updates an announcement banner.
- */
 export async function updateAnnouncementAction(
-  id: string,
-  formData: Partial<AnnouncementFormData>
-): Promise<{
-  success: boolean;
-  data?: AnnouncementBannerItem;
-  error?: string;
-}> {
+  id: string, formData: Partial<AnnouncementFormData>
+): Promise<{ success: boolean; data?: AnnouncementBannerItem; error?: string }> {
+  let previousIds: string[] = [];
   try {
     await verifyAdminAuth();
+    if (formData.isActive) previousIds = await deactivateOtherAnnouncements(id);
 
-    try {
-      const supabase = await createClient();
+    const payload: Record<string, unknown> = { updated_at: new Date().toISOString() };
+    if (formData.category !== undefined) payload.category = formData.category;
+    if (formData.textEn !== undefined) payload.text_en = formData.textEn.trim();
+    if (formData.textAr !== undefined) payload.text_ar = formData.textAr.trim();
+    if (formData.tagEn !== undefined) payload.tag_en = formData.tagEn.trim();
+    if (formData.tagAr !== undefined) payload.tag_ar = formData.tagAr.trim();
+    if (formData.linkTextEn !== undefined) payload.link_text_en = formData.linkTextEn.trim();
+    if (formData.linkTextAr !== undefined) payload.link_text_ar = formData.linkTextAr.trim();
+    if (formData.href !== undefined) payload.href = formData.href.trim();
+    if (formData.isActive !== undefined) payload.is_active = formData.isActive;
+    if (formData.isDismissible !== undefined) payload.is_dismissible = formData.isDismissible;
 
-      if (formData.isActive) {
-        await supabase
-          .from("announcements")
-          .update({ is_active: false })
-          .neq("id", id);
-      }
-
-      const updatePayload: Record<string, unknown> = {
-        updated_at: new Date().toISOString(),
-      };
-
-      if (formData.category !== undefined) updatePayload.category = formData.category;
-      if (formData.textEn !== undefined) updatePayload.text_en = formData.textEn.trim();
-      if (formData.textAr !== undefined) updatePayload.text_ar = formData.textAr.trim();
-      if (formData.tagEn !== undefined) updatePayload.tag_en = formData.tagEn.trim();
-      if (formData.tagAr !== undefined) updatePayload.tag_ar = formData.tagAr.trim();
-      if (formData.linkTextEn !== undefined) updatePayload.link_text_en = formData.linkTextEn.trim();
-      if (formData.linkTextAr !== undefined) updatePayload.link_text_ar = formData.linkTextAr.trim();
-      if (formData.href !== undefined) updatePayload.href = formData.href.trim();
-      if (formData.isActive !== undefined) updatePayload.is_active = formData.isActive;
-      if (formData.isDismissible !== undefined) updatePayload.is_dismissible = formData.isDismissible;
-
-      const { data, error } = await supabase
-        .from("announcements")
-        .update(updatePayload)
-        .eq("id", id)
-        .select()
-        .single();
-
-      if (!error && data) {
-        const updated = mapRowToAnnouncement(data as unknown as AnnouncementDbRow);
-        if (updated.isActive) {
-          memoryAnnouncementsCache = memoryAnnouncementsCache.map((b) => ({
-            ...b,
-            isActive: b.id === id,
-          }));
-        }
-        memoryAnnouncementsCache = memoryAnnouncementsCache.map((b) =>
-          b.id === id ? updated : b
-        );
-        revalidatePath("/", "layout");
-        revalidatePath("/[locale]", "layout");
-        revalidatePath("/[locale]/admin/announcements", "page");
-        return { success: true, data: updated };
-      }
-    } catch {
-      // In-memory fallback
+    const supabase = await createClient();
+    const { data, error } = await supabase.from("announcements")
+      .update(payload).eq("id", id).select().single();
+    if (error || !data) {
+      console.error("Failed to update announcement:", error?.code || "no-data");
+      await restorePreviousAnnouncements(previousIds);
+      return { success: false, error: "Announcement changes were not saved." };
     }
-
-    if (formData.isActive) {
-      memoryAnnouncementsCache = memoryAnnouncementsCache.map((b) => ({
-        ...b,
-        isActive: b.id === id,
-      }));
-    }
-
-    memoryAnnouncementsCache = memoryAnnouncementsCache.map((b) => {
-      if (b.id !== id) return b;
-      return {
-        ...b,
-        category: formData.category ?? b.category,
-        textEn: formData.textEn !== undefined ? formData.textEn.trim() : b.textEn,
-        textAr: formData.textAr !== undefined ? formData.textAr.trim() : b.textAr,
-        tagEn: formData.tagEn !== undefined ? formData.tagEn.trim() : b.tagEn,
-        tagAr: formData.tagAr !== undefined ? formData.tagAr.trim() : b.tagAr,
-        linkTextEn: formData.linkTextEn !== undefined ? formData.linkTextEn.trim() : b.linkTextEn,
-        linkTextAr: formData.linkTextAr !== undefined ? formData.linkTextAr.trim() : b.linkTextAr,
-        href: formData.href !== undefined ? formData.href.trim() : b.href,
-        isActive: formData.isActive !== undefined ? formData.isActive : b.isActive,
-        isDismissible: formData.isDismissible !== undefined ? formData.isDismissible : b.isDismissible,
-        updatedAt: new Date().toISOString(),
-      };
-    });
-
-    const updated = memoryAnnouncementsCache.find((b) => b.id === id);
-    revalidatePath("/", "layout");
-    revalidatePath("/[locale]", "layout");
-    revalidatePath("/[locale]/admin/announcements", "page");
-
-    return { success: true, data: updated };
+    revalidateAnnouncements();
+    return { success: true, data: mapRowToAnnouncement(data as AnnouncementDbRow) };
   } catch (err: unknown) {
-    return { success: false, error: (err as Error).message || "Failed to update announcement." };
+    await restorePreviousAnnouncements(previousIds);
+    return { success: false, error: err instanceof Error ? err.message : "Failed to update announcement." };
   }
 }
 
-/**
- * Toggles an announcement's active broadcast status.
- */
 export async function toggleAnnouncementActiveAction(
-  id: string,
-  isActive: boolean
-): Promise<{
-  success: boolean;
-  error?: string;
-}> {
+  id: string, isActive: boolean
+): Promise<{ success: boolean; error?: string }> {
   return updateAnnouncementAction(id, { isActive });
 }
 
-/**
- * Deletes an announcement banner.
- */
-export async function deleteAnnouncementAction(id: string): Promise<{
-  success: boolean;
-  error?: string;
-}> {
+export async function deleteAnnouncementAction(
+  id: string
+): Promise<{ success: boolean; error?: string }> {
   try {
     await verifyAdminAuth();
-
-    try {
-      const supabase = await createClient();
-      await supabase.from("announcements").delete().eq("id", id);
-    } catch {
-      // In-memory
+    const supabase = await createClient();
+    const { data, error } = await supabase.from("announcements")
+      .delete().eq("id", id).select("id").single();
+    if (error || !data) {
+      console.error("Failed to delete announcement:", error?.code || "no-data");
+      return { success: false, error: "Announcement was not deleted." };
     }
-
-    memoryAnnouncementsCache = memoryAnnouncementsCache.filter((b) => b.id !== id);
-    revalidatePath("/", "layout");
-    revalidatePath("/[locale]", "layout");
-    revalidatePath("/[locale]/admin/announcements", "page");
-
+    revalidateAnnouncements();
     return { success: true };
   } catch (err: unknown) {
-    return { success: false, error: (err as Error).message || "Failed to delete announcement." };
+    return { success: false, error: err instanceof Error ? err.message : "Failed to delete announcement." };
   }
 }

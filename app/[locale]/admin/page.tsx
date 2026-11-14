@@ -218,42 +218,37 @@ export default async function AdminDashboardPage({ params }: AdminPageProps) {
     },
   ];
 
+  // Configuration checks are not live health probes. Do not claim security or telemetry health.
   const systemStatus = [
     {
-      name: "Supabase PostgreSQL Database",
-      status: telemetry?.supabaseConfigured ? (isAr ? "متصل" : "Connected") : (isAr ? "غير مهيأ" : "Unconfigured"),
-      health: telemetry?.supabaseConfigured ? "Optimal" : "Check Env",
+      name: "Supabase Configuration",
+      status: telemetry?.supabaseConfigured ? (isAr ? "مهيأ" : "Configured") : (isAr ? "غير مهيأ" : "Unconfigured"),
       isOk: Boolean(telemetry?.supabaseConfigured),
     },
     {
       name: "Row Level Security (RLS)",
-      status: isAr ? "مفعّل ومحمي" : "Enforced & Active",
-      health: "Secure",
-      isOk: true,
+      status: isAr ? "لم يُفحص مباشرة" : "Not live-checked",
+      isOk: false,
     },
     {
-      name: "Clerk Auth & Session Claims",
-      status: telemetry?.clerkConfigured ? (isAr ? "نشط" : "Active") : (isAr ? "غير مهيأ" : "Unconfigured"),
-      health: telemetry?.clerkConfigured ? "Ready" : "Check Env",
+      name: "Clerk Configuration",
+      status: telemetry?.clerkConfigured ? (isAr ? "مهيأ" : "Configured") : (isAr ? "غير مهيأ" : "Unconfigured"),
       isOk: Boolean(telemetry?.clerkConfigured),
     },
     {
-      name: "Vercel Web Analytics Beacon",
-      status: isAr ? "يعمل على الحافة" : "Active (Edge)",
-      health: "Streaming",
-      isOk: true,
+      name: "Vercel Web Analytics",
+      status: isAr ? "الفحص عبر Vercel" : "Verify in Vercel",
+      isOk: false,
     },
     {
-      name: "Vercel Speed Insights (RUM)",
-      status: isAr ? "مراقب لحظي" : "Active (Real User)",
-      health: "Live",
-      isOk: true,
+      name: "Vercel Speed Insights",
+      status: isAr ? "الفحص عبر Vercel" : "Verify in Vercel",
+      isOk: false,
     },
     {
-      name: "Environment / بيئة التشغيل",
-      status: telemetry?.nodeEnv || "production",
-      health: "Ready",
-      isOk: true,
+      name: "Runtime Environment",
+      status: telemetry?.nodeEnv || (isAr ? "غير معروف" : "Unknown"),
+      isOk: Boolean(telemetry?.nodeEnv),
     },
   ];
 
@@ -591,17 +586,17 @@ export default async function AdminDashboardPage({ params }: AdminPageProps) {
         <div className="space-y-4 min-w-0">
           <h2 className="text-base font-bold text-foreground tracking-tight flex items-center gap-2">
             <LuShieldCheck className="w-4 h-4 text-emerald-500 shrink-0" />
-            <span>{isAr ? "جاهزية البنية التحتية" : "Infrastructure Telemetry"}</span>
+            <span>{isAr ? "التهيئة والتحقق" : "Configuration & Verification"}</span>
           </h2>
 
           <Card className="min-w-0">
             <CardHeader className="p-4 pb-3 border-b border-border/40">
               <CardTitle className="text-sm font-semibold flex items-center gap-2">
                 <LuServer className="w-4 h-4 text-primary shrink-0" />
-                <span className="truncate">{isAr ? "صحة الخدمات الأساسية" : "Service Health & Status"}</span>
+                <span className="truncate">{isAr ? "حالة إعداد الخدمات" : "Service Configuration Status"}</span>
               </CardTitle>
               <CardDescription className="text-xs line-clamp-1">
-                {isAr ? "حالة الاتصال بالخدمات السحابية وقواعد البيانات" : "Cloud services & database connection telemetry"}
+                {isAr ? "مؤشرات تهيئة فقط؛ ليست فحصاً مباشراً لصحة الخدمات" : "Configuration indicators only; not live health checks"}
               </CardDescription>
             </CardHeader>
             <CardContent className="p-3.5 sm:p-4 space-y-2.5">

@@ -5,32 +5,33 @@ import { getJobDetailConfig } from "./job-detail-data";
 import { JobDetailIntro } from "./job-detail-intro";
 import { JobResponsibilities } from "./job-responsibilities";
 import { JobRequirements } from "./job-requirements";
-import { JobNiceToHave } from "./job-nice-to-have";
 import { JobApplicationForm } from "./job-application-form";
 import { OtherOpenPositions } from "./other-open-positions";
+import { getCareerJobBySlugAction, getCareerJobsAction } from "@/lib/careers/actions";
 import type { JobDetailTemplateProps } from "./job-detail-types";
 import { localizedUrl } from "@/lib/seo/config";
-import { breadcrumbsJsonLd, jobPostingJsonLd, organizationJsonLd, serializeJsonLd } from "@/lib/seo/structured-data";
+import { breadcrumbsJsonLd, organizationJsonLd, serializeJsonLd } from "@/lib/seo/structured-data";
 
 export async function JobDetailTemplate({
   slug,
   locale,
 }: JobDetailTemplateProps) {
   const config = getJobDetailConfig(slug);
-  if (!config) {
-    notFound();
-  }
+  if (!config) notFound();
+  const [job, openJobs] = await Promise.all([
+    getCareerJobBySlugAction(slug),
+    getCareerJobsAction(false),
+  ]);
+  if (!job) notFound();
 
   const t = await getTranslations({ locale, namespace: "JobDetail" });
   const tPositions = await getTranslations({ locale, namespace: "Careers.positions" });
 
   const isRtl = locale === "ar";
-  const deadlineFormatted = isRtl ? config.deadlineAr : config.deadlineEn;
-  const jobTitle = t(`${config.translationKey}.title`);
-  const subtitle = t(`${config.translationKey}.subtitle`);
-  const responsibilities = t.raw(`${config.translationKey}.responsibilities`) as string[];
-  const requirements = t.raw(`${config.translationKey}.requirements`) as string[];
-  const niceToHave = t.raw(`${config.translationKey}.niceToHave`) as string[];
+  const jobTitle = isRtl ? job.titleAr : job.titleEn;
+  const subtitle = isRtl ? job.descriptionAr : job.descriptionEn;
+  const responsibilities = isRtl ? job.responsibilitiesAr : job.responsibilitiesEn;
+  const requirements = isRtl ? job.requirementsAr : job.requirementsEn;
 
   return (
     <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 w-full flex-1">
@@ -38,15 +39,6 @@ export async function JobDetailTemplate({
         "@context": "https://schema.org",
         "@graph": [
           organizationJsonLd(),
-          jobPostingJsonLd({
-            title: jobTitle,
-            description: subtitle,
-            department: tPositions(`departments.${config.department}`),
-            employmentType: config.workTypeKey === "fullTime" ? "FULL_TIME" : "CONTRACTOR",
-            location: tPositions(`locations.${config.locationKey}`),
-            datePosted: "2026-01-01",
-            validThrough: config.deadlineEn,
-          }, locale),
           breadcrumbsJsonLd([
             { name: t("common.breadcrumb.home"), url: localizedUrl(locale, "/") },
             { name: t("common.breadcrumb.careers"), url: localizedUrl(locale, "/careers") },
@@ -62,11 +54,11 @@ export async function JobDetailTemplate({
         jobTitle={jobTitle}
         eyebrow={t("common.eyebrow")}
         subtitle={subtitle}
-        departmentLabel={tPositions(`departments.${config.department}`)}
-        workTypeLabel={tPositions(`workTypes.${config.workTypeKey}`)}
-        locationLabel={tPositions(`locations.${config.locationKey}`)}
-        modeLabel={tPositions(`modes.${config.mode}`)}
-        deadlineFormatted={deadlineFormatted}
+        departmentLabel={tPositions(`departments.${job.department}`)}
+        workTypeLabel={isRtl ? job.workTypeAr : job.workTypeEn}
+        locationLabel={isRtl ? job.locationAr : job.locationEn}
+        modeLabel={tPositions(`modes.${job.workMode}`)}
+        deadlineFormatted=""
         deadlinePrefix={t("common.deadlinePrefix")}
       />
 
@@ -82,10 +74,6 @@ export async function JobDetailTemplate({
             heading={t("common.requirementsHeading")}
             items={requirements}
           />
-          <JobNiceToHave
-            heading={t("common.niceToHaveHeading")}
-            items={niceToHave}
-          />
         </div>
 
         {/* Right Column: Sticky Application Form */}
@@ -100,7 +88,8 @@ export async function JobDetailTemplate({
 
       {/* 3. Other Open Positions Section */}
       <OtherOpenPositions
-        otherPositionsSlugs={config.otherPositionsSlugs}
+        positions={openJobs.filter((item) => item.slug !== slug)}
+        locale={locale}
       />
     </div>
   );

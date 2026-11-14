@@ -3,7 +3,6 @@
 import { auth } from "@clerk/nextjs/server";
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/utils/supabase/server";
-import { ALL_TECH_ITEMS } from "@/components/hero/tech-data";
 import type { ManagedTechnology, NewTechnologyInput } from "./types";
 
 /**
@@ -25,20 +24,6 @@ function inferCategory(id: string): ManagedTechnology["category"] {
   if (ai.includes(id)) return "AI & Realtime";
   return "Other";
 }
-
-// Master pre-seeded inventory from official tech catalog
-const MASTER_TECH_INVENTORY: ManagedTechnology[] = ALL_TECH_ITEMS.map((item, idx) => ({
-  id: item.id,
-  name: item.name,
-  category: inferCategory(item.id),
-  enabledHome: true,
-  displayOrder: idx + 1,
-}));
-
-// In-memory fallback cache
-let memoryTechCache: ManagedTechnology[] = [...MASTER_TECH_INVENTORY];
-let lastFetch = 0;
-const CACHE_TTL_MS = 60 * 1000;
 
 async function verifyAdminAuth(): Promise<string> {
   const { userId, sessionClaims } = await auth();
@@ -72,149 +57,92 @@ function mapRowToTech(row: TechnologyDbRow): ManagedTechnology {
   };
 }
 
-/**
- * Retrieves all company technologies (for Dashboard & Admin)
- */
+function revalidateTechnologies(): void {
+  revalidatePath("/[locale]", "layout");
+  revalidatePath("/[locale]/admin/technologies", "page");
+}
+
+/** Only show technologies actually persisted in Supabase. */
 export async function getTechnologiesAction(): Promise<ManagedTechnology[]> {
-  const now = Date.now();
-  if (lastFetch > 0 && now - lastFetch < CACHE_TTL_MS && memoryTechCache.length > 0) {
-    return memoryTechCache;
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("technologies").select("*").order("display_order", { ascending: true });
+  if (error) {
+    console.error("Failed to query technologies:", error.code);
+    throw new Error("Technology catalog is unavailable.");
   }
-
-  try {
-    const supabase = await createClient();
-    const { data, error } = await supabase
-      .from("technologies")
-      .select("*")
-      .order("display_order", { ascending: true });
-
-    if (!error && data && data.length > 0) {
-      memoryTechCache = (data as unknown as TechnologyDbRow[]).map(mapRowToTech);
-      lastFetch = now;
-      return memoryTechCache;
-    }
-  } catch (err) {
-    console.warn("Could not query technologies table from Supabase, using master memory cache:", err);
-  }
-
-  return memoryTechCache;
+  return ((data ?? []) as TechnologyDbRow[]).map(mapRowToTech);
 }
 
-/**
- * Retrieves only active technologies for the Home page
- */
 export async function getHomeTechnologiesAction(): Promise<ManagedTechnology[]> {
-  const all = await getTechnologiesAction();
-  return all.filter((t) => t.enabledHome);
+  return (await getTechnologiesAction()).filter((technology) => technology.enabledHome);
 }
 
-/**
- * Toggle whether a technology appears on the Home page
- */
 export async function toggleTechnologyHomeAction(
   id: string,
   enabledHome: boolean
 ): Promise<{ success: boolean; error?: string }> {
   try {
     await verifyAdminAuth();
-
-    // Update in-memory cache
-    memoryTechCache = memoryTechCache.map((t) =>
-      t.id === id ? { ...t, enabledHome } : t
-    );
-
-    // Persist to Supabase if table exists
-    try {
-      const supabase = await createClient();
-      await supabase
-        .from("technologies")
-        .upsert(
-          {
-            id,
-            enabled_home: enabledHome,
-            updated_at: new Date().toISOString(),
-          },
-          { onConflict: "id" }
-        );
-    } catch (dbErr) {
-      console.warn("Supabase technologies table update skipped:", dbErr);
+    const supabase = await createClient();
+    const { data, error } = await supabase.from("technologies")
+      .update({ enabled_home: enabledHome })
+      .eq("id", id).select("id").single();
+    if (error || !data) {
+      console.error("Failed to toggle technology:", error?.code || "no-data");
+      return { success: false, error: "Technology change was not saved." };
     }
-
-    revalidatePath("/", "layout");
-    revalidatePath("/admin/technologies", "page");
+    revalidateTechnologies();
     return { success: true };
   } catch (err: unknown) {
     return { success: false, error: err instanceof Error ? err.message : "Failed to toggle technology." };
   }
 }
 
-/**
- * Add a new technology to the company catalog
- */
 export async function addTechnologyAction(
   input: NewTechnologyInput
 ): Promise<{ success: boolean; data?: ManagedTechnology; error?: string }> {
   try {
     await verifyAdminAuth();
+    const name = input.name.trim();
+    const cleanId = (input.id || name).toLowerCase().trim()
+      .replace(/[^a-z0-9]/g, "-").replace(/-+/g, "-").replace(/^-|-$/g, "");
+    if (!name || !cleanId) return { success: false, error: "Technology name and ID are required." };
 
-    const cleanId = (input.id || input.name)
-      .toLowerCase()
-      .trim()
-      .replace(/[^a-z0-9]/g, "-")
-      .replace(/-+/g, "-");
-
-    const newTech: ManagedTechnology = {
+    const displayOrder = (await getTechnologiesAction()).reduce((max, t) => Math.max(max, t.displayOrder), 0) + 1;
+    const supabase = await createClient();
+    const { data, error } = await supabase.from("technologies").insert({
       id: cleanId,
-      name: input.name.trim(),
+      name,
       category: input.category || inferCategory(cleanId),
-      enabledHome: input.enabledHome ?? true,
-      displayOrder: memoryTechCache.length + 1,
-      createdAt: new Date().toISOString(),
-    };
+      enabled_home: input.enabledHome ?? true,
+      display_order: displayOrder,
+    }).select().single();
 
-    memoryTechCache.push(newTech);
-
-    try {
-      const supabase = await createClient();
-      await supabase.from("technologies").insert({
-        id: newTech.id,
-        name: newTech.name,
-        category: newTech.category,
-        enabled_home: newTech.enabledHome,
-        display_order: newTech.displayOrder,
-      });
-    } catch (dbErr) {
-      console.warn("Supabase technologies insert skipped:", dbErr);
+    if (error || !data) {
+      console.error("Failed to create technology:", error?.code || "no-data");
+      return { success: false, error: "Technology was not saved." };
     }
-
-    revalidatePath("/", "layout");
-    revalidatePath("/admin/technologies", "page");
-    return { success: true, data: newTech };
+    revalidateTechnologies();
+    return { success: true, data: mapRowToTech(data as TechnologyDbRow) };
   } catch (err: unknown) {
     return { success: false, error: err instanceof Error ? err.message : "Failed to add technology." };
   }
 }
 
-/**
- * Delete a technology from the company catalog
- */
 export async function deleteTechnologyAction(
   id: string
 ): Promise<{ success: boolean; error?: string }> {
   try {
     await verifyAdminAuth();
-
-    memoryTechCache = memoryTechCache.filter((t) => t.id !== id);
-
-    try {
-      const supabase = await createClient();
-      await supabase.from("technologies").delete().eq("id", id);
-    } catch (dbErr) {
-      console.warn("Supabase technologies delete skipped:", dbErr);
+    const supabase = await createClient();
+    const { data, error } = await supabase.from("technologies")
+      .delete().eq("id", id).select("id").single();
+    if (error || !data) {
+      console.error("Failed to delete technology:", error?.code || "no-data");
+      return { success: false, error: "Technology was not deleted." };
     }
-
-    revalidatePath("/", "layout");
-    revalidatePath("/admin/technologies", "page");
+    revalidateTechnologies();
     return { success: true };
   } catch (err: unknown) {
     return { success: false, error: err instanceof Error ? err.message : "Failed to delete technology." };

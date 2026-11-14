@@ -10,179 +10,6 @@ import type {
   AboutApproachRecord,
 } from "./types";
 
-const FALLBACK_ABOUT_CONTENT: AboutContentData = {
-  id: "main",
-  missionTitleEn: "Our mission",
-  missionTitleAr: "مهمتنا",
-  missionDescEn:
-    "Help teams ship software that is reliable, maintainable, and worth trusting — and show our work so others can verify it.",
-  missionDescAr:
-    "مساعدة الفِرق على بناء برمجيات موثوقة وقابلة للصيانة وجديرة بالثقة — وتوثيق عملنا بشفافية لتمكين الجميع من التحقق منه.",
-  visionTitleEn: "Our vision",
-  visionTitleAr: "رؤيتنا",
-  visionDescEn:
-    "A regional engineering culture where quality is the default, not a premium.",
-  visionDescAr:
-    "ترسيخ ثقافة هندسية إقليمية تكون فيها الجودة هي المعيار الأساسي وليست ميزة استثنائية.",
-  storyTitleEn: "How we got here",
-  storyTitleAr: "كيف بدأنا مسيرتنا",
-  storyP1En:
-    "Musnad Tech was founded in Riyadh in 2021 by a small group of senior engineers who had spent a decade building software at scale.",
-  storyP1Ar:
-    "تأسست مسند للتقنية في الرياض عام 2021 على يد نخبة من كبار المهندسين أصحاب الخبرة الطويلة في بناء الأنظمة المعقدة.",
-  storyP2En:
-    "From the first commit, we made a deliberate choice: bilingual-first, by default. Arabic and English are first-class.",
-  storyP2Ar:
-    "منذ السطر الأول البرمجي، اخترنا أن تكون أنظمتنا ثنائية اللغة أصالةً وبشكل افتراضي.",
-};
-
-const FALLBACK_ABOUT_VALUES: AboutValueRecord[] = [
-  {
-    id: "proof",
-    titleEn: "Proof over claims",
-    titleAr: "البرهان قبل الادعاء",
-    descriptionEn: "We show our work. Case studies, evals, open source — verify us.",
-    descriptionAr: "نوثق نتائج أعمالنا فعلياً عبر دراسات الحالة والتقييم والبرمجيات المفتوحة.",
-    icon: "LuTarget",
-    displayOrder: 1,
-    isActive: true,
-  },
-  {
-    id: "flexibility",
-    titleEn: "Structured flexibility",
-    titleAr: "مرونة مهيكلة ومدروسة",
-    descriptionEn: "Deliberate structure with room for the right exceptions — not a rigid template.",
-    descriptionAr: "هيكلة منظمة تستوعب المتغيرات دون قوالب جامدة تعيق الإنتاجية.",
-    icon: "LuSlidersHorizontal",
-    displayOrder: 2,
-    isActive: true,
-  },
-  {
-    id: "security",
-    titleEn: "Security by design",
-    titleAr: "الأمان بالتصميم المعماري",
-    descriptionEn: "Threat modeling and least privilege are defaults, not add-ons.",
-    descriptionAr: "نمذجة التهديدات ومبدأ الامتيازات الأقل هي معاييرنا الافتراضية دائماً.",
-    icon: "LuShieldCheck",
-    displayOrder: 3,
-    isActive: true,
-  },
-  {
-    id: "bilingual",
-    titleEn: "Bilingual first",
-    titleAr: "ثنائية اللغة بالأصالة",
-    descriptionEn: "Arabic and English are first-class. RTL and LTR, end to end.",
-    descriptionAr: "العربية والإنجليزية من الدرجة الأولى دعماً وتجربة وتصميماً متكاملاً.",
-    icon: "LuLanguages",
-    displayOrder: 4,
-    isActive: true,
-  },
-];
-
-const FALLBACK_ABOUT_MILESTONES: AboutMilestoneRecord[] = [
-  {
-    id: "2021",
-    year: "2021",
-    titleEn: "Musnad Tech founded",
-    titleAr: "تأسيس مسند للتقنية",
-    descriptionEn: "Started as a two-person studio in Riyadh.",
-    descriptionAr: "انطلقت كاستوديو هندسي من مهندسَين اثنين في الرياض.",
-    displayOrder: 1,
-    isActive: true,
-  },
-  {
-    id: "2022",
-    year: "2022",
-    titleEn: "First regulated client portal",
-    titleAr: "أول بوابة عملاء متوافقة تنظيمياً",
-    descriptionEn: "Shipped Rakeen — our first bilingual, compliant product.",
-    descriptionAr: "إطلاق بوابة ركين — أول منتج ثنائي اللغة ومعتمد ومطابق للمعايير التنظيمية.",
-    displayOrder: 2,
-    isActive: true,
-  },
-  {
-    id: "2023",
-    year: "2023",
-    titleEn: "Open-source Naft",
-    titleAr: "إطلاق أداة نفط مفتوحة المصدر",
-    descriptionEn: "Released Naft Deploy, our deployment tool for small teams.",
-    descriptionAr: "إطلاق أداة Naft Deploy لتسهيل النشر السحابي للفِرق البرمجية الصغيرة.",
-    displayOrder: 3,
-    isActive: true,
-  },
-  {
-    id: "2024",
-    year: "2024",
-    titleEn: "Streaming analytics at scale",
-    titleAr: "تحليلات التدفق اللحظي على نطاق واسع",
-    descriptionEn: "Delivered Sahim — 48k events/min with sub-200ms queries.",
-    descriptionAr: "تسليم منصة سهم — معالجة 48 ألف حدث في الدقيقة باستعلامات أقل من 200 مللي ثانية.",
-    displayOrder: 4,
-    isActive: true,
-  },
-  {
-    id: "2025",
-    year: "2025",
-    titleEn: "AI practice & eval-first RAG",
-    titleAr: "تطوير ممارسة الذكاء الاصطناعي وRAG",
-    descriptionEn: "Formalized our AI integration practice around evals and honesty.",
-    descriptionAr: "تأسيس ممارسة تكامل الذكاء الاصطناعي القائمة على التقييم الصارم والشفافية.",
-    displayOrder: 5,
-    isActive: true,
-  },
-];
-
-const FALLBACK_ABOUT_APPROACH: AboutApproachRecord[] = [
-  {
-    id: "discovery",
-    stepNumber: "01",
-    titleEn: "Discovery",
-    titleAr: "الاستكشاف والتحليل",
-    descriptionEn:
-      "A paid engagement to align on the problem, constraints, and success metrics before committing to build.",
-    descriptionAr:
-      "مرحلة استكشافية دقيقة لمواءمة التحديات والمحددات ومؤشرات النجاح قبل البدء في التنفيذ.",
-    displayOrder: 1,
-    isActive: true,
-  },
-  {
-    id: "architecture",
-    stepNumber: "02",
-    titleEn: "Architecture & RFCs",
-    titleAr: "المعمارية ووثائق RFCs",
-    descriptionEn:
-      "We write down the hard decisions — architecture, trade-offs, risks — and review them openly.",
-    descriptionAr:
-      "توثيق القرارات الهندسية المفصلية والمفاضلات الفنية وتحليل المخاطر بشفافية تامة.",
-    displayOrder: 2,
-    isActive: true,
-  },
-  {
-    id: "cadence",
-    stepNumber: "03",
-    titleEn: "Build with cadence",
-    titleAr: "البناء بإيقاع منتظم",
-    descriptionEn:
-      "Weekly demos, continuous review, and honest progress. No black boxes, no surprises at the end.",
-    descriptionAr:
-      "استعراض أسبوعي ومراجعة مستمرة وتقدم واقعي، بلا صناديق مغلقة أو مفاجآت.",
-    displayOrder: 3,
-    isActive: true,
-  },
-  {
-    id: "operate",
-    stepNumber: "04",
-    titleEn: "Ship & operate",
-    titleAr: "الإطلاق والتشغيل",
-    descriptionEn:
-      "We deploy to production with observability and own the first weeks of operation. Then we hand over, or stay on.",
-    descriptionAr:
-      "النشر السحابي بأعلى معايير المراقبة وإدارة أسابيع التشغيل الأولى حتى التسليم الكامل أو الشراكة المستمرة.",
-    displayOrder: 4,
-    isActive: true,
-  },
-];
-
 async function verifyAdminAuth(): Promise<string> {
   const { userId, sessionClaims } = await auth();
   if (!userId) {
@@ -220,7 +47,8 @@ export async function getAboutContentAction(): Promise<AboutContentData> {
 
     const { data, error } = await withTimeout(query);
 
-    if (!error && data) {
+    if (error) throw error;
+    if (data) {
       return {
         id: data.id,
         missionTitleEn: data.mission_title_en,
@@ -241,10 +69,10 @@ export async function getAboutContentAction(): Promise<AboutContentData> {
       };
     }
   } catch (err) {
-    console.warn("Could not query about_content from Supabase, using fallback:", err instanceof Error ? err.message : String(err));
+    console.error("getAboutContentAction failed:", err instanceof Error ? err.message : String(err));
+    throw new Error("Unable to load company profile content.");
   }
-
-  return FALLBACK_ABOUT_CONTENT;
+  throw new Error("The requested content is unavailable.");
 }
 
 /**
@@ -294,6 +122,8 @@ export async function updateAboutContentAction(
  * Retrieves About Values
  */
 export async function getAboutValuesAction(includeInactive = false): Promise<AboutValueRecord[]> {
+  if (includeInactive) await verifyAdminAuth();
+
   try {
     const supabase = await createClient();
     const query = supabase
@@ -306,7 +136,8 @@ export async function getAboutValuesAction(includeInactive = false): Promise<Abo
     }
 
     const { data, error } = await withTimeout(query);
-    if (!error && data && data.length > 0) {
+    if (error) throw error;
+    if (data) {
       return data.map((row) => ({
         id: row.id,
         titleEn: row.title_en,
@@ -321,12 +152,10 @@ export async function getAboutValuesAction(includeInactive = false): Promise<Abo
       }));
     }
   } catch (err) {
-    console.warn("Could not query about_values from Supabase, using fallback:", err instanceof Error ? err.message : String(err));
+    console.error("getAboutValuesAction failed:", err instanceof Error ? err.message : String(err));
+    throw new Error("Unable to load published content from the database.");
   }
-
-  return includeInactive
-    ? FALLBACK_ABOUT_VALUES
-    : FALLBACK_ABOUT_VALUES.filter((v) => v.isActive);
+  throw new Error("The requested content is unavailable.");
 }
 
 /**
@@ -391,6 +220,8 @@ export async function deleteAboutValueAction(id: string): Promise<{ success: boo
  * Retrieves About Milestones
  */
 export async function getAboutMilestonesAction(includeInactive = false): Promise<AboutMilestoneRecord[]> {
+  if (includeInactive) await verifyAdminAuth();
+
   try {
     const supabase = await createClient();
     const query = supabase
@@ -403,7 +234,8 @@ export async function getAboutMilestonesAction(includeInactive = false): Promise
     }
 
     const { data, error } = await withTimeout(query);
-    if (!error && data && data.length > 0) {
+    if (error) throw error;
+    if (data) {
       return data.map((row) => ({
         id: row.id,
         year: row.year,
@@ -418,12 +250,10 @@ export async function getAboutMilestonesAction(includeInactive = false): Promise
       }));
     }
   } catch (err) {
-    console.warn("Could not query about_milestones from Supabase, using fallback:", err instanceof Error ? err.message : String(err));
+    console.error("getAboutMilestonesAction failed:", err instanceof Error ? err.message : String(err));
+    throw new Error("Unable to load published content from the database.");
   }
-
-  return includeInactive
-    ? FALLBACK_ABOUT_MILESTONES
-    : FALLBACK_ABOUT_MILESTONES.filter((m) => m.isActive);
+  throw new Error("The requested content is unavailable.");
 }
 
 /**
@@ -488,6 +318,8 @@ export async function deleteAboutMilestoneAction(id: string): Promise<{ success:
  * Retrieves About Approach Steps
  */
 export async function getAboutApproachAction(includeInactive = false): Promise<AboutApproachRecord[]> {
+  if (includeInactive) await verifyAdminAuth();
+
   try {
     const supabase = await createClient();
     const query = supabase
@@ -500,7 +332,8 @@ export async function getAboutApproachAction(includeInactive = false): Promise<A
     }
 
     const { data, error } = await withTimeout(query);
-    if (!error && data && data.length > 0) {
+    if (error) throw error;
+    if (data) {
       return data.map((row) => ({
         id: row.id,
         stepNumber: row.step_number,
@@ -515,12 +348,10 @@ export async function getAboutApproachAction(includeInactive = false): Promise<A
       }));
     }
   } catch (err) {
-    console.warn("Could not query about_approach_steps from Supabase, using fallback:", err instanceof Error ? err.message : String(err));
+    console.error("getAboutApproachAction failed:", err instanceof Error ? err.message : String(err));
+    throw new Error("Unable to load published content from the database.");
   }
-
-  return includeInactive
-    ? FALLBACK_ABOUT_APPROACH
-    : FALLBACK_ABOUT_APPROACH.filter((a) => a.isActive);
+  throw new Error("The requested content is unavailable.");
 }
 
 /**

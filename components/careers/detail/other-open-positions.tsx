@@ -3,21 +3,18 @@ import { Link } from "@/i18n/routing";
 import { useTranslations } from "next-intl";
 import { Badge } from "@/components/ui/badge";
 import { LuCircleDot, LuMapPin, LuArrowRight, LuPlus } from "react-icons/lu";
-import { getJobPositionBySlug } from "@/data/careers";
 import type { OtherOpenPositionsProps } from "./job-detail-types";
 import { cn } from "@/lib/utils";
 
 export function OtherOpenPositions({
-  otherPositionsSlugs,
+  positions,
+  locale = "en",
   className = "",
 }: OtherOpenPositionsProps) {
-  const tJobDetail = useTranslations("JobDetail");
   const tPositions = useTranslations("Careers.positions");
   const tOther = useTranslations("JobDetail.common.otherPositions");
 
-  const positions = otherPositionsSlugs
-    .map((slug) => getJobPositionBySlug(slug))
-    .filter(Boolean);
+  const isRtl = locale === "ar";
 
   return (
     <section
@@ -35,8 +32,7 @@ export function OtherOpenPositions({
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
         {positions.map((pos) => {
-          if (!pos) return null;
-          const jobTitle = tJobDetail(`${pos.translationKey}.title`);
+          const jobTitle = isRtl ? pos.titleAr : pos.titleEn;
 
           return (
             <div
@@ -57,7 +53,7 @@ export function OtherOpenPositions({
                 {/* Job Title */}
                 <h3 className="text-xl sm:text-2xl font-bold font-serif rtl:font-sans text-foreground group-hover:text-primary transition-colors mb-3">
                   <Link
-                    href={pos.href}
+                    href={`/careers/${pos.slug}`}
                     className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm"
                   >
                     {jobTitle}
@@ -69,11 +65,11 @@ export function OtherOpenPositions({
               <div className="flex items-center flex-wrap gap-4 text-xs sm:text-sm text-muted-foreground pt-4 border-t border-border/40 mt-3">
                 <span className="inline-flex items-center gap-1.5">
                   <LuCircleDot className="h-3.5 w-3.5 text-muted-foreground/70 shrink-0" aria-hidden="true" />
-                  <span>{tPositions(`workTypes.${pos.workTypeKey}`)}</span>
+                  <span>{isRtl ? pos.workTypeAr : pos.workTypeEn}</span>
                 </span>
                 <span className="inline-flex items-center gap-1.5">
                   <LuMapPin className="h-3.5 w-3.5 text-muted-foreground/70 shrink-0" aria-hidden="true" />
-                  <span>{tPositions(`locations.${pos.locationKey}`)}</span>
+                  <span>{isRtl ? pos.locationAr : pos.locationEn}</span>
                 </span>
               </div>
             </div>

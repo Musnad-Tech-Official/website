@@ -5,166 +5,6 @@ import { revalidatePath } from "next/cache";
 import { createClient } from "@/utils/supabase/server";
 import type { CareerJobRecord, CareerValueRecord } from "./types";
 
-const FALLBACK_CAREER_JOBS: CareerJobRecord[] = [
-  {
-    id: "senior-backend-engineer",
-    slug: "senior-backend-engineer",
-    titleEn: "Senior Backend Engineer",
-    titleAr: "مهندس نظم وخلفيات أول",
-    department: "engineering",
-    workMode: "hybrid",
-    workTypeEn: "Full-time",
-    workTypeAr: "دوام كامل",
-    locationEn: "Riyadh / Remote",
-    locationAr: "الرياض / عن بُعد",
-    descriptionEn:
-      "Lead high-throughput distributed backend architectures with strong guarantees on data consistency and zero-downtime deployments.",
-    descriptionAr:
-      "قيادة معمارية الأنظمة الخلفية الموزعة عالية الأداء، وضمان استقرار البيانات والنشر المستمر دون توقف.",
-    requirementsEn: [
-      "5+ years in distributed systems (Go/Node/Postgres)",
-      "Deep SQL & database performance tuning",
-      "Strong understanding of event-driven architectures",
-    ],
-    requirementsAr: [
-      "خبرة 5+ سنوات في الأنظمة الموزعة (Go / Node / Postgres)",
-      "معرفة متقدمة بتحسين استعلامات وقواعد البيانات",
-      "فهم متين للأنظمة المعتمدة على الأحداث Event-Driven",
-    ],
-    responsibilitiesEn: [
-      "Design resilient database schemas and caching layers",
-      "Mentor junior engineers and lead technical RFCs",
-      "Collaborate on bilingual API contracts",
-    ],
-    responsibilitiesAr: [
-      "تصميم قواعد بيانات متينة وطبقات التخزين المؤقت",
-      "توجيه المهندسين وقيادة وثائق الـ RFCs الفنية",
-      "تطوير واجهات برمجية ثنائية اللغة بمعايير صارمة",
-    ],
-    displayOrder: 1,
-    isActive: true,
-  },
-  {
-    id: "machine-learning-engineer",
-    slug: "machine-learning-engineer",
-    titleEn: "Machine Learning Engineer",
-    titleAr: "مهندس تعلم الآلة والذكاء الاصطناعي",
-    department: "ai",
-    workMode: "remote",
-    workTypeEn: "Full-time",
-    workTypeAr: "دوام كامل",
-    locationEn: "Remote",
-    locationAr: "عن بُعد",
-    descriptionEn:
-      "Build reliable RAG architectures, custom domain evaluations, and production AI pipelines with strict truthfulness guarantees.",
-    descriptionAr:
-      "بناء معمارية RAG متطورة وتقييمات مخصصة ونظم ذكاء اصطناعي إنتاجية بضمانات دقة وشفافية صارمة.",
-    requirementsEn: [
-      "Experience building production RAG & Vector DB pipelines",
-      "Proficiency in Python, PyTorch, and LLM evaluation frameworks",
-      "Knowledge of prompt engineering & semantic retrieval",
-    ],
-    requirementsAr: [
-      "خبرة في بناء مسارات RAG وقواعد البيانات المتجهية",
-      "إتقان بايثون وأطر تقييم النماذج اللغوية الكبيرة",
-      "معرفة عميقة بالاسترجاع الدلالي وهندسة الأوامر",
-    ],
-    responsibilitiesEn: [
-      "Design evaluation-first AI benchmarks",
-      "Integrate streaming LLM responses into production apps",
-      "Monitor and prevent model hallucinations",
-    ],
-    responsibilitiesAr: [
-      "تصميم مقاييس واختبارات لتقييم النماذج بدقة",
-      "دمج الردود المتدفقة للنماذج في بيئات الإنتاج",
-      "مراقبة وتقليل هلوسة النماذج والتحقق من المخرجات",
-    ],
-    displayOrder: 2,
-    isActive: true,
-  },
-  {
-    id: "design-engineer",
-    slug: "design-engineer",
-    titleEn: "Design Engineer",
-    titleAr: "مهندس تصميم وواجهات",
-    department: "design",
-    workMode: "onSite",
-    workTypeEn: "Full-time",
-    workTypeAr: "دوام كامل",
-    locationEn: "Riyadh",
-    locationAr: "الرياض",
-    descriptionEn:
-      "Bridge the gap between product design and engineering with high-craft UI components, accessibility, and fluid animations.",
-    descriptionAr:
-      "الربط بين تصميم المنتجات وهندسة الواجهات عبر مكونات برمجية فائقة الإتقان تدعم الوصولية والحركات الانسيابية.",
-    requirementsEn: [
-      "Mastery of React, Tailwind CSS, TypeScript, and micro-interactions",
-      "Deep respect for bilingual typography and RTL nuances",
-      "Experience building and maintaining accessible design systems",
-    ],
-    requirementsAr: [
-      "إتقان تام لـ React و Tailwind و TypeScript والتفاعلات الدقيقة",
-      "فهم عميق للخطوط العربية وخصوصية الاتجاه من اليمين لليسار (RTL)",
-      "خبرة في بناء وتطوير أنظمة التصميم الشاملة والوصولية",
-    ],
-    responsibilitiesEn: [
-      "Build accessible UI components matching rigorous tokens",
-      "Optimize layout shifts and interaction metrics (INP, CLS)",
-      "Partner with product designers on component specs",
-    ],
-    responsibilitiesAr: [
-      "برمجة مكونات واجهات تفاعلية متوافقة مع معايير الوصولية",
-      "تحسين مؤشرات تجربة المستخدم واستقرار التخطيط (INP, CLS)",
-      "التعاون مع المصممين في تحديد وتوثيق خصائص المكونات",
-    ],
-    displayOrder: 3,
-    isActive: true,
-  },
-];
-
-const FALLBACK_CAREER_VALUES: CareerValueRecord[] = [
-  {
-    id: "senior",
-    titleEn: "Senior by default",
-    titleAr: "كبار المهندسين بالأصالة",
-    descriptionEn: "Small, high-agency teams of senior practitioners who own problems end-to-end.",
-    descriptionAr: "فِرق صغيرة ذات كفاءة واستقلالية عالية تتولى مسؤولية الحلول من البداية للنهاية.",
-    icon: "LuAward",
-    displayOrder: 1,
-    isActive: true,
-  },
-  {
-    id: "bilingual",
-    titleEn: "Bilingual first",
-    titleAr: "ثنائية اللغة بالأصالة",
-    descriptionEn: "We treat Arabic as a first-class citizen across documentation, code, and interfaces.",
-    descriptionAr: "العربية لغة أصيلة من الدرجة الأولى في توثيقنا، أكوادنا، وواجهاتنا.",
-    icon: "LuLanguages",
-    displayOrder: 2,
-    isActive: true,
-  },
-  {
-    id: "openSource",
-    titleEn: "Open-source friendly",
-    titleAr: "دعم البرمجيات مفتوحة المصدر",
-    descriptionEn: "We give back to the tools we depend on and open-source our non-proprietary tooling.",
-    descriptionAr: "نساهم في تطوير الأدوات التي نعتمد عليها ونشارك برمجياتنا غير الاحتكارية مع المجتمع.",
-    icon: "LuCode",
-    displayOrder: 3,
-    isActive: true,
-  },
-  {
-    id: "remote",
-    titleEn: "Remote & asynchronous",
-    titleAr: "العمل المرن وغير المتزامن",
-    descriptionEn: "Autonomous workflows that respect deep focus and clear, documented expectations.",
-    descriptionAr: "سير عمل مرن ومستقل يحترم التركيز العميق والتوقعات الموثقة بدقة.",
-    icon: "LuLaptop",
-    displayOrder: 4,
-    isActive: true,
-  },
-];
-
 async function verifyAdminAuth(): Promise<string> {
   const { userId, sessionClaims } = await auth();
   if (!userId) {
@@ -240,6 +80,8 @@ function withTimeout<T>(promise: PromiseLike<T>, timeoutMs = DB_TIMEOUT_MS): Pro
  * Retrieves all jobs
  */
 export async function getCareerJobsAction(includeInactive = false): Promise<CareerJobRecord[]> {
+  if (includeInactive) await verifyAdminAuth();
+
   try {
     const supabase = await createClient();
     const query = supabase
@@ -252,16 +94,15 @@ export async function getCareerJobsAction(includeInactive = false): Promise<Care
     }
 
     const { data, error } = await withTimeout(query);
-    if (!error && data && data.length > 0) {
+    if (error) throw error;
+    if (data) {
       return (data as unknown as CareerJobDbRow[]).map(mapRowToJob);
     }
   } catch (err) {
-    console.warn("Could not query career_jobs from Supabase, using fallback:", err instanceof Error ? err.message : String(err));
+    console.error("getCareerJobsAction failed:", err instanceof Error ? err.message : String(err));
+    throw new Error("Unable to load published content from the database.");
   }
-
-  return includeInactive
-    ? FALLBACK_CAREER_JOBS
-    : FALLBACK_CAREER_JOBS.filter((j) => j.isActive);
+  throw new Error("The requested content is unavailable.");
 }
 
 /**
@@ -274,19 +115,20 @@ export async function getCareerJobBySlugAction(slug: string): Promise<CareerJobR
       .from("career_jobs")
       .select("*")
       .eq("slug", slug)
-      .single();
+      .eq("is_active", true)
+      .maybeSingle();
 
     const { data, error } = await withTimeout(query);
 
-    if (!error && data) {
+    if (error) throw error;
+    if (data) {
       return mapRowToJob(data as unknown as CareerJobDbRow);
     }
   } catch (err) {
-    console.warn(`Could not query career job ${slug} from Supabase:`, err instanceof Error ? err.message : String(err));
+    console.error("getCareerJobBySlugAction failed:", err instanceof Error ? err.message : String(err));
+    throw new Error("Unable to load the requested job.");
   }
-
-  const fallback = FALLBACK_CAREER_JOBS.find((j) => j.slug === slug);
-  return fallback || null;
+  return null;
 }
 
 /**
@@ -364,6 +206,8 @@ export async function deleteCareerJobAction(id: string): Promise<{ success: bool
  * Retrieves career values
  */
 export async function getCareerValuesAction(includeInactive = false): Promise<CareerValueRecord[]> {
+  if (includeInactive) await verifyAdminAuth();
+
   try {
     const supabase = await createClient();
     const query = supabase
@@ -376,7 +220,8 @@ export async function getCareerValuesAction(includeInactive = false): Promise<Ca
     }
 
     const { data, error } = await withTimeout(query);
-    if (!error && data && data.length > 0) {
+    if (error) throw error;
+    if (data) {
       return data.map((row) => ({
         id: row.id,
         titleEn: row.title_en,
@@ -391,12 +236,10 @@ export async function getCareerValuesAction(includeInactive = false): Promise<Ca
       }));
     }
   } catch (err) {
-    console.warn("Could not query career_values from Supabase, using fallback:", err instanceof Error ? err.message : String(err));
+    console.error("getCareerValuesAction failed:", err instanceof Error ? err.message : String(err));
+    throw new Error("Unable to load published content from the database.");
   }
-
-  return includeInactive
-    ? FALLBACK_CAREER_VALUES
-    : FALLBACK_CAREER_VALUES.filter((v) => v.isActive);
+  throw new Error("The requested content is unavailable.");
 }
 
 /**

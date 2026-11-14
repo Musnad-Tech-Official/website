@@ -6,11 +6,6 @@ import { MASTER_PAGE_INVENTORY } from "./inventory";
 import type { PageControlItem, PageStatus } from "./types";
 import { createClient } from "@/utils/supabase/server";
 
-// Fallback in-memory storage for active development / offline resilience
-let memoryCache: PageControlItem[] = [...MASTER_PAGE_INVENTORY];
-let lastFetchTime = 0;
-const CACHE_TTL_MS = 60 * 1000; // 60 seconds in-memory TTL across requests
-
 /**
  * Ensures the caller is an authenticated administrator.
  */
@@ -45,220 +40,136 @@ interface PageSettingRow {
   updated_by?: string;
 }
 
-/**
- * Retrieves all page controls, merging DB settings on top of the master inventory.
- * Uses in-memory TTL caching and a fast timeout fallback so that slow DB handshakes
- * never block SSR page renders for 15+ seconds.
- */
-export async function getPageControlsAction(): Promise<PageControlItem[]> {
-  const now = Date.now();
-  if (lastFetchTime > 0 && now - lastFetchTime < CACHE_TTL_MS && memoryCache.length > 0) {
-    return memoryCache;
-  }
-
-  try {
-    const fetchPromise = (async () => {
-      const supabase = await createClient();
-      return supabase
-        .from("page_settings")
-        .select("*")
-        .order("family", { ascending: true });
-    })();
-
-    // 2.5s maximum wait for DB roundtrip to avoid high-latency connection stalls
-    const timeoutPromise = new Promise<{ data: null; error: Error }>((_, reject) =>
-      setTimeout(() => reject(new Error("Supabase request timeout")), 2500)
-    );
-
-    const { data, error } = await Promise.race([fetchPromise, timeoutPromise]);
-
-    if (!error && data && data.length > 0) {
-      const dbMap = new Map((data as unknown as PageSettingRow[]).map((r) => [r.id, r]));
-
-      // Merge DB overrides with Master Inventory so new code routes are never omitted
-      const merged: PageControlItem[] = MASTER_PAGE_INVENTORY.map((inv) => {
-        const row = dbMap.get(inv.id);
-        if (!row) return inv;
-        return {
-          ...inv,
-          status: inv.isProtected ? "live" : ((row.status as PageStatus) || inv.status),
-          showInNavbar: row.show_in_navbar ?? inv.showInNavbar,
-          showInFooter: row.show_in_footer ?? inv.showInFooter,
-          maintenanceNoticeEn: row.maintenance_notice_en || inv.maintenanceNoticeEn,
-          maintenanceNoticeAr: row.maintenance_notice_ar || inv.maintenanceNoticeAr,
-          isProtected: inv.isProtected || (row.is_protected ?? false),
-          updatedAt: row.updated_at,
-          updatedBy: row.updated_by,
-        };
-      });
-
-      memoryCache = merged;
-      lastFetchTime = Date.now();
-      return merged;
-    }
-  } catch {
-    // If Supabase table isn't migrated yet or connection times out, use memory cache
-  }
-
-  // Update lastFetchTime on fallback so repeated calls in the same render don't re-trigger timeouts
-  lastFetchTime = Date.now();
-  return memoryCache;
+function toDatabaseRow(item: PageControlItem, adminId: string, now: string) {
+  return {
+    id: item.id,
+    path: item.path,
+    title_en: item.titleEn,
+    title_ar: item.titleAr,
+    family: item.family,
+    status: item.status,
+    show_in_navbar: item.showInNavbar,
+    show_in_footer: item.showInFooter,
+    maintenance_notice_en: item.maintenanceNoticeEn || null,
+    maintenance_notice_ar: item.maintenanceNoticeAr || null,
+    is_protected: item.isProtected ?? false,
+    updated_at: now,
+    updated_by: adminId,
+  };
 }
 
-/**
- * Updates a single page setting.
- */
+function revalidatePageControls() {
+  revalidatePath("/admin/pages");
+  revalidatePath("/[locale]", "layout");
+}
+
+/** Read persisted visibility rules. Never silently use defaults on database failure. */
+export async function getPageControlsAction(): Promise<PageControlItem[]> {
+  const supabase = await createClient();
+  const { data, error } = await supabase.from("page_settings").select("*");
+  if (error || !data || data.length === 0) {
+    console.error("Unable to read page settings:", error?.code || "empty-or-missing-table");
+    throw new Error("Page visibility settings are unavailable.");
+  }
+  const dbMap = new Map((data as PageSettingRow[]).map((row) => [row.id, row]));
+  return MASTER_PAGE_INVENTORY.map((inv) => {
+    const row = dbMap.get(inv.id);
+    if (!row) return inv; // A newly added route has not yet been configured.
+    return {
+      ...inv,
+      // Protected pages cannot be switched off from the dashboard.
+      status: inv.isProtected ? "live" : ((row.status as PageStatus) || inv.status),
+      showInNavbar: row.show_in_navbar ?? inv.showInNavbar,
+      showInFooter: row.show_in_footer ?? inv.showInFooter,
+      maintenanceNoticeEn: row.maintenance_notice_en || inv.maintenanceNoticeEn,
+      maintenanceNoticeAr: row.maintenance_notice_ar || inv.maintenanceNoticeAr,
+      isProtected: inv.isProtected || (row.is_protected ?? false),
+      updatedAt: row.updated_at,
+      updatedBy: row.updated_by,
+    };
+  });
+}
+
+/** Update one page only if Supabase confirms the write. */
 export async function updatePageControlAction(
   id: string,
   updates: Partial<Pick<PageControlItem, "status" | "showInNavbar" | "showInFooter" | "maintenanceNoticeEn" | "maintenanceNoticeAr">>
 ): Promise<{ success: boolean; item?: PageControlItem; error?: string }> {
   try {
     const adminId = await verifyAdminAuth();
-
-    // 1. Update in-memory cache first for instant feedback
-    const index = memoryCache.findIndex((p) => p.id === id);
-    if (index === -1) {
-      return { success: false, error: "Page route not found in inventory." };
+    const current = (await getPageControlsAction()).find((item) => item.id === id);
+    if (!current) return { success: false, error: "Page route not found in inventory." };
+    if (current.isProtected && updates.status && updates.status !== "live") {
+      return { success: false, error: "This protected page must remain live." };
     }
 
-    const current = memoryCache[index];
-    const updated: PageControlItem = {
-      ...current,
-      ...updates,
-      updatedAt: new Date().toISOString(),
-      updatedBy: adminId,
-    };
-    memoryCache[index] = updated;
-    lastFetchTime = Date.now();
-
-    // 2. Persist to Supabase via atomic upsert
-    try {
-      const supabase = await createClient();
-      await supabase
-        .from("page_settings")
-        .upsert({
-          id: updated.id,
-          path: updated.path,
-          title_en: updated.titleEn,
-          title_ar: updated.titleAr,
-          family: updated.family,
-          status: updated.status,
-          show_in_navbar: updated.showInNavbar,
-          show_in_footer: updated.showInFooter,
-          maintenance_notice_en: updated.maintenanceNoticeEn || null,
-          maintenance_notice_ar: updated.maintenanceNoticeAr || null,
-          is_protected: updated.isProtected ?? false,
-          updated_at: updated.updatedAt,
-          updated_by: adminId,
-        });
-    } catch {
-      // Non-fatal if DB is offline during dev
+    const now = new Date().toISOString();
+    const candidate: PageControlItem = { ...current, ...updates, updatedAt: now, updatedBy: adminId };
+    const supabase = await createClient();
+    const { data, error } = await supabase.from("page_settings")
+      .upsert(toDatabaseRow(candidate, adminId, now))
+      .select("id").single();
+    if (error || !data || data.id !== id) {
+      console.error("Could not persist page setting:", error?.code || "no-data");
+      return { success: false, error: "Page setting was not saved." };
     }
 
-    // 3. Revalidate affected routes
-    revalidatePath("/admin/pages");
-    revalidatePath("/[locale]", "layout");
-
-    return { success: true, item: updated };
+    revalidatePageControls();
+    return { success: true, item: candidate };
   } catch (err: unknown) {
-    return { success: false, error: (err as Error).message || "Failed to update page settings." };
+    return { success: false, error: err instanceof Error ? err.message : "Failed to update page settings." };
   }
 }
 
-/**
- * Bulk updates the status for multiple pages at once.
- */
+/** An atomic upsert of known IDs; count only rows confirmed by the database. */
 export async function batchUpdatePageStatusAction(
   ids: string[],
   status: PageStatus
 ): Promise<{ success: boolean; count: number; error?: string }> {
   try {
     const adminId = await verifyAdminAuth();
-
-    let updatedCount = 0;
+    const uniqueIds = [...new Set(ids)];
+    if (!uniqueIds.length) return { success: true, count: 0 };
+    if (!["live", "maintenance", "hidden"].includes(status)) {
+      return { success: false, count: 0, error: "Invalid page status." };
+    }
+    const all = await getPageControlsAction();
+    const selected = all.filter((item) => uniqueIds.includes(item.id));
+    if (selected.length !== uniqueIds.length || selected.some((item) => item.isProtected && status !== "live")) {
+      return { success: false, count: 0, error: "Batch contains unknown or protected pages." };
+    }
     const now = new Date().toISOString();
-
-    memoryCache = memoryCache.map((item) => {
-      if (ids.includes(item.id)) {
-        updatedCount++;
-        return {
-          ...item,
-          status,
-          updatedAt: now,
-          updatedBy: adminId,
-        };
-      }
-      return item;
-    });
-    lastFetchTime = Date.now();
-
-    try {
-      const supabase = await createClient();
-      await supabase
-        .from("page_settings")
-        .update({
-          status,
-          updated_at: now,
-          updated_by: adminId,
-        })
-        .in("id", ids);
-    } catch {
-      // Non-fatal if DB is offline
+    const supabase = await createClient();
+    const { data, error } = await supabase.from("page_settings")
+      .upsert(selected.map((item) => toDatabaseRow({ ...item, status }, adminId, now)))
+      .select("id");
+    if (error || !data || data.length !== selected.length) {
+      console.error("Could not persist batch page settings:", error?.code || "incomplete");
+      return { success: false, count: 0, error: "Page statuses were not saved." };
     }
 
-    revalidatePath("/admin/pages");
-    revalidatePath("/[locale]", "layout");
-
-    return { success: true, count: updatedCount };
+    revalidatePageControls();
+    return { success: true, count: data.length };
   } catch (err: unknown) {
-    return { success: false, count: 0, error: (err as Error).message || "Failed batch update." };
+    return { success: false, count: 0, error: err instanceof Error ? err.message : "Failed batch update." };
   }
 }
 
-/**
- * Resets all page controls back to original inventory defaults.
- */
+/** Reset only after the complete database write succeeds. */
 export async function resetPageControlsAction(): Promise<{ success: boolean; error?: string }> {
   try {
     const adminId = await verifyAdminAuth();
     const now = new Date().toISOString();
-
-    memoryCache = MASTER_PAGE_INVENTORY.map((item) => ({
-      ...item,
-      updatedAt: now,
-      updatedBy: adminId,
-    }));
-    lastFetchTime = Date.now();
-
-    try {
-      const supabase = await createClient();
-      const rows = memoryCache.map((item) => ({
-        id: item.id,
-        path: item.path,
-        title_en: item.titleEn,
-        title_ar: item.titleAr,
-        family: item.family,
-        status: item.status,
-        show_in_navbar: item.showInNavbar,
-        show_in_footer: item.showInFooter,
-        maintenance_notice_en: item.maintenanceNoticeEn || null,
-        maintenance_notice_ar: item.maintenanceNoticeAr || null,
-        is_protected: item.isProtected ?? false,
-        updated_at: now,
-        updated_by: adminId,
-      }));
-
-      // Single atomic bulk upsert instead of 25 sequential roundtrips
-      await supabase.from("page_settings").upsert(rows);
-    } catch {
-      // Non-fatal
+    const rows = MASTER_PAGE_INVENTORY.map((item) => toDatabaseRow(item, adminId, now));
+    const supabase = await createClient();
+    const { data, error } = await supabase.from("page_settings").upsert(rows).select("id");
+    if (error || !data || data.length !== rows.length) {
+      console.error("Could not persist default page settings:", error?.code || "incomplete");
+      return { success: false, error: "Page settings could not be reset." };
     }
-
-    revalidatePath("/admin/pages");
-    revalidatePath("/[locale]", "layout");
-
+    revalidatePageControls();
     return { success: true };
   } catch (err: unknown) {
-    return { success: false, error: (err as Error).message || "Failed reset." };
+    return { success: false, error: err instanceof Error ? err.message : "Failed reset." };
   }
 }

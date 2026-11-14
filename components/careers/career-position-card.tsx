@@ -16,7 +16,7 @@ export function CareerPositionCard({
 
   const isRtl = locale === "ar";
   const dateFormatted = isRtl ? position.dateAr : position.dateEn;
-  const jobTitle = tJobDetail(`${position.translationKey}.title`);
+  const jobTitle = position.title || tJobDetail(`${position.translationKey}.title`);
 
   return (
     <div
@@ -54,11 +54,11 @@ export function CareerPositionCard({
         <div className="flex items-center flex-wrap gap-4 text-xs sm:text-sm text-muted-foreground">
           <span className="inline-flex items-center gap-1.5">
             <LuCircleDot className="h-3.5 w-3.5 text-muted-foreground/70 shrink-0" aria-hidden="true" />
-            <span>{tPositions(`workTypes.${position.workTypeKey}`)}</span>
+            <span>{position.workType || tPositions(`workTypes.${position.workTypeKey}`)}</span>
           </span>
           <span className="inline-flex items-center gap-1.5">
             <LuMapPin className="h-3.5 w-3.5 text-muted-foreground/70 shrink-0" aria-hidden="true" />
-            <span>{tPositions(`locations.${position.locationKey}`)}</span>
+            <span>{position.location || tPositions(`locations.${position.locationKey}`)}</span>
           </span>
         </div>
       </div>

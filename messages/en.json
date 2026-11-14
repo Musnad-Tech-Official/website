@@ -1292,7 +1292,11 @@
           "emailRequired": "Please enter a valid email address.",
           "coverLetterRequired": "Please provide a cover letter.",
           "cvRequired": "Please upload your CV."
-        }
+        },
+        "unavailableTitle": "Online applications are temporarily unavailable",
+        "unavailableDescription": "The application form is not connected to a submission system. To apply, email your CV and the position title to the address below. No application is registered through this website.",
+        "emailApplication": "Apply by email",
+        "contactForCareers": "Contact us"
       },
       "otherPositions": {
         "heading": "Other open positions",
