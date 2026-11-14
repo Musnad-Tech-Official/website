@@ -22,6 +22,8 @@ jobs:
           node-version: '24'
           cache: npm
       - run: npm ci
+      - name: Test staging isolation guard
+        run: npm run test:staging-preflight
       - name: Verify Playwright tests are discoverable without accessing services
         run: npm run test:e2e:list
       - name: Run existing isolated regression tests

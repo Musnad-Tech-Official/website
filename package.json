@@ -11,7 +11,8 @@
     "test:integrity": "node --test tests/production-integrity.test.mjs",
     "test:admin": "node --test tests/admin-actions.test.mjs",
     "test:e2e": "node scripts/assert-staging-environment.mjs && playwright test",
-    "test:e2e:list": "playwright test --list"
+    "test:e2e:list": "playwright test --list",
+    "test:staging-preflight": "node --test tests/staging-preflight.test.mjs"
   },
   "dependencies": {
     "@clerk/nextjs": "^7.9.4",
