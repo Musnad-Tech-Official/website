@@ -54,3 +54,30 @@ test("runtime Clerk key must match development instance", () => {
 test("a missing target refuses to proceed", () => {
   assert.notEqual(check({ E2E_BASE_URL: "" }).status, 0);
 });
+
+test("local Supabase + local Next.js is permitted after isolation confirmation", () => {
+  assert.equal(check({
+    E2E_BASE_URL: "http://127.0.0.1:3000",
+    E2E_STAGING_SUPABASE_URL: "http://127.0.0.1:54321",
+    NEXT_PUBLIC_SUPABASE_URL: "http://127.0.0.1:54321",
+  }).status, 0);
+});
+
+test("local Supabase cannot be paired with an online preview", () => {
+  assert.notEqual(check({
+    E2E_STAGING_SUPABASE_URL: "http://127.0.0.1:54321",
+  }).status, 0);
+});
+
+test("remote database cannot be paired with localhost app", () => {
+  assert.notEqual(check({
+    E2E_BASE_URL: "http://127.0.0.1:3000",
+  }).status, 0);
+});
+
+test("unexpected local database port is rejected", () => {
+  assert.notEqual(check({
+    E2E_BASE_URL: "http://localhost:3000",
+    E2E_STAGING_SUPABASE_URL: "http://localhost:54322",
+  }).status, 0);
+});

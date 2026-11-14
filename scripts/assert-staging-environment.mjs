@@ -31,8 +31,17 @@ if (app.protocol !== "https:" && !["localhost", "127.0.0.1"].includes(app.hostna
 if (["musnadtech.com", "www.musnadtech.com"].includes(app.hostname)) {
   stop("Production website is forbidden as an E2E target.");
 }
-if (db.protocol !== "https:" || !/^[a-z0-9-]+\.supabase\.co$/.test(db.hostname)) {
-  stop("Expected dedicated Supabase project HTTPS URL.");
+const isLocalApp = ["localhost", "127.0.0.1"].includes(app.hostname);
+const isLocalDb = ["localhost", "127.0.0.1"].includes(db.hostname);
+if (isLocalApp !== isLocalDb) {
+  stop("Local database must be paired with a local application.");
+}
+if (isLocalDb) {
+  if (db.protocol !== "http:" || db.port !== "54321") {
+    stop("Local Supabase must use its expected HTTP API port 54321.");
+  }
+} else if (db.protocol !== "https:" || !/^[a-z0-9-]+\.supabase\.co$/.test(db.hostname)) {
+  stop("Remote staging requires a distinct Supabase project over HTTPS.");
 }
 if (db.hostname === "zlqfoymxladqwkfliuko.supabase.co") {
   stop("Production database cannot be used for tests.");
@@ -41,13 +50,13 @@ if (!process.env.E2E_STAGING_CLERK_PUBLISHABLE_KEY.startsWith("pk_test_")) {
   stop("Clerk development publishable key required.");
 }
 if (process.env.E2E_ISOLATED_DATABASE_CONFIRMED !== "true") {
-  stop("Confirm dedicated Preview variables and set E2E_ISOLATED_DATABASE_CONFIRMED=true.");
+  stop("Confirm isolated local or Preview values and set E2E_ISOLATED_DATABASE_CONFIRMED=true.");
 }
 if (process.env.NEXT_PUBLIC_SUPABASE_URL) {
   let runtime;
   try { runtime = new URL(process.env.NEXT_PUBLIC_SUPABASE_URL); }
   catch { stop("Runtime Supabase URL is invalid."); }
-  if (runtime.hostname !== db.hostname) stop("Runtime Supabase URL does not match staging.");
+  if (runtime.origin !== db.origin) stop("Runtime Supabase URL does not match staging.");
 }
 if (process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY &&
     process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY !== process.env.E2E_STAGING_CLERK_PUBLISHABLE_KEY) {
