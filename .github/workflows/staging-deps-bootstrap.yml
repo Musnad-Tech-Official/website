@@ -1,0 +1,45 @@
+name: Temporary staging Playwright lockfile bootstrap
+
+on:
+  push:
+    branches: [chore/staging-playwright-20261115]
+    paths: [.github/workflows/staging-deps-bootstrap.yml]
+
+permissions:
+  contents: write
+
+jobs:
+  lockfile:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - name: Checkout isolated staging feature branch
+        uses: actions/checkout@v4
+        with:
+          ref: chore/staging-playwright-20261115
+          persist-credentials: true
+
+      - name: Node.js 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+
+      - name: Install pinned Playwright test-runner into lockfile
+        run: npm install --package-lock-only --ignore-scripts --save-dev --save-exact @playwright/test@1.65.1
+
+      - name: Verify reproducible dependency graph
+        run: |
+          npm ci
+          npx playwright --version
+          npm audit --omit=dev --audit-level=high
+
+      - name: Commit manifest and lockfile to staging feature branch only
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -- package.json package-lock.json
+          if ! git diff --cached --quiet; then
+            git commit -m "test(e2e): pin Playwright runner and lockfile"
+            git push origin HEAD:refs/heads/chore/staging-playwright-20261115
+          fi
