@@ -9,7 +9,9 @@
     "lint": "eslint",
     "test:seo": "node --test tests/seo.test.mjs",
     "test:integrity": "node --test tests/production-integrity.test.mjs",
-    "test:admin": "node --test tests/admin-actions.test.mjs"
+    "test:admin": "node --test tests/admin-actions.test.mjs",
+    "test:e2e": "node scripts/assert-staging-environment.mjs && playwright test",
+    "test:e2e:list": "playwright test --list"
   },
   "dependencies": {
     "@clerk/nextjs": "^7.9.4",
