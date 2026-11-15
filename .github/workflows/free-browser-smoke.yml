@@ -44,10 +44,10 @@ jobs:
     timeout-minutes: 30
     env:
       CLERK_SECRET_KEY: ${{ secrets.MUSNAD_E2E_CLERK_DEV_SECRET_KEY }}
-      E2E_BASE_URL: http://127.0.0.1:3000
+      E2E_BASE_URL: http://localhost:3000
       E2E_ISOLATED_DATABASE_CONFIRMED: "true"
       SITE_INDEXABLE: "false"
-      NEXT_PUBLIC_SITE_URL: http://127.0.0.1:3000
+      NEXT_PUBLIC_SITE_URL: http://localhost:3000
       NEXT_TELEMETRY_DISABLED: "1"
       # This is the PUBLIC development publishable key of the existing Musnad
       # Clerk development instance, not the live/production key.
@@ -115,13 +115,13 @@ jobs:
         run: |
           set -euo pipefail
           # Isolate dev-bundler effects after repeated Turbopack route timeouts.
-          npm run dev -- --webpack --hostname 127.0.0.1 > /tmp/musnad-local-next.log 2>&1 &
+          npm run dev -- --webpack --hostname localhost > /tmp/musnad-local-next.log 2>&1 &
           echo "$!" > /tmp/musnad-next.pid
           # A static response proves the local HTTP server is accepting connections.
           # Dynamic page correctness is asserted separately by Playwright.
           last_status="not_checked"
           for i in $(seq 1 24); do
-            last_status="$(curl --noproxy '*' --silent --connect-timeout 2 --max-time 4 -o /dev/null -w '%{http_code}' http://127.0.0.1:3000/favicon.ico 2>/dev/null || true)"
+            last_status="$(curl --noproxy '*' --silent --connect-timeout 2 --max-time 4 -o /dev/null -w '%{http_code}' http://localhost:3000/favicon.ico 2>/dev/null || true)"
             if [[ "$last_status" == "200" ]]; then
               echo "Local Next.js static HTTP server is ready; Playwright will test dynamic pages."
               exit 0
@@ -137,7 +137,7 @@ jobs:
           echo "Diagnostic: Next.js process state (PID, parent, state, command)"
           ps -eo pid,ppid,stat,comm,args | grep -E '[n]ext-server|[n]ext dev|[n]pm run dev' | head -n 15 || true
           echo "Diagnostic: connection failure category"
-          curl --noproxy '*' --connect-timeout 3 --max-time 5 --verbose --output /dev/null http://127.0.0.1:3000/favicon.ico 2>&1 | grep -E 'Failed to connect|Connection refused|Connected to|Operation timed out|HTTP/[0-9]' | head -n 8 || true
+          curl --noproxy '*' --connect-timeout 3 --max-time 5 --verbose --output /dev/null http://localhost:3000/favicon.ico 2>&1 | grep -E 'Failed to connect|Connection refused|Connected to|Operation timed out|HTTP/[0-9]' | head -n 8 || true
           tail -n 80 /tmp/musnad-local-next.log | sed -E 's/(sk_test_|pk_test_|eyJ)[a-zA-Z0-9_.=+-]+/[REDACTED]/g'
           exit 1
 
@@ -145,7 +145,7 @@ jobs:
         run: |
           set -euo pipefail
           # Cold compiling a route can take longer than Playwright's navigation budget.
-          status="$(curl --noproxy '*' --silent --show-error --connect-timeout 3 --max-time 90 -o /dev/null -w '%{http_code}' http://127.0.0.1:3000/ar || true)"
+          status="$(curl --noproxy '*' --silent --show-error --connect-timeout 3 --max-time 90 -o /dev/null -w '%{http_code}' http://localhost:3000/ar || true)"
           if [[ "$status" != "200" ]]; then
             echo "::error::Local Arabic homepage did not complete HTTP 200 (status: ${status:-000})."
             echo "Application diagnostics (secrets masked):"
