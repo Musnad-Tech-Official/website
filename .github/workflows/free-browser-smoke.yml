@@ -6,6 +6,11 @@ on:
     paths:
       - .github/workflows/free-browser-smoke.yml
       - scripts/export-local-supabase-ci.mjs
+  pull_request:
+    branches: [test/integration-security-admin-20261115]
+    paths:
+      - .github/workflows/free-browser-smoke.yml
+      - scripts/export-local-supabase-ci.mjs
   workflow_dispatch:
 
 permissions:
