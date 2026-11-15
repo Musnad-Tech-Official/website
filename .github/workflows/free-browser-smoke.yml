@@ -27,7 +27,8 @@ jobs:
             echo 'Clerk Development key configured; browser checks may proceed.'
           else
             echo 'ready=false' >> "$GITHUB_OUTPUT"
-            echo '::notice::Browser E2E not run: add repository secret MUSNAD_E2E_CLERK_DEV_SECRET_KEY from Clerk Development, NEVER Production.'
+            echo '::error::Browser E2E not run: add repository secret MUSNAD_E2E_CLERK_DEV_SECRET_KEY from Clerk Development, NEVER Production.'
+            exit 1
           fi
 
   local-browser:
@@ -97,20 +98,20 @@ jobs:
       - name: Verify local target cannot access production
         run: node scripts/assert-staging-environment.mjs
 
-      - name: Start Next.js local dev server
+      - name: Start Next.js local dev server (bounded readiness check)
         run: |
           set -euo pipefail
           npm run dev -- --hostname 127.0.0.1 > /tmp/musnad-local-next.log 2>&1 &
           echo "$!" > /tmp/musnad-next.pid
-          for i in $(seq 1 24); do
+          for i in $(seq 1 18); do
             if curl --max-time 5 -fsS -o /tmp/musnad-ready.html http://127.0.0.1:3000/en; then
               echo "Local Next.js returned HTTP 200."
               exit 0
             fi
             sleep 2
           done
-          echo "Next.js did not return a successful page."
-          tail -n 70 /tmp/musnad-local-next.log | sed -E 's/(sk_test_|pk_test_)[a-zA-Z0-9_=+-]+/[REDACTED]/g'
+          echo "::error::Local Next.js did not return HTTP 200. Inspect redacted application diagnostics."
+          tail -n 80 /tmp/musnad-local-next.log | sed -E 's/(sk_test_|pk_test_|eyJ)[a-zA-Z0-9_.=+-]+/[REDACTED]/g'
           exit 1
 
       - name: Run actual read-only Playwright tests
