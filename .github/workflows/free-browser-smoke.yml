@@ -114,7 +114,8 @@ jobs:
       - name: Start Next.js local dev server (bounded readiness check)
         run: |
           set -euo pipefail
-          npm run dev -- --hostname 127.0.0.1 > /tmp/musnad-local-next.log 2>&1 &
+          # Isolate dev-bundler effects after repeated Turbopack route timeouts.
+          npm run dev -- --webpack --hostname 127.0.0.1 > /tmp/musnad-local-next.log 2>&1 &
           echo "$!" > /tmp/musnad-next.pid
           # A static response proves the local HTTP server is accepting connections.
           # Dynamic page correctness is asserted separately by Playwright.
@@ -139,6 +140,19 @@ jobs:
           curl --noproxy '*' --connect-timeout 3 --max-time 5 --verbose --output /dev/null http://127.0.0.1:3000/favicon.ico 2>&1 | grep -E 'Failed to connect|Connection refused|Connected to|Operation timed out|HTTP/[0-9]' | head -n 8 || true
           tail -n 80 /tmp/musnad-local-next.log | sed -E 's/(sk_test_|pk_test_|eyJ)[a-zA-Z0-9_.=+-]+/[REDACTED]/g'
           exit 1
+
+      - name: Verify a real dynamic route before browser checks
+        run: |
+          set -euo pipefail
+          # Cold compiling a route can take longer than Playwright's navigation budget.
+          status="$(curl --noproxy '*' --silent --show-error --connect-timeout 3 --max-time 90 -o /dev/null -w '%{http_code}' http://127.0.0.1:3000/ar || true)"
+          if [[ "$status" != "200" ]]; then
+            echo "::error::Local Arabic homepage did not complete HTTP 200 (status: ${status:-000})."
+            echo "Application diagnostics (secrets masked):"
+            tail -n 100 /tmp/musnad-local-next.log | sed -E 's/(sk_test_|pk_test_|eyJ)[a-zA-Z0-9_.=+-]+/[REDACTED]/g'
+            exit 1
+          fi
+          echo "Isolated dynamic homepage responded HTTP 200; starting Chromium."
 
       - name: Run actual read-only Playwright tests (bounded failures)
         run: npm run test:e2e -- --max-failures=3 --workers=1
