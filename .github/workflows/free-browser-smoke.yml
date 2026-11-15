@@ -103,14 +103,20 @@ jobs:
           set -euo pipefail
           npm run dev -- --hostname 127.0.0.1 > /tmp/musnad-local-next.log 2>&1 &
           echo "$!" > /tmp/musnad-next.pid
+          echo "Diagnostic: verify Next.js listening port (no credentials)"
+          ss -ltn | grep ':3000 ' || true
+          for route in /favicon.ico /en; do
+            diagnostic="$(curl --noproxy '*' --silent --connect-timeout 2 --max-time 7 -o /dev/null -w '%{http_code} (connect=%{time_connect}s, first_byte=%{time_starttransfer}s)' "http://127.0.0.1:3000$route" 2>/dev/null || true)"
+            echo "Diagnostic $route: ${diagnostic:-unreachable}"
+          done
           last_status="not_checked"
-          for i in $(seq 1 12); do
-            last_status="$(curl --silent --show-error --max-time 7 -o /tmp/musnad-ready.html -w '%{http_code}' http://127.0.0.1:3000/en 2>/dev/null || true)"
+          for i in $(seq 1 10); do
+            last_status="$(curl --noproxy '*' --silent --connect-timeout 2 --max-time 7 -o /tmp/musnad-ready.html -w '%{http_code}' http://127.0.0.1:3000/en 2>/dev/null || true)"
             if [[ "$last_status" == "200" ]]; then
               echo "Local Next.js returned HTTP 200."
               exit 0
             fi
-            if [[ "$i" == 1 || "$i" == 6 || "$i" == 12 ]]; then
+            if [[ "$i" == 1 || "$i" == 5 || "$i" == 10 ]]; then
               echo "Readiness HTTP status: ${last_status:-000} on attempt $i"
             fi
             sleep 2
