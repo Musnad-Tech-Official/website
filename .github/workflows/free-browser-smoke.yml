@@ -1,0 +1,110 @@
+name: Free browser smoke with local Next.js and Supabase
+
+on:
+  push:
+    branches: [chore/staging-playwright-20261115]
+    paths:
+      - .github/workflows/free-browser-smoke.yml
+      - scripts/export-local-supabase-ci.mjs
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  local-browser:
+    name: Anonymous desktop/mobile browser smoke (test-only Clerk)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      E2E_BASE_URL: http://127.0.0.1:3000
+      E2E_ISOLATED_DATABASE_CONFIRMED: "true"
+      SITE_INDEXABLE: "false"
+      NEXT_PUBLIC_SITE_URL: http://127.0.0.1:3000
+      # This is the PUBLIC development publishable key of the existing Musnad
+      # Clerk development instance, not the live/production key.
+      NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: pk_test_dmlhYmxlLW1vdGgtMTgxNC5jbGVyay5hY2NvdW50cy5kZXYk
+      E2E_STAGING_CLERK_PUBLISHABLE_KEY: pk_test_dmlhYmxlLW1vdGgtMTgxNC5jbGVyay5hY2NvdW50cy5kZXYk
+      NEXT_PUBLIC_CLERK_SIGN_IN_URL: /sign-in
+      NEXT_PUBLIC_CLERK_SIGN_UP_URL: /sign-up
+      NEXT_PUBLIC_CLERK_SIGN_IN_FALLBACK_REDIRECT_URL: /
+      NEXT_PUBLIC_CLERK_SIGN_UP_FALLBACK_REDIRECT_URL: /
+    steps:
+      - name: Checkout isolated test branch
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install browser
+        run: npx playwright install --with-deps chromium
+
+      - name: Use pinned Supabase local CLI
+        uses: supabase/setup-cli@v3
+        with:
+          version: 3.1.0
+
+      - name: Prepare schema and seed from approved sources
+        run: |
+          set -euo pipefail
+          supabase init --force
+          supabase migration new local_schema
+          target="$(find supabase/migrations -maxdepth 1 -type f -name '*_local_schema.sql' | head -n 1)"
+          test -n "$target"
+          node scripts/build-local-supabase-schema.mjs "$target"
+          cp tests/staging/seed.sql supabase/seed.sql
+
+      - name: Start isolated Supabase (no cloud project)
+        run: |
+          set -euo pipefail
+          supabase start -x realtime,storage-api,imgproxy,postgres-meta,studio,edge-runtime,logflare,vector,supavisor > /tmp/musnad-local-start.log 2>&1 || {
+            tail -n 70 /tmp/musnad-local-start.log
+            exit 1
+          }
+          supabase status -o env > /tmp/musnad-local-status.env
+          chmod 600 /tmp/musnad-local-status.env
+          node scripts/smoke-local-supabase.mjs /tmp/musnad-local-status.env
+          node scripts/export-local-supabase-ci.mjs /tmp/musnad-local-status.env "$GITHUB_ENV"
+
+      - name: Create nonfunctional Clerk server key for anonymous smoke only
+        run: |
+          # This key is intentionally NOT a real Clerk secret and cannot sign
+          # in or verify real Clerk users. This job tests only anonymous UI.
+          echo "CLERK_SECRET_KEY=sk_test_$(openssl rand -hex 24)" >> "$GITHUB_ENV"
+
+      - name: Verify local target cannot access production
+        run: node scripts/assert-staging-environment.mjs
+
+      - name: Start Next.js local dev server
+        run: |
+          set -euo pipefail
+          npm run dev -- --hostname 127.0.0.1 > /tmp/musnad-local-next.log 2>&1 &
+          echo "$!" > /tmp/musnad-next.pid
+          for i in $(seq 1 60); do
+            if curl --max-time 10 -fsS -o /tmp/musnad-ready.html http://127.0.0.1:3000/en; then
+              echo "Local Next.js returned HTTP 200."
+              exit 0
+            fi
+            sleep 3
+          done
+          echo "Next.js did not return a successful page."
+          tail -n 70 /tmp/musnad-local-next.log | sed -E 's/(sk_test_|pk_test_)[a-zA-Z0-9_=+-]+/[REDACTED]/g'
+          exit 1
+
+      - name: Run actual read-only Playwright tests
+        run: npm run test:e2e
+
+      - name: Cleanup isolated local processes and database
+        if: always()
+        run: |
+          if test -f /tmp/musnad-next.pid; then
+            kill "$(cat /tmp/musnad-next.pid)" 2>/dev/null || true
+          fi
+          supabase stop --no-backup || true
