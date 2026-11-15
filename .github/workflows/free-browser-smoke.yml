@@ -95,6 +95,13 @@ jobs:
           node scripts/smoke-local-supabase.mjs /tmp/musnad-local-status.env
           node scripts/export-local-supabase-ci.mjs /tmp/musnad-local-status.env "$GITHUB_ENV"
 
+      - name: Test outbound public dependencies (no secret transmitted)
+        run: |
+          for endpoint in https://fonts.googleapis.com https://viable-moth-1814.clerk.accounts.dev; do
+            status="$(curl --silent --noproxy '*' --connect-timeout 5 --max-time 12 -o /dev/null -w '%{http_code}' "$endpoint" || true)"
+            echo "Outbound dependency $endpoint: HTTP ${status:-000}"
+          done
+
       - name: Verify local target cannot access production
         run: node scripts/assert-staging-environment.mjs
 
@@ -129,6 +136,14 @@ jobs:
 
       - name: Run actual read-only Playwright tests (bounded failures)
         run: npm run test:e2e -- --max-failures=3 --workers=1
+
+      - name: Capture sanitized local Next.js diagnostics on browser failure
+        if: failure()
+        run: |
+          if test -f /tmp/musnad-local-next.log; then
+            echo "Local Next.js log (filtered tokens and keys):"
+            tail -n 150 /tmp/musnad-local-next.log | sed -E 's/(sk_test_|pk_test_|eyJ)[a-zA-Z0-9_.=+-]+/[REDACTED]/g'
+          fi
 
       - name: Cleanup isolated local processes and database
         if: always()
