@@ -103,14 +103,19 @@ jobs:
           set -euo pipefail
           npm run dev -- --hostname 127.0.0.1 > /tmp/musnad-local-next.log 2>&1 &
           echo "$!" > /tmp/musnad-next.pid
-          for i in $(seq 1 18); do
-            if curl --max-time 5 -fsS -o /tmp/musnad-ready.html http://127.0.0.1:3000/en; then
+          last_status="not_checked"
+          for i in $(seq 1 12); do
+            last_status="$(curl --silent --show-error --max-time 7 -o /tmp/musnad-ready.html -w '%{http_code}' http://127.0.0.1:3000/en 2>/dev/null || true)"
+            if [[ "$last_status" == "200" ]]; then
               echo "Local Next.js returned HTTP 200."
               exit 0
             fi
+            if [[ "$i" == 1 || "$i" == 6 || "$i" == 12 ]]; then
+              echo "Readiness HTTP status: ${last_status:-000} on attempt $i"
+            fi
             sleep 2
           done
-          echo "::error::Local Next.js did not return HTTP 200. Inspect redacted application diagnostics."
+          echo "::error::Local Next.js did not return HTTP 200 (last status: ${last_status:-000})."
           tail -n 80 /tmp/musnad-local-next.log | sed -E 's/(sk_test_|pk_test_|eyJ)[a-zA-Z0-9_.=+-]+/[REDACTED]/g'
           exit 1
 
