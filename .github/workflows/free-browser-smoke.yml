@@ -12,11 +12,32 @@ permissions:
   contents: read
 
 jobs:
+  clerk-development-credentials:
+    name: Confirm real Clerk Development key exists
+    runs-on: ubuntu-latest
+    outputs:
+      ready: ${{ steps.check.outputs.ready }}
+    steps:
+      - id: check
+        env:
+          DEV_CLERK_SECRET: ${{ secrets.MUSNAD_E2E_CLERK_DEV_SECRET_KEY }}
+        run: |
+          if [[ "${DEV_CLERK_SECRET:-}" == sk_test_* ]]; then
+            echo 'ready=true' >> "$GITHUB_OUTPUT"
+            echo 'Clerk Development key configured; browser checks may proceed.'
+          else
+            echo 'ready=false' >> "$GITHUB_OUTPUT"
+            echo '::notice::Browser E2E not run: add repository secret MUSNAD_E2E_CLERK_DEV_SECRET_KEY from Clerk Development, NEVER Production.'
+          fi
+
   local-browser:
+    needs: clerk-development-credentials
+    if: needs.clerk-development-credentials.outputs.ready == 'true'
     name: Anonymous desktop/mobile browser smoke (test-only Clerk)
     runs-on: ubuntu-latest
     timeout-minutes: 30
     env:
+      CLERK_SECRET_KEY: ${{ secrets.MUSNAD_E2E_CLERK_DEV_SECRET_KEY }}
       E2E_BASE_URL: http://127.0.0.1:3000
       E2E_ISOLATED_DATABASE_CONFIRMED: "true"
       SITE_INDEXABLE: "false"
@@ -73,12 +94,6 @@ jobs:
           node scripts/smoke-local-supabase.mjs /tmp/musnad-local-status.env
           node scripts/export-local-supabase-ci.mjs /tmp/musnad-local-status.env "$GITHUB_ENV"
 
-      - name: Create nonfunctional Clerk server key for anonymous smoke only
-        run: |
-          # This key is intentionally NOT a real Clerk secret and cannot sign
-          # in or verify real Clerk users. This job tests only anonymous UI.
-          echo "CLERK_SECRET_KEY=sk_test_$(openssl rand -hex 24)" >> "$GITHUB_ENV"
-
       - name: Verify local target cannot access production
         run: node scripts/assert-staging-environment.mjs
 
@@ -87,12 +102,12 @@ jobs:
           set -euo pipefail
           npm run dev -- --hostname 127.0.0.1 > /tmp/musnad-local-next.log 2>&1 &
           echo "$!" > /tmp/musnad-next.pid
-          for i in $(seq 1 60); do
-            if curl --max-time 10 -fsS -o /tmp/musnad-ready.html http://127.0.0.1:3000/en; then
+          for i in $(seq 1 24); do
+            if curl --max-time 5 -fsS -o /tmp/musnad-ready.html http://127.0.0.1:3000/en; then
               echo "Local Next.js returned HTTP 200."
               exit 0
             fi
-            sleep 3
+            sleep 2
           done
           echo "Next.js did not return a successful page."
           tail -n 70 /tmp/musnad-local-next.log | sed -E 's/(sk_test_|pk_test_)[a-zA-Z0-9_=+-]+/[REDACTED]/g'
