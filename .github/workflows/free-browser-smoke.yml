@@ -122,6 +122,12 @@ jobs:
             sleep 2
           done
           echo "::error::Local Next.js did not return HTTP 200 (last status: ${last_status:-000})."
+          echo "Diagnostic: TCP listeners on application ports"
+          ss -ltnp | grep -E ':3000|:3001|:3333' || true
+          echo "Diagnostic: Next.js process state (PID, parent, state, command)"
+          ps -eo pid,ppid,stat,comm,args | grep -E '[n]ext-server|[n]ext dev|[n]pm run dev' | head -n 15 || true
+          echo "Diagnostic: connection failure category"
+          curl --noproxy '*' --connect-timeout 3 --max-time 5 --verbose --output /dev/null http://127.0.0.1:3000/favicon.ico 2>&1 | grep -E 'Failed to connect|Connection refused|Connected to|Operation timed out|HTTP/[0-9]' | head -n 8 || true
           tail -n 80 /tmp/musnad-local-next.log | sed -E 's/(sk_test_|pk_test_|eyJ)[a-zA-Z0-9_.=+-]+/[REDACTED]/g'
           exit 1
 
