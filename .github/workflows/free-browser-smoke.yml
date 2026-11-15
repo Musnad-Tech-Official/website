@@ -43,6 +43,7 @@ jobs:
       E2E_ISOLATED_DATABASE_CONFIRMED: "true"
       SITE_INDEXABLE: "false"
       NEXT_PUBLIC_SITE_URL: http://127.0.0.1:3000
+      NEXT_TELEMETRY_DISABLED: "1"
       # This is the PUBLIC development publishable key of the existing Musnad
       # Clerk development instance, not the live/production key.
       NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: pk_test_dmlhYmxlLW1vdGgtMTgxNC5jbGVyay5hY2NvdW50cy5kZXYk
@@ -97,7 +98,7 @@ jobs:
 
       - name: Test outbound public dependencies (no secret transmitted)
         run: |
-          for endpoint in https://fonts.googleapis.com https://viable-moth-1814.clerk.accounts.dev; do
+          for endpoint in https://fonts.googleapis.com https://fonts.gstatic.com https://viable-moth-1814.clerk.accounts.dev; do
             status="$(curl --silent --noproxy '*' --connect-timeout 5 --max-time 12 -o /dev/null -w '%{http_code}' "$endpoint" || true)"
             echo "Outbound dependency $endpoint: HTTP ${status:-000}"
           done
