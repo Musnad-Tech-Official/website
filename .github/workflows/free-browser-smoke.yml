@@ -8,6 +8,8 @@ on:
       - scripts/export-local-supabase-ci.mjs
       - scripts/e2e-clerk-dev-users.mjs
       - tests/e2e/authorization.spec.ts
+      - tests/e2e/clerk.setup.ts
+      - playwright.config.ts
   pull_request:
     branches: [test/integration-security-admin-20261115]
     paths:
@@ -15,6 +17,8 @@ on:
       - scripts/export-local-supabase-ci.mjs
       - scripts/e2e-clerk-dev-users.mjs
       - tests/e2e/authorization.spec.ts
+      - tests/e2e/clerk.setup.ts
+      - playwright.config.ts
   workflow_dispatch:
 
 permissions:
@@ -43,11 +47,13 @@ jobs:
   local-browser:
     needs: clerk-development-credentials
     if: needs.clerk-development-credentials.outputs.ready == 'true'
-    name: Anonymous desktop/mobile browser smoke (test-only Clerk)
+    name: Isolated anonymous and authenticated browser tests (test-only Clerk)
     runs-on: ubuntu-latest
     timeout-minutes: 30
     env:
       CLERK_SECRET_KEY: ${{ secrets.MUSNAD_E2E_CLERK_DEV_SECRET_KEY }}
+      E2E_CLERK_DEV_AUTH: "true"
+      CLERK_PUBLISHABLE_KEY: pk_test_dmlhYmxlLW1vdGgtMTgxNC5jbGVyay5hY2NvdW50cy5kZXYk
       E2E_BASE_URL: http://localhost:3000
       E2E_ISOLATED_DATABASE_CONFIRMED: "true"
       SITE_INDEXABLE: "false"
@@ -74,6 +80,9 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
+
+      - name: Install pinned Clerk testing helper (CI only)
+        run: npm install --no-save --package-lock=false --ignore-scripts --no-audit --no-fund @clerk/testing@2.2.50
 
       - name: Install browser
         run: npx playwright install --with-deps chromium
