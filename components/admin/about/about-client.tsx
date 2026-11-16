@@ -238,7 +238,7 @@ export function AboutClient({
       )}
 
       {!hasSavedProfile && (
-        <Alert variant="default">
+        <Alert variant="info">
           <AlertDescription>
             {isAr
               ? "لم يتم حفظ محتوى صفحة «من نحن» في قاعدة البيانات بعد. الحقول التالية فارغة حتى تُدخل المعلومات الفعلية للشركة وتحفظها."
