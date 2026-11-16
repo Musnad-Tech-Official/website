@@ -52,11 +52,13 @@ async function loginWithDevelopmentTestCode(page: Page, email: string) {
     throw error;
   }
   await otp.pressSequentially("424242");
-  // Some Clerk UI configurations auto-submit the 6th digit.
+  // Clerk's OTP UI auto-submits; a page-global Clerk object is not
+  // guaranteed by @clerk/nextjs. Require navigation out of sign-in and
+  // prove authorization against the server-side /admin boundary below.
   await expect.poll(
-    async () => page.evaluate(() => Boolean((window as Window & { Clerk?: { user?: unknown } }).Clerk?.user)),
+    () => new URL(page.url()).pathname,
     { timeout: 20_000 }
-  ).toBe(true);
+  ).toMatch(/^\/(?:en|ar)\/?$/);
 }
 
 test.describe("authenticated DEVELOPMENT-only role boundaries", () => {
@@ -80,7 +82,10 @@ test.describe("authenticated DEVELOPMENT-only role boundaries", () => {
       const response = await page.goto("/" + locale + "/admin", { waitUntil: "domcontentloaded" });
       assertApplicationResponse(page.url());
       const path = new URL(page.url()).pathname;
-      expect(response?.status() === 404 || !/\/admin(?:\/|$)/.test(path)).toBe(true);
+      // An anonymous visitor is redirected to /sign-in, not to the
+      // localized home. Do not count an unauthenticated redirect as denial.
+      expect(path).not.toMatch(/\/sign-in(?:\/|$)/);
+      expect(response?.status() === 404 || path === "/" + locale || path === "/" + locale + "/").toBe(true);
     });
   }
 });
