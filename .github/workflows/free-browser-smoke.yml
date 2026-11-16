@@ -87,6 +87,18 @@ jobs:
         run: |
           set -euo pipefail
           supabase init --force
+          # Local-only: verify Clerk Development JWTs with Supabase third-party auth.
+          # This file and all services live only in disposable GitHub Actions.
+          if grep -q '^\[auth\.third_party\.clerk\]' supabase/config.toml; then
+            echo "::error::Unexpected preexisting active Clerk integration in local config."
+            exit 1
+          fi
+          cat >> supabase/config.toml <<'TOML'
+
+          [auth.third_party.clerk]
+          enabled = true
+          domain = "viable-moth-1814.clerk.accounts.dev"
+          TOML
           supabase migration new local_schema
           target="$(find supabase/migrations -maxdepth 1 -type f -name '*_local_schema.sql' | head -n 1)"
           test -n "$target"
