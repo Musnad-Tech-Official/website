@@ -6,11 +6,15 @@ on:
     paths:
       - .github/workflows/free-browser-smoke.yml
       - scripts/export-local-supabase-ci.mjs
+      - scripts/e2e-clerk-dev-users.mjs
+      - tests/e2e/authorization.spec.ts
   pull_request:
     branches: [test/integration-security-admin-20261115]
     paths:
       - .github/workflows/free-browser-smoke.yml
       - scripts/export-local-supabase-ci.mjs
+      - scripts/e2e-clerk-dev-users.mjs
+      - tests/e2e/authorization.spec.ts
   workflow_dispatch:
 
 permissions:
@@ -154,6 +158,9 @@ jobs:
           fi
           echo "Isolated dynamic homepage responded HTTP 200; starting Chromium."
 
+      - name: Create two disposable Clerk Development-only users
+        run: node scripts/e2e-clerk-dev-users.mjs create
+
       - name: Run actual read-only Playwright tests (bounded failures)
         run: npm run test:e2e -- --max-failures=3 --workers=1
 
@@ -165,10 +172,18 @@ jobs:
             tail -n 150 /tmp/musnad-local-next.log | sed -E 's/(sk_test_|pk_test_|eyJ)[a-zA-Z0-9_.=+-]+/[REDACTED]/g'
           fi
 
-      - name: Cleanup isolated local processes and database
+      - name: Cleanup temporary Clerk Development accounts, local app and DB
         if: always()
         run: |
+          cleanup_error=0
+          if test -f /tmp/musnad-clerk-dev-e2e-users.json; then
+            node scripts/e2e-clerk-dev-users.mjs cleanup || cleanup_error=1
+          fi
           if test -f /tmp/musnad-next.pid; then
             kill "$(cat /tmp/musnad-next.pid)" 2>/dev/null || true
           fi
           supabase stop --no-backup || true
+          if [[ "$cleanup_error" -ne 0 ]]; then
+            echo "::error::Temporary Clerk Development test users require manual cleanup review."
+            exit 1
+          fi
