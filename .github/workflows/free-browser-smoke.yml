@@ -87,18 +87,29 @@ jobs:
         run: |
           set -euo pipefail
           supabase init --force
-          # Local-only: verify Clerk Development JWTs with Supabase third-party auth.
-          # This file and all services live only in disposable GitHub Actions.
-          if grep -q '^\[auth\.third_party\.clerk\]' supabase/config.toml; then
-            echo "::error::Unexpected preexisting active Clerk integration in local config."
-            exit 1
-          fi
-          cat >> supabase/config.toml <<'TOML'
+          # Restrict the existing Clerk config to our Development domain.
+          # This is the disposable CLI-generated local Supabase config only.
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          import tomllib
 
-          [auth.third_party.clerk]
-          enabled = true
-          domain = "viable-moth-1814.clerk.accounts.dev"
-          TOML
+          path = Path("supabase/config.toml")
+          contents = path.read_text(encoding="utf-8")
+          section = '[auth.third_party.clerk]'
+          replacement = section + '\\n' + 'enabled = true\\n' + 'domain = "viable-moth-1814.clerk.accounts.dev"\\n\\n'
+          pattern = r'(?ms)^\\[auth\\.third_party\\.clerk\\]\\n.*?(?=^\\[|\\Z)'
+          matches = list(re.finditer(pattern, contents))
+          if len(matches) > 1:
+              raise RuntimeError("Refusing multiple Clerk integration sections.")
+          contents = re.sub(pattern, lambda _: replacement, contents, count=1) if matches else contents + '\\n' + replacement
+          data = tomllib.loads(contents)
+          conf = data["auth"]["third_party"]["clerk"]
+          if conf.get("enabled") is not True or conf.get("domain") != "viable-moth-1814.clerk.accounts.dev":
+              raise RuntimeError("Clerk Development JWT trust configuration did not validate.")
+          path.write_text(contents, encoding="utf-8")
+          print("Validated local-only Clerk Development JWT trust configuration.")
+          PY
           supabase migration new local_schema
           target="$(find supabase/migrations -maxdepth 1 -type f -name '*_local_schema.sql' | head -n 1)"
           test -n "$target"
