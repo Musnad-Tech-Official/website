@@ -27,8 +27,30 @@ async function loginWithDevelopmentTestCode(page: Page, email: string) {
 
   // Clerk Development test emails never send messages and accept the fixed
   // verification code documented in Clerk's testing guidance.
-  const otp = page.locator('input[name="code"]').first();
-  await expect(otp).toBeVisible({ timeout: 15_000 });
+  // Clerk's OTP widgets are not guaranteed to expose input[name="code"].
+  // Prefer Clerk's documented accessible name, then standard OTP attributes.
+  const otp = page.getByRole("textbox", { name: /enter verification code/i })
+    .or(page.locator('input[autocomplete="one-time-code"]'))
+    .or(page.locator('input[inputmode="numeric"]'))
+    .first();
+  try {
+    await expect(otp).toBeVisible({ timeout: 12_000 });
+  } catch (error) {
+    const form = await page.evaluate(() => ({
+      path: location.pathname,
+      inputs: Array.from(document.querySelectorAll("input")).map((input) => ({
+        name: input.name,
+        type: input.type,
+        autocomplete: input.autocomplete,
+        inputMode: input.inputMode,
+        placeholder: input.placeholder,
+      })),
+      buttonCount: document.querySelectorAll("button").length,
+      otpWidgetCount: document.querySelectorAll('[data-otp-input], [data-input-otp]').length,
+    }));
+    console.error("Sanitized Clerk test form structure:", JSON.stringify(form));
+    throw error;
+  }
   await otp.pressSequentially("424242");
   // Some Clerk UI configurations auto-submit the 6th digit.
   const verifyButton = page.getByRole("button", { name: /continue|verify/i });
