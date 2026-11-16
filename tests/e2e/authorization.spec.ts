@@ -21,7 +21,7 @@ async function signInWithClerkTesting(page: Page, email: string, role: "admin" |
   const runId = process.env.GITHUB_RUN_ID;
   const attempt = process.env.GITHUB_RUN_ATTEMPT || "1";
   const requiredEmail = `musnad-e2e+clerk_test_${role}_${runId}_${attempt}@example.com`;
-  if (!runId || !/^\\d+$/.test(runId) || email !== requiredEmail) {
+  if (!runId || !/^\d+$/.test(runId) || email !== requiredEmail) {
     throw new Error("Only the current GitHub Actions run's synthetic account is allowed.");
   }
   if (
