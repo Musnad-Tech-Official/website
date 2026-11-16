@@ -5,6 +5,7 @@ import type { Locator, Page } from "@playwright/test";
 async function openTeamEditor(page: Page, trigger: Locator, heading: string) {
   // React hydration may still be attaching event handlers after DOMContentLoaded.
   // The operation only opens a modal, so bounded retries are safe.
+  await expect(page.locator('[data-admin-hydrated="true"]')).toBeVisible({ timeout: 20_000 });
   const modal = page.locator(".fixed.inset-0").filter({
     has: page.getByRole("heading", { name: heading, exact: true }),
   }).first();
@@ -72,9 +73,24 @@ test.describe("isolated team administration persistence", () => {
     await expect(row).toContainText(newRole);
 
     // Delete only the uniquely named record created by this CI run.
-    await row.getByTitle("Delete").click();
+    await expect(page.locator('[data-admin-hydrated="true"]')).toBeVisible({ timeout: 20_000 });
     const dialog = page.getByRole("dialog");
-    await expect(dialog).toBeVisible({ timeout: 8000 });
+    let confirmationOpened = false;
+    for (let attempt = 0; attempt < 3; attempt++) {
+      await row.getByTitle("Delete").click();
+      if (await dialog.isVisible().catch(() => false)) {
+        confirmationOpened = true;
+        break;
+      }
+      try {
+        await expect(dialog).toBeVisible({ timeout: 2500 });
+        confirmationOpened = true;
+        break;
+      } catch {
+        // Opening the confirmation is side-effect-free; allow hydration retry.
+      }
+    }
+    if (!confirmationOpened) throw Error("Team delete confirmation failed to open.");
     await expect(dialog).toContainText("Delete Team Member");
     await dialog.getByRole("button", { name: "Confirm Delete" }).click();
     await expect(dialog).toBeHidden({ timeout: 20_000 });
