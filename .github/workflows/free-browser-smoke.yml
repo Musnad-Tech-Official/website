@@ -9,6 +9,8 @@ on:
       - scripts/e2e-clerk-dev-users.mjs
       - tests/e2e/authorization.spec.ts
       - tests/e2e/clerk.setup.ts
+      - tests/e2e/clerk-test-auth.ts
+      - tests/e2e/admin-services-crud.spec.ts
       - playwright.config.ts
   pull_request:
     branches: [test/integration-security-admin-20261115]
@@ -18,6 +20,8 @@ on:
       - scripts/e2e-clerk-dev-users.mjs
       - tests/e2e/authorization.spec.ts
       - tests/e2e/clerk.setup.ts
+      - tests/e2e/clerk-test-auth.ts
+      - tests/e2e/admin-services-crud.spec.ts
       - playwright.config.ts
   workflow_dispatch:
 
