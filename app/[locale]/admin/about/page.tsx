@@ -1,6 +1,6 @@
 import * as React from "react";
 import {
-  getAboutContentAction,
+  getOptionalAboutContentForAdminAction,
   getAboutValuesAction,
   getAboutMilestonesAction,
   getAboutApproachAction,
@@ -15,7 +15,7 @@ export default async function AdminAboutPage({ params }: AdminAboutPageProps) {
   const { locale } = await params;
 
   const [content, values, milestones, approach] = await Promise.all([
-    getAboutContentAction(),
+    getOptionalAboutContentForAdminAction(),
     getAboutValuesAction(true),
     getAboutMilestonesAction(true),
     getAboutApproachAction(true),
