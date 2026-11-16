@@ -17,48 +17,38 @@ test.describe("anonymous administration boundary", () => {
 // Separate, disposable accounts are created only by scripts/e2e-clerk-dev-users.mjs
 // against the VERIFIED Musnad Clerk DEVELOPMENT instance. Nothing is persisted
 // in the repository, and no existing staff or customer accounts are used.
-async function loginWithDevelopmentTestCode(page: Page, email: string) {
-  if (!/^musnad-e2e\+clerk_test_(admin|member)_\d+_\d+@example\.com$/.test(email)) {
-    throw Error("Refusing to sign in with anything except this run's synthetic Clerk test address.");
+async function signInWithClerkTesting(page: Page, email: string, role: "admin" | "member") {
+  const runId = process.env.GITHUB_RUN_ID;
+  const attempt = process.env.GITHUB_RUN_ATTEMPT || "1";
+  const requiredEmail = `musnad-e2e+clerk_test_${role}_${runId}_${attempt}@example.com`;
+  if (!runId || !/^\\d+$/.test(runId) || email !== requiredEmail) {
+    throw new Error("Only the current GitHub Actions run's synthetic account is allowed.");
   }
-  await page.goto("/en/sign-in", { waitUntil: "domcontentloaded" });
-  await page.locator('input[name="identifier"]').fill(email);
-  await page.getByRole("button", { name: /continue/i }).click();
+  if (
+    !process.env.CLERK_SECRET_KEY?.startsWith("sk_test_") ||
+    process.env.E2E_CLERK_DEV_AUTH !== "true" ||
+    process.env.E2E_BASE_URL !== "http://localhost:3000" ||
+    process.env.E2E_ISOLATED_DATABASE_CONFIRMED !== "true" ||
+    process.env.E2E_STAGING_SUPABASE_URL !== "http://127.0.0.1:54321" ||
+    process.env.CLERK_PUBLISHABLE_KEY !==
+      "pk_test_dmlhYmxlLW1vdGgtMTgxNC5jbGVyay5hY2NvdW50cy5kZXYk"
+  ) {
+    throw new Error("Clerk authenticated E2E is restricted to isolated Development CI.");
+  }
 
-  // Clerk Development test emails never send messages and accept the fixed
-  // verification code documented in Clerk's testing guidance.
-  // Clerk's OTP widgets are not guaranteed to expose input[name="code"].
-  // Prefer Clerk's documented accessible name, then standard OTP attributes.
-  const otp = page.getByRole("textbox", { name: /enter verification code/i })
-    .or(page.locator('input[autocomplete="one-time-code"]'))
-    .or(page.locator('input[inputmode="numeric"]'))
-    .first();
-  try {
-    await expect(otp).toBeVisible({ timeout: 12_000 });
-  } catch (error) {
-    const form = await page.evaluate(() => ({
-      path: location.pathname,
-      inputs: Array.from(document.querySelectorAll("input")).map((input) => ({
-        name: input.name,
-        type: input.type,
-        autocomplete: input.autocomplete,
-        inputMode: input.inputMode,
-        placeholder: input.placeholder,
-      })),
-      buttonCount: document.querySelectorAll("button").length,
-      otpWidgetCount: document.querySelectorAll('[data-otp-input], [data-input-otp]').length,
-    }));
-    console.error("Sanitized Clerk test form structure:", JSON.stringify(form));
-    throw error;
-  }
-  await otp.pressSequentially("424242");
-  // Clerk's OTP UI auto-submits; a page-global Clerk object is not
-  // guaranteed by @clerk/nextjs. Require navigation out of sign-in and
-  // prove authorization against the server-side /admin boundary below.
-  await expect.poll(
-    () => new URL(page.url()).pathname,
-    { timeout: 20_000 }
-  ).toMatch(/^\/(?:en|ar)\/?$/);
+  // Clerk's official helper signs in a test email via its Backend API.
+  // It also adds a testing token, avoiding first-factor UI and bot challenges.
+  // CI installs the pinned helper without changing production dependencies.
+  const clerkPackage = "@clerk/testing/playwright";
+  const { clerk } = await import(clerkPackage);
+  await page.goto("/en", { waitUntil: "domcontentloaded" });
+  await clerk.signIn({
+    page,
+    emailAddress: email,
+    setupClerkTestingTokenOptions: {
+      frontendApiUrl: "viable-moth-1814.clerk.accounts.dev",
+    },
+  });
 }
 
 test.describe("authenticated DEVELOPMENT-only role boundaries", () => {
@@ -67,8 +57,11 @@ test.describe("authenticated DEVELOPMENT-only role boundaries", () => {
   for (const locale of ["ar", "en"] as const) {
     test("synthetic admin can access dashboard " + locale, async ({ page }) => {
       const email = process.env.E2E_ADMIN_EMAIL;
-      test.skip(!email, "No verified temporary Clerk Development administrator was created.");
-      await loginWithDevelopmentTestCode(page, email!);
+      if (!email && process.env.E2E_CLERK_DEV_AUTH === "true") {
+        throw new Error("Missing synthetic Development administrator; refusing to skip CI auth coverage.");
+      }
+      test.skip(!email, "No isolated test administrator was provisioned.");
+      await signInWithClerkTesting(page, email!, "admin");
       const response = await page.goto("/" + locale + "/admin", { waitUntil: "domcontentloaded" });
       assertApplicationResponse(page.url());
       expect(response?.status()).toBe(200);
@@ -77,8 +70,11 @@ test.describe("authenticated DEVELOPMENT-only role boundaries", () => {
 
     test("synthetic non-admin cannot access dashboard " + locale, async ({ page }) => {
       const email = process.env.E2E_MEMBER_EMAIL;
-      test.skip(!email, "No verified temporary Clerk Development member was created.");
-      await loginWithDevelopmentTestCode(page, email!);
+      if (!email && process.env.E2E_CLERK_DEV_AUTH === "true") {
+        throw new Error("Missing synthetic Development member; refusing to skip CI auth coverage.");
+      }
+      test.skip(!email, "No isolated test member was provisioned.");
+      await signInWithClerkTesting(page, email!, "member");
       const response = await page.goto("/" + locale + "/admin", { waitUntil: "domcontentloaded" });
       assertApplicationResponse(page.url());
       const path = new URL(page.url()).pathname;
