@@ -73,8 +73,9 @@ test.describe("isolated team administration persistence", () => {
 
     // Delete only the uniquely named record created by this CI run.
     await row.getByTitle("Delete").click();
-    const dialog = page.getByRole("dialog", { name: "Delete Team Member" });
+    const dialog = page.getByRole("dialog");
     await expect(dialog).toBeVisible({ timeout: 8000 });
+    await expect(dialog).toContainText("Delete Team Member");
     await dialog.getByRole("button", { name: "Confirm Delete" }).click();
     await expect(dialog).toBeHidden({ timeout: 20_000 });
     await page.reload({ waitUntil: "domcontentloaded" });
