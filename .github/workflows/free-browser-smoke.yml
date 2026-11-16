@@ -13,6 +13,10 @@ on:
       - tests/e2e/admin-services-crud.spec.ts
       - tests/e2e/admin-team-crud.spec.ts
       - tests/e2e/admin-modules-routes.spec.ts
+      - lib/about/actions.ts
+      - app/**/admin/about/page.tsx
+      - components/admin/about/about-client.tsx
+      - components/admin/layout/admin-header.tsx
       - playwright.config.ts
   pull_request:
     branches: [test/integration-security-admin-20261115]
@@ -26,6 +30,10 @@ on:
       - tests/e2e/admin-services-crud.spec.ts
       - tests/e2e/admin-team-crud.spec.ts
       - tests/e2e/admin-modules-routes.spec.ts
+      - lib/about/actions.ts
+      - app/**/admin/about/page.tsx
+      - components/admin/about/about-client.tsx
+      - components/admin/layout/admin-header.tsx
       - playwright.config.ts
   workflow_dispatch:
 
