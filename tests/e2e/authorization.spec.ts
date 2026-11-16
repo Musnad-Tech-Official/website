@@ -53,10 +53,6 @@ async function loginWithDevelopmentTestCode(page: Page, email: string) {
   }
   await otp.pressSequentially("424242");
   // Some Clerk UI configurations auto-submit the 6th digit.
-  const verifyButton = page.getByRole("button", { name: /continue|verify/i });
-  if (await verifyButton.isVisible().catch(() => false)) {
-    await verifyButton.click();
-  }
   await expect.poll(
     async () => page.evaluate(() => Boolean((window as Window & { Clerk?: { user?: unknown } }).Clerk?.user)),
     { timeout: 20_000 }
