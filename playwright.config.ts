@@ -1,6 +1,8 @@
 import { defineConfig, devices } from "@playwright/test";
 
 // Remote-only test suite: never start a dev server that could inherit production credentials.
+const clerkCiSetup = process.env.E2E_CLERK_DEV_AUTH === "true";
+
 export default defineConfig({
   testDir: "./tests/e2e",
   testMatch: "**/*.spec.ts",
@@ -21,7 +23,18 @@ export default defineConfig({
     navigationTimeout: 25_000,
   },
   projects: [
-    { name: "chromium-desktop", use: { ...devices["Desktop Chrome"] } },
-    { name: "chromium-mobile", use: { ...devices["Pixel 7"] } },
+    ...(clerkCiSetup
+      ? [{ name: "clerk-setup", testMatch: "**/clerk.setup.ts" }]
+      : []),
+    {
+      name: "chromium-desktop",
+      use: { ...devices["Desktop Chrome"] },
+      dependencies: clerkCiSetup ? ["clerk-setup"] : [],
+    },
+    {
+      name: "chromium-mobile",
+      use: { ...devices["Pixel 7"] },
+      dependencies: clerkCiSetup ? ["clerk-setup"] : [],
+    },
   ],
 });
