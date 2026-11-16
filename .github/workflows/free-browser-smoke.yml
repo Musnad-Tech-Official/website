@@ -17,6 +17,7 @@ on:
       - app/**/admin/about/page.tsx
       - components/admin/about/about-client.tsx
       - components/admin/layout/admin-header.tsx
+      - components/admin/layout/admin-shell.tsx
       - playwright.config.ts
   pull_request:
     branches: [test/integration-security-admin-20261115]
@@ -34,6 +35,7 @@ on:
       - app/**/admin/about/page.tsx
       - components/admin/about/about-client.tsx
       - components/admin/layout/admin-header.tsx
+      - components/admin/layout/admin-shell.tsx
       - playwright.config.ts
   workflow_dispatch:
 
@@ -209,7 +211,7 @@ jobs:
       - name: Create two disposable Clerk Development-only users
         run: node scripts/e2e-clerk-dev-users.mjs create
 
-      - name: Run actual read-only Playwright tests (bounded failures)
+      - name: Run Playwright routes and isolated synthetic admin CRUD (bounded failures)
         run: npm run test:e2e -- --max-failures=3 --workers=1
 
       - name: Capture sanitized local Next.js diagnostics on browser failure
