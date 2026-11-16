@@ -5,6 +5,7 @@ import type { Page, Locator } from "@playwright/test";
 // Next.js development hydration may still be attaching event handlers after
 // DOMContentLoaded. Re-attempt only the idempotent modal-opening action.
 async function openModal(page: Page, trigger: Locator): Promise<Locator> {
+  await expect(page.locator('[data-admin-hydrated="true"]')).toBeVisible({ timeout: 20_000 });
   const dialog = page.getByRole("dialog");
   for (let attempt = 0; attempt < 3; attempt++) {
     await trigger.click();
