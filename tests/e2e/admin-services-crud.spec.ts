@@ -1,5 +1,26 @@
 import { test, expect, assertApplicationResponse } from "./fixtures";
 import { signInWithClerkTesting } from "./clerk-test-auth";
+import type { Page, Locator } from "@playwright/test";
+
+// Next.js development hydration may still be attaching event handlers after
+// DOMContentLoaded. Re-attempt only the idempotent modal-opening action.
+async function openModal(page: Page, trigger: Locator): Promise<Locator> {
+  const dialog = page.getByRole("dialog");
+  for (let attempt = 0; attempt < 3; attempt++) {
+    await trigger.click();
+    try {
+      await expect(dialog).toBeVisible({ timeout: 2_500 });
+      return dialog;
+    } catch {
+      // Give React's pending hydration work a chance before a bounded retry.
+    }
+  }
+  const structure = await page.evaluate(() => ({
+    dialogCount: document.querySelectorAll('[role="dialog"]').length,
+    buttonCount: document.querySelectorAll("button").length,
+  }));
+  throw new Error("Admin editor did not open after hydration attempts: " + JSON.stringify(structure));
+}
 
 test.describe("isolated admin service persistence", () => {
   test.use({ storageState: { cookies: [], origins: [] } });
@@ -30,9 +51,7 @@ test.describe("isolated admin service persistence", () => {
     expect(response?.status()).toBe(200);
     expect(new URL(page.url()).pathname).toMatch(/\/en\/admin\/services\/?$/);
 
-    await page.getByRole("button", { name: "Add New Service" }).first().click();
-    let dialog = page.getByRole("dialog");
-    await expect(dialog).toBeVisible();
+    let dialog = await openModal(page, page.getByRole("button", { name: "Add New Service" }).first());
     await dialog.getByPlaceholder("e.g. Platform & Cloud Infrastructure").fill(initialTitle);
     await dialog.getByPlaceholder("مثال: البنية التحتية والمنصات السحابية").fill("خدمة تجريبية آلية معزولة");
     await dialog.locator("textarea").nth(0).fill("Synthetic CI-only service used to verify real Supabase persistence.");
@@ -47,9 +66,7 @@ test.describe("isolated admin service persistence", () => {
     });
     await expect(card).toHaveCount(1, { timeout: 15_000 });
 
-    await card.getByTitle("Edit service").click();
-    dialog = page.getByRole("dialog");
-    await expect(dialog).toBeVisible();
+    dialog = await openModal(page, card.getByTitle("Edit service"));
     await dialog.getByPlaceholder("e.g. Platform & Cloud Infrastructure").fill(updatedTitle);
     await dialog.getByRole("button", { name: "Save Changes" }).click();
     await expect(dialog).toBeHidden({ timeout: 20_000 });
@@ -61,8 +78,7 @@ test.describe("isolated admin service persistence", () => {
     await expect(card).toHaveCount(1, { timeout: 15_000 });
     await expect(page.getByRole("heading", { name: initialTitle, exact: true })).toHaveCount(0);
 
-    await card.getByTitle("Delete service").click();
-    dialog = page.getByRole("dialog");
+    dialog = await openModal(page, card.getByTitle("Delete service"));
     await expect(dialog).toContainText("Delete Engineering Service?");
     await dialog.getByRole("button", { name: "Yes, Delete Service" }).click();
     await expect(dialog).toBeHidden({ timeout: 20_000 });
