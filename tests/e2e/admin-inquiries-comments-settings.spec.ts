@@ -91,6 +91,8 @@ test.describe("isolated contact, moderation and settings workflows", () => {
       expect(memberResponse?.status()).toBe(200);
       const commentArea = memberPage.locator('section[aria-labelledby="comments-heading"]');
       await expect(commentArea.locator('textarea[required]')).toBeVisible({ timeout: 15_000 });
+      // A server-rendered textarea can be visible before React attaches onSubmit.
+      await expect(commentArea).toHaveAttribute("data-comments-hydrated", "true", { timeout: 15_000 });
       const input = commentArea.locator('textarea[required]');
       await input.fill(comment);
       await commentArea.locator('form button[type="submit"]').first().click();
