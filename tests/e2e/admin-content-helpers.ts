@@ -30,7 +30,7 @@ export async function openAdminEditor(
     has: page.getByRole("heading", { name: title, exact: true }),
   }).first();
   for (let n = 0; n < 3; n++) {
-    await trigger.click();
+    await trigger.click({ timeout: 6_000 });
     try {
       await expect(editor).toBeVisible({ timeout: 2_500 });
       return editor;
@@ -50,7 +50,7 @@ export async function openAdminDeleteConfirmation(
   await expect(page.locator('[data-admin-hydrated="true"]')).toBeVisible({ timeout: 20_000 });
   const dialog = page.getByRole("dialog");
   for (let n = 0; n < 3; n++) {
-    await trigger.click();
+    await trigger.click({ timeout: 6_000 });
     try {
       await expect(dialog).toBeVisible({ timeout: 2_500 });
       await expect(dialog).toContainText(title);
