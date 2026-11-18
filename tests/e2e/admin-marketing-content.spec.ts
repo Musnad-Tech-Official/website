@@ -130,20 +130,24 @@ test.describe("isolated marketing CMS write and visibility checks", () => {
     await expect(card).toContainText("Off");
     const anon = await browser.newContext({ baseURL: "http://localhost:3000" });
     try {
-      let html = await (await anon.request.get("/en")).text();
-      expect(html).not.toContain(revised);
+      // Next.js RSC may serialize inactive records into raw HTML. Verify real DOM visibility.
+      const visitor = await anon.newPage();
+      const publicBanner = visitor.getByRole("region", { name: "Announcement" });
+      await visitor.goto("/en", { waitUntil: "domcontentloaded" });
+      await expect(publicBanner).toHaveCount(0);
       await expect(page.locator('[data-admin-hydrated="true"]')).toBeVisible();
       await card.getByRole("switch").check({ force: true });
       await expect(card).toContainText("Active", { timeout: 15_000 });
       await page.reload({ waitUntil: "domcontentloaded" });
-      html = await (await anon.request.get("/en")).text();
-      expect(html).toContain(revised);
+      await visitor.reload({ waitUntil: "domcontentloaded" });
+      await expect(publicBanner).toContainText(revised, { timeout: 15_000 });
       card = page.getByText(revised, { exact: true }).last().locator(cardAncestor);
       await expect(page.locator('[data-admin-hydrated="true"]')).toBeVisible();
       await card.getByRole("switch").uncheck({ force: true });
       await expect(card).toContainText("Off", { timeout: 15_000 });
-      html = await (await anon.request.get("/en")).text();
-      expect(html).not.toContain(revised);
+      await page.reload({ waitUntil: "domcontentloaded" });
+      await visitor.reload({ waitUntil: "domcontentloaded" });
+      await expect(publicBanner).toHaveCount(0);
     } finally {
       await anon.close();
     }
