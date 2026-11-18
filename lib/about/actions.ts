@@ -75,6 +75,49 @@ export async function getAboutContentAction(): Promise<AboutContentData> {
   throw new Error("The requested content is unavailable.");
 }
 
+/** Fetch existing About content for the admin editor; allow missing main row. */
+export async function getOptionalAboutContentForAdminAction(): Promise<AboutContentData | null> {
+  await verifyAdminAuth();
+  try {
+    const supabase = await createClient();
+    const query = supabase
+      .from("about_content")
+      .select("*")
+      .eq("id", "main")
+      .maybeSingle();
+
+    const { data, error } = await withTimeout(query);
+
+    if (error) throw error;
+    if (data) {
+      return {
+        id: data.id,
+        missionTitleEn: data.mission_title_en,
+        missionTitleAr: data.mission_title_ar,
+        missionDescEn: data.mission_desc_en,
+        missionDescAr: data.mission_desc_ar,
+        visionTitleEn: data.vision_title_en,
+        visionTitleAr: data.vision_title_ar,
+        visionDescEn: data.vision_desc_en,
+        visionDescAr: data.vision_desc_ar,
+        storyTitleEn: data.story_title_en,
+        storyTitleAr: data.story_title_ar,
+        storyP1En: data.story_p1_en,
+        storyP1Ar: data.story_p1_ar,
+        storyP2En: data.story_p2_en,
+        storyP2Ar: data.story_p2_ar,
+        updatedAt: data.updated_at,
+      };
+    }
+  } catch (err) {
+    console.error("getOptionalAboutContentForAdminAction failed:", err instanceof Error ? err.message : String(err));
+    throw new Error("Unable to load company profile content.");
+  }
+  // Missing content is an empty CMS state, not a database outage.
+  // Do not insert synthetic company claims or show an HTTP 500 to the admin.
+  return null;
+}
+
 /**
  * Updates About main content
  */

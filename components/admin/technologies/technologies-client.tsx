@@ -110,8 +110,11 @@ export function TechnologiesClient({
   const handleDelete = async (id: string) => {
     if (!confirm(isRtl ? "هل أنت متأكد من حذف هذه التقنية؟" : "Are you sure you want to delete this technology?")) return;
 
-    setTechnologies((prev) => prev.filter((t) => t.id !== id));
-    await deleteTechnologyAction(id);
+    // Never remove from the UI before Supabase confirms the record was deleted.
+    const result = await deleteTechnologyAction(id);
+    if (result.success) {
+      setTechnologies((prev) => prev.filter((t) => t.id !== id));
+    }
   };
 
   return (

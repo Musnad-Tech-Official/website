@@ -37,8 +37,27 @@ import {
   deleteAboutApproachAction,
 } from "@/lib/about/actions";
 
+// Form-only empty state; no fabricated company claims are stored or published.
+const EMPTY_COMPANY_PROFILE: AboutContentData = {
+  id: "main",
+  missionTitleEn: "",
+  missionTitleAr: "",
+  missionDescEn: "",
+  missionDescAr: "",
+  visionTitleEn: "",
+  visionTitleAr: "",
+  visionDescEn: "",
+  visionDescAr: "",
+  storyTitleEn: "",
+  storyTitleAr: "",
+  storyP1En: "",
+  storyP1Ar: "",
+  storyP2En: "",
+  storyP2Ar: "",
+};
+
 interface AboutClientProps {
-  initialContent: AboutContentData;
+  initialContent: AboutContentData | null;
   initialValues: AboutValueRecord[];
   initialMilestones: AboutMilestoneRecord[];
   initialApproach: AboutApproachRecord[];
@@ -56,7 +75,8 @@ export function AboutClient({
   const [activeTab, setActiveTab] = React.useState<"mission" | "values" | "milestones" | "approach">("mission");
 
   // Content state
-  const [content, setContent] = React.useState<AboutContentData>(initialContent);
+  const [content, setContent] = React.useState<AboutContentData>(initialContent ?? EMPTY_COMPANY_PROFILE);
+  const [hasSavedProfile, setHasSavedProfile] = React.useState(Boolean(initialContent));
   const [isSavingContent, setIsSavingContent] = React.useState(false);
 
   // Values state
@@ -95,6 +115,7 @@ export function AboutClient({
     setIsSavingContent(true);
     try {
       await updateAboutContentAction(content);
+      setHasSavedProfile(true);
       showAlert(isAr ? "تم حفظ محتوى من نحن بنجاح" : "About content saved successfully.");
     } catch {
       showAlert(isAr ? "فشل حفظ المحتوى" : "Failed to save content.", "destructive");
@@ -213,6 +234,16 @@ export function AboutClient({
       {alert && (
         <Alert variant={alert.type}>
           <AlertDescription>{alert.message}</AlertDescription>
+        </Alert>
+      )}
+
+      {!hasSavedProfile && (
+        <Alert variant="info">
+          <AlertDescription>
+            {isAr
+              ? "لم يتم حفظ محتوى صفحة «من نحن» في قاعدة البيانات بعد. الحقول التالية فارغة حتى تُدخل المعلومات الفعلية للشركة وتحفظها."
+              : "No About Us content has been saved in the database. The fields below remain empty until verified company information is entered and saved."}
+          </AlertDescription>
         </Alert>
       )}
 

@@ -9,7 +9,10 @@
     "lint": "eslint",
     "test:seo": "node --test tests/seo.test.mjs",
     "test:integrity": "node --test tests/production-integrity.test.mjs",
-    "test:admin": "node --test tests/admin-actions.test.mjs"
+    "test:admin": "node --test tests/admin-actions.test.mjs",
+    "test:e2e": "node scripts/assert-staging-environment.mjs && playwright test",
+    "test:e2e:list": "playwright test --list",
+    "test:staging-preflight": "node --test tests/staging-preflight.test.mjs"
   },
   "dependencies": {
     "@clerk/nextjs": "^7.9.4",
@@ -36,6 +39,7 @@
     "react-icons": "^5.7.0"
   },
   "devDependencies": {
+    "@playwright/test": "1.65.1",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",

@@ -1,0 +1,33 @@
+name: Localhost CI networking diagnostic
+
+on:
+  push:
+    branches: [chore/staging-playwright-20261115]
+    paths: [.github/workflows/local-http-selftest.yml]
+
+permissions:
+  contents: read
+
+jobs:
+  localhost:
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    steps:
+      - name: Check loopback TCP with a minimal Node.js server (no app secrets)
+        run: |
+          set -euo pipefail
+          node -e 'require("node:http").createServer((req,res)=>{res.writeHead(200);res.end("local-only-ok")}).listen(3401,"127.0.0.1")' >/tmp/local-http.log 2>&1 &
+          server_pid=$!
+          trap 'kill "$server_pid" 2>/dev/null || true' EXIT
+          for attempt in $(seq 1 12); do
+            status="$(curl --noproxy '*' --connect-timeout 2 --max-time 4 --silent -o /tmp/local-result -w '%{http_code}' http://127.0.0.1:3401/ || true)"
+            if [[ "$status" == "200" ]] && grep -q 'local-only-ok' /tmp/local-result; then
+              echo "PASS: GitHub runner can connect to local background Node HTTP server"
+              exit 0
+            fi
+            sleep 1
+          done
+          echo "::error::GitHub runner cannot reach a simple background Node HTTP server"
+          ss -ltnp | grep ':3401' || true
+          ps aux | grep '[n]ode' || true
+          exit 1

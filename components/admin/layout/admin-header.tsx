@@ -3,7 +3,14 @@
 import * as React from "react";
 import { usePathname, Link } from "@/i18n/routing";
 import { useTranslations } from "next-intl";
-import { UserButton } from "@clerk/nextjs";
+import dynamic from "next/dynamic";
+
+// Clerk is browser-initialized. Keep profile UI out of server markup to avoid
+// the admin header hydration mismatch observed in Chromium E2E.
+const ClientUserButton = dynamic(
+  () => import("@clerk/nextjs").then((mod) => mod.UserButton),
+  { ssr: false }
+);
 import { ThemeSwitcher } from "@/components/theme-switcher";
 import { LanguageSwitcher } from "@/components/language-switcher";
 import {
@@ -142,7 +149,7 @@ export function AdminHeader({ locale, onOpenMobileMenu }: AdminHeaderProps) {
 
         {/* Clerk User Profile */}
         <div className="shrink-0 flex items-center">
-          <UserButton
+          <ClientUserButton
             appearance={{
               elements: {
                 avatarBox: "w-8 h-8 rounded-lg ring-1 ring-border shadow-xs",

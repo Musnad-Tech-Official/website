@@ -1,0 +1,68 @@
+name: Staging browser test setup and manual E2E
+
+on:
+  push:
+    branches: [chore/staging-playwright-20261115]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  staging-setup-validation:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      - name: Test staging isolation guard
+        run: npm run test:staging-preflight
+      - name: Verify Playwright tests are discoverable without accessing services
+        run: npm run test:e2e:list
+      - name: Run existing isolated regression tests
+        run: |
+          npm run test:seo
+          npm run test:integrity
+          npm run test:admin
+      - name: Lint and type-check
+        run: |
+          npm run lint
+          npx tsc --noEmit
+      - name: Security scan
+        run: npm audit --omit=dev --audit-level=high
+
+  staging-browser:
+    if: github.event_name == 'workflow_dispatch' && github.ref != 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    environment: staging
+    env:
+      E2E_BASE_URL: ${{ vars.STAGING_BASE_URL }}
+      E2E_STAGING_SUPABASE_URL: ${{ vars.STAGING_SUPABASE_URL }}
+      E2E_STAGING_CLERK_PUBLISHABLE_KEY: ${{ vars.STAGING_CLERK_PUBLISHABLE_KEY }}
+      E2E_ISOLATED_DATABASE_CONFIRMED: ${{ vars.STAGING_ISOLATED_CONFIRMED }}
+      E2E_VERCEL_OIDC_TOKEN: ${{ secrets.STAGING_VERCEL_OIDC_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - name: Fail unless staging is explicitly isolated
+        run: node scripts/assert-staging-environment.mjs
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - name: Run read-only bilingual browser checks
+        run: npm run test:e2e
+      - name: Note authenticated-coverage requirement
+        if: always()
+        run: echo "Skipped admin/member browser-state checks do not count as live auth verification."

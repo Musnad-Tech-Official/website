@@ -73,19 +73,18 @@ export function useToggleProjectStatusMutation() {
     },
     onMutate: async ({ id, newStatus }) => {
       await queryClient.cancelQueries({ queryKey: projectKeys.all });
-      const previous = queryClient.getQueryData<Project[]>(projectKeys.lists());
-
-      if (previous) {
-        queryClient.setQueryData<Project[]>(
-          projectKeys.lists(),
-          previous.map((p) => (p.id === id ? { ...p, status: newStatus } : p))
-        );
-      }
+      // Project list queries use ["projects", "list", filters] keys, not
+      // the bare ["projects", "list"] prefix. Update all mounted filtered lists.
+      const previous = queryClient.getQueriesData<Project[]>({ queryKey: projectKeys.lists() });
+      queryClient.setQueriesData<Project[]>(
+        { queryKey: projectKeys.lists() },
+        (items) => items?.map((p) => (p.id === id ? { ...p, status: newStatus } : p))
+      );
       return { previous };
     },
     onError: (_err, _vars, context) => {
-      if (context?.previous) {
-        queryClient.setQueryData(projectKeys.lists(), context.previous);
+      for (const [key, data] of context?.previous ?? []) {
+        queryClient.setQueryData(key, data);
       }
     },
     onSettled: () => {

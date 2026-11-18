@@ -13,9 +13,12 @@ interface AdminShellProps {
 export function AdminShell({ children, locale }: AdminShellProps) {
   const [isMobileOpen, setIsMobileOpen] = React.useState(false);
   const [isCollapsed, setIsCollapsed] = React.useState(false);
+  const [hasHydrated, setHasHydrated] = React.useState(false);
+
+  React.useEffect(() => setHasHydrated(true), []);
 
   return (
-    <div className="min-h-screen bg-background text-foreground antialiased selection:bg-primary/20">
+    <div data-admin-hydrated={hasHydrated ? "true" : "false"} className="min-h-screen bg-background text-foreground antialiased selection:bg-primary/20">
       {/* Sidebar - Fixed to viewport */}
       <AdminSidebar
         locale={locale}

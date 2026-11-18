@@ -26,6 +26,11 @@ export function ContactForm({ className }: ContactFormProps) {
   const t = useTranslations("Contact.form");
 
   // Form State
+  // Client-ready marker prevents automated and fast user interactions from
+  // submitting before React has attached the controlled form handlers.
+  const [hasHydrated, setHasHydrated] = React.useState(false);
+  React.useEffect(() => setHasHydrated(true), []);
+
   const [inquiryType, setInquiryType] = React.useState<string>("project");
   const [name, setName] = React.useState<string>("");
   const [email, setEmail] = React.useState<string>("");
@@ -125,6 +130,7 @@ export function ContactForm({ className }: ContactFormProps) {
       )}
     >
       <form
+        data-contact-hydrated={hasHydrated ? "true" : "false"}
         onSubmit={handleSubmit}
         noValidate
         className="space-y-6"

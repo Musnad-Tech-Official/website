@@ -1,0 +1,274 @@
+name: Free browser smoke with local Next.js and Supabase
+
+on:
+  push:
+    branches: [chore/staging-playwright-20261115]
+    paths:
+      - .github/workflows/free-browser-smoke.yml
+      - scripts/export-local-supabase-ci.mjs
+      - scripts/e2e-clerk-dev-users.mjs
+      - tests/e2e/authorization.spec.ts
+      - tests/e2e/clerk.setup.ts
+      - tests/e2e/clerk-test-auth.ts
+      - tests/e2e/admin-services-crud.spec.ts
+      - tests/e2e/admin-team-crud.spec.ts
+      - tests/e2e/admin-content-helpers.ts
+      - tests/e2e/admin-projects-crud.spec.ts
+      - tests/e2e/admin-articles-crud.spec.ts
+      - tests/e2e/admin-publication-media.spec.ts
+      - tests/e2e/admin-careers-faqs.spec.ts
+      - tests/e2e/admin-marketing-content.spec.ts
+      - tests/e2e/admin-inquiries-comments-settings.spec.ts
+      - tests/e2e/admin-users-clerk.spec.ts
+      - tests/e2e/admin-pages-technologies.spec.ts
+      - tests/e2e/admin-about-cms.spec.ts
+      - tests/staging/seed.sql
+      - components/admin/technologies/technologies-client.tsx
+      - lib/comments/actions.ts
+      - tests/e2e/admin-modules-routes.spec.ts
+      - lib/about/actions.ts
+      - app/**/admin/about/page.tsx
+      - components/admin/about/about-client.tsx
+      - components/admin/layout/admin-header.tsx
+      - components/admin/layout/admin-shell.tsx
+      - playwright.config.ts
+  pull_request:
+    branches: [test/integration-security-admin-20261115]
+    paths:
+      - .github/workflows/free-browser-smoke.yml
+      - scripts/export-local-supabase-ci.mjs
+      - scripts/e2e-clerk-dev-users.mjs
+      - tests/e2e/authorization.spec.ts
+      - tests/e2e/clerk.setup.ts
+      - tests/e2e/clerk-test-auth.ts
+      - tests/e2e/admin-services-crud.spec.ts
+      - tests/e2e/admin-team-crud.spec.ts
+      - tests/e2e/admin-content-helpers.ts
+      - tests/e2e/admin-projects-crud.spec.ts
+      - tests/e2e/admin-articles-crud.spec.ts
+      - tests/e2e/admin-publication-media.spec.ts
+      - tests/e2e/admin-careers-faqs.spec.ts
+      - tests/e2e/admin-marketing-content.spec.ts
+      - tests/e2e/admin-inquiries-comments-settings.spec.ts
+      - tests/e2e/admin-users-clerk.spec.ts
+      - tests/e2e/admin-pages-technologies.spec.ts
+      - tests/e2e/admin-about-cms.spec.ts
+      - tests/staging/seed.sql
+      - components/admin/technologies/technologies-client.tsx
+      - lib/comments/actions.ts
+      - tests/e2e/admin-modules-routes.spec.ts
+      - lib/about/actions.ts
+      - app/**/admin/about/page.tsx
+      - components/admin/about/about-client.tsx
+      - components/admin/layout/admin-header.tsx
+      - components/admin/layout/admin-shell.tsx
+      - playwright.config.ts
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  clerk-development-credentials:
+    name: Confirm real Clerk Development key exists
+    runs-on: ubuntu-latest
+    outputs:
+      ready: ${{ steps.check.outputs.ready }}
+    steps:
+      - id: check
+        env:
+          DEV_CLERK_SECRET: ${{ secrets.MUSNAD_E2E_CLERK_DEV_SECRET_KEY }}
+        run: |
+          if [[ "${DEV_CLERK_SECRET:-}" == sk_test_* ]]; then
+            echo 'ready=true' >> "$GITHUB_OUTPUT"
+            echo 'Clerk Development key configured; browser checks may proceed.'
+          else
+            echo 'ready=false' >> "$GITHUB_OUTPUT"
+            echo '::error::Browser E2E not run: add repository secret MUSNAD_E2E_CLERK_DEV_SECRET_KEY from Clerk Development, NEVER Production.'
+            exit 1
+          fi
+
+  local-browser:
+    needs: clerk-development-credentials
+    if: needs.clerk-development-credentials.outputs.ready == 'true'
+    name: Isolated anonymous and authenticated browser tests (test-only Clerk)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      CLERK_SECRET_KEY: ${{ secrets.MUSNAD_E2E_CLERK_DEV_SECRET_KEY }}
+      E2E_CLERK_DEV_AUTH: "true"
+      CLERK_PUBLISHABLE_KEY: pk_test_dmlhYmxlLW1vdGgtMTgxNC5jbGVyay5hY2NvdW50cy5kZXYk
+      E2E_BASE_URL: http://localhost:3000
+      E2E_ISOLATED_DATABASE_CONFIRMED: "true"
+      SITE_INDEXABLE: "false"
+      NEXT_PUBLIC_SITE_URL: http://localhost:3000
+      NEXT_TELEMETRY_DISABLED: "1"
+      # This is the PUBLIC development publishable key of the existing Musnad
+      # Clerk development instance, not the live/production key.
+      NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: pk_test_dmlhYmxlLW1vdGgtMTgxNC5jbGVyay5hY2NvdW50cy5kZXYk
+      E2E_STAGING_CLERK_PUBLISHABLE_KEY: pk_test_dmlhYmxlLW1vdGgtMTgxNC5jbGVyay5hY2NvdW50cy5kZXYk
+      NEXT_PUBLIC_CLERK_SIGN_IN_URL: /sign-in
+      NEXT_PUBLIC_CLERK_SIGN_UP_URL: /sign-up
+      NEXT_PUBLIC_CLERK_SIGN_IN_FALLBACK_REDIRECT_URL: /
+      NEXT_PUBLIC_CLERK_SIGN_UP_FALLBACK_REDIRECT_URL: /
+    steps:
+      - name: Checkout isolated test branch
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install pinned Clerk testing helper (CI only)
+        run: npm install --no-save --package-lock=false --ignore-scripts --no-audit --no-fund @clerk/testing@2.2.50
+
+      - name: Typecheck application and expanded browser tests
+        run: npx tsc --noEmit
+
+      - name: Install browser
+        run: npx playwright install --with-deps chromium
+
+      - name: Use pinned Supabase local CLI
+        uses: supabase/setup-cli@v3
+        with:
+          version: 3.1.0
+
+      - name: Prepare schema and seed from approved sources
+        run: |
+          set -euo pipefail
+          supabase init --force
+          # Restrict the existing Clerk config to our Development domain.
+          # This is the disposable CLI-generated local Supabase config only.
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          import tomllib
+
+          path = Path("supabase/config.toml")
+          contents = path.read_text(encoding="utf-8")
+          section = '[auth.third_party.clerk]'
+          replacement = section + '\n' + 'enabled = true\n' + 'domain = "viable-moth-1814.clerk.accounts.dev"\n\n'
+          pattern = r'(?ms)^\[auth\.third_party\.clerk\]\n.*?(?=^\[|\Z)'
+          matches = list(re.finditer(pattern, contents))
+          if len(matches) > 1:
+              raise RuntimeError("Refusing multiple Clerk integration sections.")
+          contents = re.sub(pattern, lambda _: replacement, contents, count=1) if matches else contents + '\n' + replacement
+          data = tomllib.loads(contents)
+          conf = data["auth"]["third_party"]["clerk"]
+          if conf.get("enabled") is not True or conf.get("domain") != "viable-moth-1814.clerk.accounts.dev":
+              raise RuntimeError("Clerk Development JWT trust configuration did not validate.")
+          path.write_text(contents, encoding="utf-8")
+          print("Validated local-only Clerk Development JWT trust configuration.")
+          PY
+          supabase migration new local_schema
+          target="$(find supabase/migrations -maxdepth 1 -type f -name '*_local_schema.sql' | head -n 1)"
+          test -n "$target"
+          node scripts/build-local-supabase-schema.mjs "$target"
+          cp tests/staging/seed.sql supabase/seed.sql
+
+      - name: Start isolated Supabase (no cloud project)
+        run: |
+          set -euo pipefail
+          supabase start -x realtime,postgres-meta,studio,edge-runtime,logflare,vector,supavisor > /tmp/musnad-local-start.log 2>&1 || {
+            tail -n 70 /tmp/musnad-local-start.log
+            exit 1
+          }
+          # Storage API and imgproxy must be running for real local media upload tests.
+          storage_status="$(curl --noproxy '*' --silent --connect-timeout 3 --max-time 8 -o /dev/null -w '%{http_code}' http://127.0.0.1:54321/storage/v1/bucket || true)"
+          if [[ "$storage_status" == "000" || -z "$storage_status" ]]; then
+            echo "::error::Local Storage API is unreachable; do not skip media E2E."
+            exit 1
+          fi
+          supabase status -o env > /tmp/musnad-local-status.env
+          chmod 600 /tmp/musnad-local-status.env
+          node scripts/smoke-local-supabase.mjs /tmp/musnad-local-status.env
+          node scripts/export-local-supabase-ci.mjs /tmp/musnad-local-status.env "$GITHUB_ENV"
+
+      - name: Test outbound public dependencies (no secret transmitted)
+        run: |
+          for endpoint in https://fonts.googleapis.com https://fonts.gstatic.com https://viable-moth-1814.clerk.accounts.dev; do
+            status="$(curl --silent --noproxy '*' --connect-timeout 5 --max-time 12 -o /dev/null -w '%{http_code}' "$endpoint" || true)"
+            echo "Outbound dependency $endpoint: HTTP ${status:-000}"
+          done
+
+      - name: Verify local target cannot access production
+        run: node scripts/assert-staging-environment.mjs
+
+      - name: Start Next.js local dev server (bounded readiness check)
+        run: |
+          set -euo pipefail
+          # Isolate dev-bundler effects after repeated Turbopack route timeouts.
+          npm run dev -- --webpack --hostname localhost > /tmp/musnad-local-next.log 2>&1 &
+          echo "$!" > /tmp/musnad-next.pid
+          # A static response proves the local HTTP server is accepting connections.
+          # Dynamic page correctness is asserted separately by Playwright.
+          last_status="not_checked"
+          for i in $(seq 1 24); do
+            last_status="$(curl --noproxy '*' --silent --connect-timeout 2 --max-time 4 -o /dev/null -w '%{http_code}' http://localhost:3000/favicon.ico 2>/dev/null || true)"
+            if [[ "$last_status" == "200" ]]; then
+              echo "Local Next.js static HTTP server is ready; Playwright will test dynamic pages."
+              exit 0
+            fi
+            if [[ "$i" == 1 || "$i" == 12 || "$i" == 24 ]]; then
+              echo "Static HTTP readiness: ${last_status:-000} at attempt $i"
+            fi
+            sleep 2
+          done
+          echo "::error::Local Next.js static asset did not return HTTP 200 (last status: ${last_status:-000})."
+          echo "Diagnostic: TCP listeners on application ports"
+          ss -ltnp | grep -E ':3000|:3001|:3333' || true
+          echo "Diagnostic: Next.js process state (PID, parent, state, command)"
+          ps -eo pid,ppid,stat,comm,args | grep -E '[n]ext-server|[n]ext dev|[n]pm run dev' | head -n 15 || true
+          echo "Diagnostic: connection failure category"
+          curl --noproxy '*' --connect-timeout 3 --max-time 5 --verbose --output /dev/null http://localhost:3000/favicon.ico 2>&1 | grep -E 'Failed to connect|Connection refused|Connected to|Operation timed out|HTTP/[0-9]' | head -n 8 || true
+          tail -n 80 /tmp/musnad-local-next.log | sed -E 's/(sk_test_|pk_test_|eyJ)[a-zA-Z0-9_.=+-]+/[REDACTED]/g'
+          exit 1
+
+      - name: Verify a real dynamic route before browser checks
+        run: |
+          set -euo pipefail
+          # Cold compiling a route can take longer than Playwright's navigation budget.
+          status="$(curl --noproxy '*' --silent --show-error --connect-timeout 3 --max-time 90 -o /dev/null -w '%{http_code}' http://localhost:3000/ar || true)"
+          if [[ "$status" != "200" ]]; then
+            echo "::error::Local Arabic homepage did not complete HTTP 200 (status: ${status:-000})."
+            echo "Application diagnostics (secrets masked):"
+            tail -n 100 /tmp/musnad-local-next.log | sed -E 's/(sk_test_|pk_test_|eyJ)[a-zA-Z0-9_.=+-]+/[REDACTED]/g'
+            exit 1
+          fi
+          echo "Isolated dynamic homepage responded HTTP 200; starting Chromium."
+
+      - name: Create two disposable Clerk Development-only users
+        run: node scripts/e2e-clerk-dev-users.mjs create
+
+      - name: Run Playwright routes and isolated synthetic admin CRUD (bounded failures)
+        run: npm run test:e2e -- --max-failures=3 --workers=1
+
+      - name: Capture sanitized local Next.js diagnostics on browser failure
+        if: failure()
+        run: |
+          if test -f /tmp/musnad-local-next.log; then
+            echo "Local Next.js log (filtered tokens and keys):"
+            tail -n 150 /tmp/musnad-local-next.log | sed -E 's/(sk_test_|pk_test_|eyJ)[a-zA-Z0-9_.=+-]+/[REDACTED]/g'
+          fi
+
+      - name: Cleanup temporary Clerk Development accounts, local app and DB
+        if: always()
+        run: |
+          cleanup_error=0
+          if test -f /tmp/musnad-clerk-dev-e2e-users.json; then
+            node scripts/e2e-clerk-dev-users.mjs cleanup || cleanup_error=1
+          fi
+          if test -f /tmp/musnad-next.pid; then
+            kill "$(cat /tmp/musnad-next.pid)" 2>/dev/null || true
+          fi
+          supabase stop --no-backup || true
+          if [[ "$cleanup_error" -ne 0 ]]; then
+            echo "::error::Temporary Clerk Development test users require manual cleanup review."
+            exit 1
+          fi
