@@ -15,7 +15,11 @@ test.describe("isolated page visibility and technologies", () => {
     expect(response?.status()).toBe(200);
     await expect(page.locator('[data-admin-hydrated="true"]')).toBeVisible();
 
-    const row = page.locator("tbody tr").filter({ hasText: "Contact CI Route" });
+    // Locate the contact route by its stable path, not by the seed title.
+    const contactRow = () => page.locator("tbody tr").filter({
+      has: page.locator("code").filter({ hasText: /^\/contact$/ }),
+    });
+    const row = contactRow();
     await expect(row).toHaveCount(1, { timeout: 15_000 });
     const guest = await browser.newContext({ baseURL: "http://localhost:3000" });
     try {
@@ -25,7 +29,7 @@ test.describe("isolated page visibility and technologies", () => {
 
       await row.getByRole("button", { name: "Hidden", exact: true }).click();
       await page.reload({ waitUntil: "domcontentloaded" });
-      await expect(page.locator("tbody tr").filter({ hasText: "Contact CI Route" })
+      await expect(contactRow()
         .getByRole("button", { name: "Hidden", exact: true })).toHaveClass(/bg-rose-500/);
       for (const locale of ["en", "ar"]) {
         expect((await guest.request.get("/" + locale + "/contact")).status(),
@@ -35,7 +39,7 @@ test.describe("isolated page visibility and technologies", () => {
       await expect(page.locator('[data-admin-hydrated="true"]')).toBeVisible();
       await row.getByRole("button", { name: "Maint", exact: true }).click();
       await page.reload({ waitUntil: "domcontentloaded" });
-      await expect(page.locator("tbody tr").filter({ hasText: "Contact CI Route" })
+      await expect(contactRow()
         .getByRole("button", { name: "Maint", exact: true })).toHaveClass(/bg-amber-500/);
       for (const locale of ["en", "ar"]) {
         const resp = await guest.request.get("/" + locale + "/contact");
