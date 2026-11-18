@@ -126,7 +126,7 @@ test.describe("isolated marketing CMS write and visibility checks", () => {
     await dialog.getByRole("button", { name: "Save Banner" }).click();
     await expect(dialog).toBeHidden({ timeout: 22_000 });
     await page.reload({ waitUntil: "domcontentloaded" });
-    card = page.getByText(revised, { exact: true }).locator(cardAncestor);
+    card = page.getByText(revised, { exact: true }).last().locator(cardAncestor);
     await expect(card).toContainText("Off");
     const anon = await browser.newContext({ baseURL: "http://localhost:3000" });
     try {
@@ -138,7 +138,7 @@ test.describe("isolated marketing CMS write and visibility checks", () => {
       await page.reload({ waitUntil: "domcontentloaded" });
       html = await (await anon.request.get("/en")).text();
       expect(html).toContain(revised);
-      card = page.getByText(revised, { exact: true }).locator(cardAncestor);
+      card = page.getByText(revised, { exact: true }).last().locator(cardAncestor);
       await expect(page.locator('[data-admin-hydrated="true"]')).toBeVisible();
       await card.getByRole("switch").uncheck({ force: true });
       await expect(card).toContainText("Off", { timeout: 15_000 });
@@ -148,7 +148,7 @@ test.describe("isolated marketing CMS write and visibility checks", () => {
       await anon.close();
     }
     await page.reload({ waitUntil: "domcontentloaded" });
-    card = page.getByText(revised, { exact: true }).locator(cardAncestor);
+    card = page.getByText(revised, { exact: true }).last().locator(cardAncestor);
     const confirm = await openAdminDeleteConfirmation(page, card.getByRole("button").last(), "Delete Announcement Banner");
     await confirm.getByRole("button", { name: "Delete" }).click();
     await expect(confirm).toBeHidden({ timeout: 22_000 });
