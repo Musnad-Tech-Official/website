@@ -74,6 +74,8 @@ test.describe("publication and storage visibility: local Supabase only", () => {
 
       // Publish via existing admin UI; confirm real anonymous SSR HTML after reload.
       await row.getByRole("button", { name: "Draft" }).click();
+      await expect(page.getByText("Project status updated to published", { exact: true }))
+        .toBeVisible({ timeout: 15_000 });
       await expect(row.getByRole("button", { name: "Published" })).toBeVisible({ timeout: 15_000 });
       await page.reload({ waitUntil: "domcontentloaded" });
       row = page.locator("tbody tr").filter({ hasText: titleEn });
@@ -87,6 +89,8 @@ test.describe("publication and storage visibility: local Supabase only", () => {
       }
 
       await row.getByRole("button", { name: "Published" }).click();
+      await expect(page.getByText("Project status updated to draft", { exact: true }))
+        .toBeVisible({ timeout: 15_000 });
       await expect(row.getByRole("button", { name: "Draft" })).toBeVisible({ timeout: 15_000 });
       await page.reload({ waitUntil: "domcontentloaded" });
       for (const url of [publicEn, publicAr]) {
@@ -170,6 +174,8 @@ test.describe("publication and storage visibility: local Supabase only", () => {
       }
 
       await row.getByRole("button", { name: "Draft" }).click();
+      await expect(page.getByText("Article status updated to published", { exact: true }))
+        .toBeVisible({ timeout: 15_000 });
       await expect(row.getByRole("button", { name: "Published" })).toBeVisible({ timeout: 15_000 });
       await page.reload({ waitUntil: "domcontentloaded" });
       row = page.locator("tbody tr").filter({ hasText: titleEn });
@@ -182,6 +188,8 @@ test.describe("publication and storage visibility: local Supabase only", () => {
       }
 
       await row.getByRole("button", { name: "Published" }).click();
+      await expect(page.getByText("Article status updated to draft", { exact: true }))
+        .toBeVisible({ timeout: 15_000 });
       await expect(row.getByRole("button", { name: "Draft" })).toBeVisible({ timeout: 15_000 });
       await page.reload({ waitUntil: "domcontentloaded" });
       for (const url of [publicEn, publicAr]) {
