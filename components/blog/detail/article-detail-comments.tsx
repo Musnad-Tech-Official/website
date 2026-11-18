@@ -313,6 +313,8 @@ export function ArticleDetailComments({
 
   const [newComment, setNewComment] = useState("");
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [isHydrated, setIsHydrated] = useState(false);
+  React.useEffect(() => { setIsHydrated(true); }, []);
 
   // TanStack Query for live comments management
   const { data: comments = initialComments, isLoading } = useArticleCommentsQuery(
@@ -353,6 +355,7 @@ export function ArticleDetailComments({
   return (
     <section
       aria-labelledby="comments-heading"
+      data-comments-hydrated={isHydrated ? "true" : undefined}
       className={cn("py-12 sm:py-16 border-t border-border/60", className)}
     >
       {/* 1. Header & Section Title with Count Badge */}
