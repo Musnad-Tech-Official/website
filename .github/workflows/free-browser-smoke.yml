@@ -20,6 +20,10 @@ on:
       - tests/e2e/admin-marketing-content.spec.ts
       - tests/e2e/admin-inquiries-comments-settings.spec.ts
       - tests/e2e/admin-users-clerk.spec.ts
+      - tests/e2e/admin-pages-technologies.spec.ts
+      - tests/e2e/admin-about-cms.spec.ts
+      - tests/staging/seed.sql
+      - components/admin/technologies/technologies-client.tsx
       - lib/comments/actions.ts
       - tests/e2e/admin-modules-routes.spec.ts
       - lib/about/actions.ts
@@ -47,6 +51,10 @@ on:
       - tests/e2e/admin-marketing-content.spec.ts
       - tests/e2e/admin-inquiries-comments-settings.spec.ts
       - tests/e2e/admin-users-clerk.spec.ts
+      - tests/e2e/admin-pages-technologies.spec.ts
+      - tests/e2e/admin-about-cms.spec.ts
+      - tests/staging/seed.sql
+      - components/admin/technologies/technologies-client.tsx
       - lib/comments/actions.ts
       - tests/e2e/admin-modules-routes.spec.ts
       - lib/about/actions.ts
@@ -119,6 +127,9 @@ jobs:
 
       - name: Install pinned Clerk testing helper (CI only)
         run: npm install --no-save --package-lock=false --ignore-scripts --no-audit --no-fund @clerk/testing@2.2.50
+
+      - name: Typecheck application and expanded browser tests
+        run: npx tsc --noEmit
 
       - name: Install browser
         run: npx playwright install --with-deps chromium
