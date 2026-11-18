@@ -128,8 +128,10 @@ test.describe("isolated careers and FAQ administration", () => {
     await page.reload({ waitUntil: "domcontentloaded" });
     await expect(page.getByText(question, { exact: true })).toHaveCount(0);
 
+    await expect(page.locator('[data-admin-hydrated="true"]')).toBeVisible({ timeout: 20_000 });
     await page.getByRole("button", { name: /Topics & Categories/ }).click();
     const topicCard = page.getByRole("heading", { name: topic, exact: true }).locator(parentCard);
+    await expect(topicCard).toBeVisible({ timeout: 12_000 });
     const deleteTopic = await openAdminDeleteConfirmation(page, topicCard.getByRole("button", { name: "Delete" }), "Confirm Deletion");
     await deleteTopic.getByRole("button", { name: "Delete" }).click();
     await expect(deleteTopic).toBeHidden({ timeout: 20_000 });
