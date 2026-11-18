@@ -39,7 +39,7 @@ test.describe("isolated careers and FAQ administration", () => {
     await expect(card).toContainText("Active");
 
     await expect(page.locator('[data-admin-hydrated="true"]')).toBeVisible();
-    await card.getByRole("switch").uncheck({ force: true });
+    await card.getByRole("switch").locator("xpath=parent::label").click();
     await expect(card).toContainText("Inactive");
     await page.reload({ waitUntil: "domcontentloaded" });
     card = page.getByText(title, { exact: true }).locator(parentCard);
@@ -91,6 +91,7 @@ test.describe("isolated careers and FAQ administration", () => {
     await expect(modal).toBeHidden({ timeout: 20_000 });
 
     await page.reload({ waitUntil: "domcontentloaded" });
+    await expect(page.locator('[data-admin-hydrated="true"]')).toBeVisible({ timeout: 20_000 });
     await page.getByRole("button", { name: /Topics & Categories/ }).click();
     await expect(page.getByRole("heading", { name: topic, exact: true })).toBeVisible({ timeout: 15_000 });
 
@@ -133,6 +134,7 @@ test.describe("isolated careers and FAQ administration", () => {
     await deleteTopic.getByRole("button", { name: "Delete" }).click();
     await expect(deleteTopic).toBeHidden({ timeout: 20_000 });
     await page.reload({ waitUntil: "domcontentloaded" });
+    await expect(page.locator('[data-admin-hydrated="true"]')).toBeVisible({ timeout: 20_000 });
     await page.getByRole("button", { name: /Topics & Categories/ }).click();
     await expect(page.getByRole("heading", { name: topic, exact: true })).toHaveCount(0);
   });
