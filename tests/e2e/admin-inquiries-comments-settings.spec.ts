@@ -20,6 +20,7 @@ test.describe("isolated contact, moderation and settings workflows", () => {
       const publicPage = await guest.newPage();
       const res = await publicPage.goto("/en/contact", { waitUntil: "domcontentloaded" });
       expect(res?.status()).toBe(200);
+      await expect(publicPage.locator('[data-contact-hydrated="true"]')).toBeVisible({ timeout: 20_000 });
       await publicPage.locator("#contact-name").fill(clientName);
       await publicPage.locator("#contact-email").fill(clientEmail);
       await publicPage.locator("#contact-message").fill(message);
@@ -93,6 +94,20 @@ test.describe("isolated contact, moderation and settings workflows", () => {
       await commentArea.locator('textarea[required]').fill(comment);
       await commentArea.locator('form button[type="submit"]').first().click();
       await expect(commentArea.getByText(comment, { exact: true })).toBeVisible({ timeout: 20_000 });
+
+      // Independently prove durability and public RLS with the local PostgREST API,
+      // not just the post-submit client cache. Never use a remote database.
+      const localAnonKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
+      if (!localAnonKey) throw Error("No local Supabase public test key.");
+      const stored = await page.request.get(
+        "http://127.0.0.1:54321/rest/v1/article_comments?article_slug=eq." +
+        encodeURIComponent(slug) + "&select=id,content,status",
+        { headers: { apikey: localAnonKey, Authorization: "Bearer " + localAnonKey } },
+      );
+      expect(stored.status(), "Local approved comments must be readable via RLS").toBe(200);
+      const rows = (await stored.json()) as Array<{ content: string; status: string }>;
+      expect(rows.filter((row) => row.content === comment && row.status === "approved")).toHaveLength(1);
+
       await memberPage.reload({ waitUntil: "domcontentloaded" });
       await expect(memberPage.getByText(comment, { exact: true })).toBeVisible({ timeout: 20_000 });
 
