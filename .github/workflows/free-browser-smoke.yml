@@ -17,6 +17,7 @@ on:
       - tests/e2e/admin-articles-crud.spec.ts
       - tests/e2e/admin-publication-media.spec.ts
       - tests/e2e/admin-careers-faqs.spec.ts
+      - tests/e2e/admin-marketing-content.spec.ts
       - tests/e2e/admin-modules-routes.spec.ts
       - lib/about/actions.ts
       - app/**/admin/about/page.tsx
@@ -40,6 +41,7 @@ on:
       - tests/e2e/admin-articles-crud.spec.ts
       - tests/e2e/admin-publication-media.spec.ts
       - tests/e2e/admin-careers-faqs.spec.ts
+      - tests/e2e/admin-marketing-content.spec.ts
       - tests/e2e/admin-modules-routes.spec.ts
       - lib/about/actions.ts
       - app/**/admin/about/page.tsx
