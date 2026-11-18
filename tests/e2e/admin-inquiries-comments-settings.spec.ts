@@ -91,8 +91,16 @@ test.describe("isolated contact, moderation and settings workflows", () => {
       expect(memberResponse?.status()).toBe(200);
       const commentArea = memberPage.locator('section[aria-labelledby="comments-heading"]');
       await expect(commentArea.locator('textarea[required]')).toBeVisible({ timeout: 15_000 });
-      await commentArea.locator('textarea[required]').fill(comment);
+      const input = commentArea.locator('textarea[required]');
+      await input.fill(comment);
       await commentArea.locator('form button[type="submit"]').first().click();
+      // An unchanged textarea can match getByText even when posting failed.
+      // The form clears only on a confirmed successful server action.
+      await expect.poll(async () => {
+        if ((await input.inputValue()) === "") return "submitted";
+        const errors = await commentArea.locator("p.text-destructive").allTextContents();
+        return errors.join(" | ") || "posting-or-failed";
+      }, { timeout: 20_000, message: "Member comment must be saved before clearing the editor" }).toBe("submitted");
       await expect(commentArea.getByText(comment, { exact: true })).toBeVisible({ timeout: 20_000 });
       // A client cache update is not proof that the database committed.
       await memberPage.reload({ waitUntil: "domcontentloaded" });
