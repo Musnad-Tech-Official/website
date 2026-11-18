@@ -18,6 +18,9 @@ on:
       - tests/e2e/admin-publication-media.spec.ts
       - tests/e2e/admin-careers-faqs.spec.ts
       - tests/e2e/admin-marketing-content.spec.ts
+      - tests/e2e/admin-inquiries-comments-settings.spec.ts
+      - tests/e2e/admin-users-clerk.spec.ts
+      - lib/comments/actions.ts
       - tests/e2e/admin-modules-routes.spec.ts
       - lib/about/actions.ts
       - app/**/admin/about/page.tsx
@@ -42,6 +45,9 @@ on:
       - tests/e2e/admin-publication-media.spec.ts
       - tests/e2e/admin-careers-faqs.spec.ts
       - tests/e2e/admin-marketing-content.spec.ts
+      - tests/e2e/admin-inquiries-comments-settings.spec.ts
+      - tests/e2e/admin-users-clerk.spec.ts
+      - lib/comments/actions.ts
       - tests/e2e/admin-modules-routes.spec.ts
       - lib/about/actions.ts
       - app/**/admin/about/page.tsx
@@ -158,10 +164,16 @@ jobs:
       - name: Start isolated Supabase (no cloud project)
         run: |
           set -euo pipefail
-          supabase start -x realtime,storage-api,imgproxy,postgres-meta,studio,edge-runtime,logflare,vector,supavisor > /tmp/musnad-local-start.log 2>&1 || {
+          supabase start -x realtime,postgres-meta,studio,edge-runtime,logflare,vector,supavisor > /tmp/musnad-local-start.log 2>&1 || {
             tail -n 70 /tmp/musnad-local-start.log
             exit 1
           }
+          # Storage API and imgproxy must be running for real local media upload tests.
+          storage_status="$(curl --noproxy '*' --silent --connect-timeout 3 --max-time 8 -o /dev/null -w '%{http_code}' http://127.0.0.1:54321/storage/v1/bucket || true)"
+          if [[ "$storage_status" == "000" || -z "$storage_status" ]]; then
+            echo "::error::Local Storage API is unreachable; do not skip media E2E."
+            exit 1
+          fi
           supabase status -o env > /tmp/musnad-local-status.env
           chmod 600 /tmp/musnad-local-status.env
           node scripts/smoke-local-supabase.mjs /tmp/musnad-local-status.env
