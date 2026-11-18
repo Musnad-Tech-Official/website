@@ -94,6 +94,9 @@ test.describe("isolated contact, moderation and settings workflows", () => {
       await commentArea.locator('textarea[required]').fill(comment);
       await commentArea.locator('form button[type="submit"]').first().click();
       await expect(commentArea.getByText(comment, { exact: true })).toBeVisible({ timeout: 20_000 });
+      // A client cache update is not proof that the database committed.
+      await memberPage.reload({ waitUntil: "domcontentloaded" });
+      await expect(memberPage.getByText(comment, { exact: true })).toBeVisible({ timeout: 20_000 });
 
       // Independently prove durability and public RLS with the local PostgREST API,
       // not just the post-submit client cache. Never use a remote database.
@@ -107,9 +110,6 @@ test.describe("isolated contact, moderation and settings workflows", () => {
       expect(stored.status(), "Local approved comments must be readable via RLS").toBe(200);
       const rows = (await stored.json()) as Array<{ content: string; status: string }>;
       expect(rows.filter((row) => row.content === comment && row.status === "approved")).toHaveLength(1);
-
-      await memberPage.reload({ waitUntil: "domcontentloaded" });
-      await expect(memberPage.getByText(comment, { exact: true })).toBeVisible({ timeout: 20_000 });
 
       await page.goto("/en/admin/comments", { waitUntil: "domcontentloaded" });
       let commentCard = page.getByText(comment, { exact: true })
