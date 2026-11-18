@@ -6,7 +6,7 @@ test.describe("isolated page visibility and technologies", () => {
   test.use({ storageState: { cookies: [], origins: [] } });
 
   test("contact route is live/hidden/maintenance/live in both languages", async ({ page, browser }) => {
-    test.setTimeout(125_000);
+    test.setTimeout(180_000);
     const email = process.env.E2E_ADMIN_EMAIL;
     requireIsolatedAdminCrd(email);
     await signInWithClerkTesting(page, email, "admin");
@@ -15,32 +15,40 @@ test.describe("isolated page visibility and technologies", () => {
     expect(response?.status()).toBe(200);
     await expect(page.locator('[data-admin-hydrated="true"]')).toBeVisible();
 
-    // Locate the contact route by its stable path, not by the seed title.
+    // Match the canonical path: the displayed title comes from the master inventory.
     const contactRow = () => page.locator("tbody tr").filter({
       has: page.locator("code").filter({ hasText: /^\/contact$/ }),
     });
-    const row = contactRow();
-    await expect(row).toHaveCount(1, { timeout: 15_000 });
+    await expect(contactRow()).toHaveCount(1, { timeout: 15_000 });
+
+    const changeStatus = async (button: "Live" | "Hidden" | "Maint", status: "live" | "hidden" | "maintenance", color: string) => {
+      await expect(page.locator('[data-admin-hydrated="true"]')).toBeVisible();
+      await contactRow().getByRole("button", { name: button, exact: true }).click();
+      // The UI updates optimistically: wait for an explicit server-action success
+      // before reloading, or a retried test can inherit partially written state.
+      await expect(page.getByText(`Updated "Contact & Consultations" status to ${status}`, { exact: true }))
+        .toBeVisible({ timeout: 20_000 });
+      await page.reload({ waitUntil: "domcontentloaded" });
+      await expect(page.locator('[data-admin-hydrated="true"]')).toBeVisible();
+      await expect(contactRow().getByRole("button", { name: button, exact: true }))
+        .toHaveClass(new RegExp(color), { timeout: 15_000 });
+    };
+
+    // Restore a known baseline even after a failed previous retry.
+    await changeStatus("Live", "live", "bg-emerald-500");
     const guest = await browser.newContext({ baseURL: "http://localhost:3000" });
     try {
       for (const locale of ["en", "ar"]) {
         expect((await guest.request.get("/" + locale + "/contact")).status()).toBe(200);
       }
 
-      await row.getByRole("button", { name: "Hidden", exact: true }).click();
-      await page.reload({ waitUntil: "domcontentloaded" });
-      await expect(contactRow()
-        .getByRole("button", { name: "Hidden", exact: true })).toHaveClass(/bg-rose-500/);
+      await changeStatus("Hidden", "hidden", "bg-rose-500");
       for (const locale of ["en", "ar"]) {
         expect((await guest.request.get("/" + locale + "/contact")).status(),
           "Hidden route must be HTTP 404 for anonymous visitor").toBe(404);
       }
 
-      await expect(page.locator('[data-admin-hydrated="true"]')).toBeVisible();
-      await row.getByRole("button", { name: "Maint", exact: true }).click();
-      await page.reload({ waitUntil: "domcontentloaded" });
-      await expect(contactRow()
-        .getByRole("button", { name: "Maint", exact: true })).toHaveClass(/bg-amber-500/);
+      await changeStatus("Maint", "maintenance", "bg-amber-500");
       for (const locale of ["en", "ar"]) {
         const resp = await guest.request.get("/" + locale + "/contact");
         expect(resp.status()).toBe(200);
@@ -48,9 +56,7 @@ test.describe("isolated page visibility and technologies", () => {
         expect(html).not.toContain("contact-email");
       }
 
-      await expect(page.locator('[data-admin-hydrated="true"]')).toBeVisible();
-      await row.getByRole("button", { name: "Live", exact: true }).click();
-      await page.reload({ waitUntil: "domcontentloaded" });
+      await changeStatus("Live", "live", "bg-emerald-500");
       for (const locale of ["en", "ar"]) {
         const resp = await guest.request.get("/" + locale + "/contact");
         expect(resp.status()).toBe(200);
@@ -58,6 +64,11 @@ test.describe("isolated page visibility and technologies", () => {
       }
     } finally {
       await guest.close();
+      // Ensure a failed test does not leave the contact route hidden for retries.
+      const liveButton = contactRow().getByRole("button", { name: "Live", exact: true });
+      if (!(await liveButton.getAttribute("class"))?.includes("bg-emerald-500")) {
+        await changeStatus("Live", "live", "bg-emerald-500");
+      }
     }
   });
 
