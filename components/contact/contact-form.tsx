@@ -22,14 +22,16 @@ import type { ContactFormProps } from "./contact-types";
  * ContactForm renders the full contact submission form matching the Page 28 structural reference,
  * now connected to the real inquiries engine and admin lead queue.
  */
+// React switches the server snapshot to the client snapshot after hydration.
+const subscribeHydration = () => () => {};
+
 export function ContactForm({ className }: ContactFormProps) {
   const t = useTranslations("Contact.form");
 
   // Form State
   // Client-ready marker prevents automated and fast user interactions from
   // submitting before React has attached the controlled form handlers.
-  const [hasHydrated, setHasHydrated] = React.useState(false);
-  React.useEffect(() => setHasHydrated(true), []);
+  const hasHydrated = React.useSyncExternalStore(subscribeHydration, () => true, () => false);
 
   const [inquiryType, setInquiryType] = React.useState<string>("project");
   const [name, setName] = React.useState<string>("");
