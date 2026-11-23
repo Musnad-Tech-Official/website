@@ -38,7 +38,7 @@ test.describe("isolated About Us company CMS", () => {
     await expect(page.locator('[data-admin-hydrated="true"]')).toBeVisible();
     await page.getByRole("button", { name: /Company Values/ }).click();
     await page.getByRole("button", { name: "Add Value" }).click();
-    let modal = page.getByRole("dialog");
+    const modal = page.getByRole("dialog");
     await expect(modal).toBeVisible();
     await modal.locator("input").nth(0).fill("ci-value-" + id.toLowerCase());
     await modal.locator("input").nth(1).fill(valueTitle);
@@ -50,7 +50,7 @@ test.describe("isolated About Us company CMS", () => {
     await page.reload({ waitUntil: "domcontentloaded" });
     await expect(page.locator('[data-admin-hydrated="true"]')).toBeVisible();
     await page.getByRole("button", { name: /Company Values/ }).click();
-    let card = page.getByRole("heading", { name: valueTitle, exact: true })
+    const card = page.getByRole("heading", { name: valueTitle, exact: true })
       .locator("xpath=ancestor::div[contains(@class,'justify-between') and contains(@class,'p-5')][1]");
     await expect(card).toContainText("Synthetic CI-only company value.", { timeout: 15_000 });
     const confirm = await openAdminDeleteConfirmation(page, card.getByRole("button", { name: "Delete" }), "Confirm Deletion");
