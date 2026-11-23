@@ -109,7 +109,11 @@ test.describe("isolated page visibility and technologies", () => {
     await expect(page.locator('[data-admin-hydrated="true"]')).toBeVisible();
     page.once("dialog", (dialog) => dialog.accept());
     await card.getByTitle("Delete").click();
+    // The technology disappears from React state only after the delete
+    // server action confirms success. Reloading immediately can cancel it.
+    await expect(page.getByText(name, { exact: true })).toHaveCount(0, { timeout: 20_000 });
     await page.reload({ waitUntil: "domcontentloaded" });
+    await expect(page.locator('[data-admin-hydrated="true"]')).toBeVisible();
     await expect(page.getByText(name, { exact: true })).toHaveCount(0);
   });
 });
