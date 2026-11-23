@@ -300,6 +300,9 @@ function CommentItem({
   );
 }
 
+// React switches the server snapshot to the client snapshot after hydration.
+const subscribeHydration = () => () => {};
+
 export function ArticleDetailComments({
   articleId,
   articleSlug,
@@ -313,8 +316,7 @@ export function ArticleDetailComments({
 
   const [newComment, setNewComment] = useState("");
   const [submitError, setSubmitError] = useState<string | null>(null);
-  const [isHydrated, setIsHydrated] = useState(false);
-  React.useEffect(() => { setIsHydrated(true); }, []);
+  const isHydrated = React.useSyncExternalStore(subscribeHydration, () => true, () => false);
 
   // TanStack Query for live comments management
   const { data: comments = initialComments, isLoading } = useArticleCommentsQuery(
