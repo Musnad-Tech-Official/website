@@ -72,7 +72,7 @@ test.describe("isolated contact, moderation and settings workflows", () => {
     const comment = "CI persistent member comment " + suffix;
 
     await signInWithClerkTesting(page, adminEmail, "admin");
-    let response = await page.goto("/en/admin/articles", { waitUntil: "domcontentloaded" });
+    const response = await page.goto("/en/admin/articles", { waitUntil: "domcontentloaded" });
     assertApplicationResponse(page.url());
     expect(response?.status()).toBe(200);
     const editor = await openAdminEditor(page, page.getByRole("button", { name: "New Article" }), "Create New Article");
