@@ -134,9 +134,15 @@ test.describe("isolated marketing CMS write and visibility checks", () => {
       const visitor = await anon.newPage();
       const publicBanner = visitor.getByRole("region", { name: "Announcement" });
       await visitor.goto("/en", { waitUntil: "domcontentloaded" });
-      await expect(publicBanner).toHaveCount(0);
+      // A failed previous attempt may leave a different announcement active.
+      // Assert only that this newly created, inactive announcement is absent.
+      await expect(publicBanner.filter({ hasText: revised })).toHaveCount(0);
       await expect(page.locator('[data-admin-hydrated="true"]')).toBeVisible();
       await card.getByRole("switch").check({ force: true });
+      // "Active" is an optimistic UI state; the success notice comes only
+      // after the Supabase update finishes.
+      await expect(page.getByText("Banner is now broadcasting live on website.", { exact: true }))
+        .toBeVisible({ timeout: 20_000 });
       await expect(card).toContainText("Active", { timeout: 15_000 });
       await page.reload({ waitUntil: "domcontentloaded" });
       await visitor.reload({ waitUntil: "domcontentloaded" });
@@ -144,10 +150,12 @@ test.describe("isolated marketing CMS write and visibility checks", () => {
       card = page.getByText(revised, { exact: true }).last().locator(cardAncestor);
       await expect(page.locator('[data-admin-hydrated="true"]')).toBeVisible();
       await card.getByRole("switch").uncheck({ force: true });
+      await expect(page.getByText("Banner broadcast turned off.", { exact: true }))
+        .toBeVisible({ timeout: 20_000 });
       await expect(card).toContainText("Off", { timeout: 15_000 });
       await page.reload({ waitUntil: "domcontentloaded" });
       await visitor.reload({ waitUntil: "domcontentloaded" });
-      await expect(publicBanner).toHaveCount(0);
+      await expect(publicBanner.filter({ hasText: revised })).toHaveCount(0);
     } finally {
       await anon.close();
     }
