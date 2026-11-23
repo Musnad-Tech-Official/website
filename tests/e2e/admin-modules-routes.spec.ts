@@ -27,17 +27,17 @@ test.describe("authenticated admin module route coverage", () => {
 
       await signInWithClerkTesting(page, email, "admin");
       const failures: string[] = [];
-      for (const module of modules) {
-        const path = "/" + locale + "/admin/" + module;
+      for (const moduleName of modules) {
+        const path = "/" + locale + "/admin/" + moduleName;
         try {
           const response = await page.goto(path, { waitUntil: "domcontentloaded", timeout: 25000 });
           assertApplicationResponse(page.url());
           const actualPath = new URL(page.url()).pathname.replace(/\/$/, "");
           if (response?.status() !== 200 || actualPath !== path) {
-            failures.push(module + ": HTTP " + (response?.status() ?? "no response") + ", final path " + actualPath);
+            failures.push(moduleName + ": HTTP " + (response?.status() ?? "no response") + ", final path " + actualPath);
           }
         } catch (err) {
-          failures.push(module + ": " + (err instanceof Error ? err.message.split("\n")[0] : "navigation failed"));
+          failures.push(moduleName + ": " + (err instanceof Error ? err.message.split("\n")[0] : "navigation failed"));
         }
       }
       expect(failures, "Admin module HTTP/path failures").toEqual([]);
