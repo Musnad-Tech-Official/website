@@ -177,6 +177,8 @@ test.describe("publication and storage visibility: local Supabase only", () => {
         expect(res.status(), "Draft article must return HTTP 404: " + url).toBe(404);
       }
 
+      // The article table can be server-rendered before its client handlers hydrate.
+      await expect(page.locator('[data-admin-hydrated="true"]')).toBeVisible();
       await row.getByRole("button", { name: "Draft" }).click();
       await expect(page.getByText("Article status updated to published", { exact: true }))
         .toBeVisible({ timeout: 15_000 });
@@ -191,6 +193,9 @@ test.describe("publication and storage visibility: local Supabase only", () => {
         expect(html).toContain(body);
       }
 
+      // Anonymous SSR requests above do not imply that the reloaded admin UI
+      // has hydrated. Without this, a click may hit inert server markup.
+      await expect(page.locator('[data-admin-hydrated="true"]')).toBeVisible();
       await row.getByRole("button", { name: "Published" }).click();
       await expect(page.getByText("Article status updated to draft", { exact: true }))
         .toBeVisible({ timeout: 15_000 });
