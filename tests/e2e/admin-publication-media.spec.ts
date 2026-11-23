@@ -73,6 +73,7 @@ test.describe("publication and storage visibility: local Supabase only", () => {
       }
 
       // Publish via existing admin UI; confirm real anonymous SSR HTML after reload.
+      await expect(page.locator('[data-admin-hydrated="true"]')).toBeVisible();
       await row.getByRole("button", { name: "Draft" }).click();
       await expect(page.getByText("Project status updated to published", { exact: true }))
         .toBeVisible({ timeout: 15_000 });
@@ -88,6 +89,9 @@ test.describe("publication and storage visibility: local Supabase only", () => {
         expect(html).toContain(body);
       }
 
+      // A server-rendered button can become visible before its React click
+      // handler is hydrated after navigation. Wait for the client boundary.
+      await expect(page.locator('[data-admin-hydrated="true"]')).toBeVisible();
       await row.getByRole("button", { name: "Published" }).click();
       await expect(page.getByText("Project status updated to draft", { exact: true }))
         .toBeVisible({ timeout: 15_000 });
