@@ -68,6 +68,12 @@ on:
 permissions:
   contents: read
 
+# Push and pull_request events for the same test branch must not launch
+# duplicate full browser suites against the same rate-limited Clerk dev instance.
+concurrency:
+  group: free-browser-${{ github.event.pull_request.head.ref || github.ref_name }}
+  cancel-in-progress: true
+
 jobs:
   clerk-development-credentials:
     name: Confirm real Clerk Development key exists
