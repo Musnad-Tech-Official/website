@@ -10,12 +10,13 @@ interface AdminShellProps {
   locale: string;
 }
 
+// React switches the server snapshot to the client snapshot after hydration.
+const subscribeHydration = () => () => {};
+
 export function AdminShell({ children, locale }: AdminShellProps) {
   const [isMobileOpen, setIsMobileOpen] = React.useState(false);
   const [isCollapsed, setIsCollapsed] = React.useState(false);
-  const [hasHydrated, setHasHydrated] = React.useState(false);
-
-  React.useEffect(() => setHasHydrated(true), []);
+  const hasHydrated = React.useSyncExternalStore(subscribeHydration, () => true, () => false);
 
   return (
     <div data-admin-hydrated={hasHydrated ? "true" : "false"} className="min-h-screen bg-background text-foreground antialiased selection:bg-primary/20">
