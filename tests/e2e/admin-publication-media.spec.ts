@@ -67,7 +67,7 @@ test.describe("publication and storage visibility: local Supabase only", () => {
     const anonymous = await browser.newContext({ baseURL: "http://localhost:3000" });
     try {
       for (const url of [publicEn, publicAr]) {
-        let publicResponse = await anonymous.request.get(url);
+        const publicResponse = await anonymous.request.get(url);
         expect(publicResponse.status(), "Draft project must return HTTP 404: " + url).toBe(404);
         expect(await publicResponse.text()).not.toContain(bodyEn);
       }
