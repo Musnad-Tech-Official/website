@@ -89,7 +89,12 @@ test.describe("isolated marketing CMS write and visibility checks", () => {
     await expect(card).toContainText(revisedQuote);
     const confirmation = await openAdminDeleteConfirmation(page, card.getByRole("button").last(), "Delete Testimonial");
     await confirmation.getByRole("button", { name: "Delete" }).click();
+    // The modal closes even when deletion fails. Require server-confirmed
+    // success and the updated UI before reloading to verify durability.
+    await expect(page.getByText("Testimonial deleted successfully.", { exact: true }))
+      .toBeVisible({ timeout: 22_000 });
     await expect(confirmation).toBeHidden({ timeout: 22_000 });
+    await expect(page.getByText(author, { exact: true })).toHaveCount(0);
     await page.reload({ waitUntil: "domcontentloaded" });
     await expect(page.getByText(author, { exact: true })).toHaveCount(0);
   });
