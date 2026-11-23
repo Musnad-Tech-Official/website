@@ -10,9 +10,6 @@ import type {
   ArticleCommentDbRow,
 } from "./types";
 
-// In-memory fallback comments store in case Supabase schema migration is pending
-const fallbackCommentsStore: Map<string, ArticleComment[]> = new Map();
-
 function mapRowToComment(row: ArticleCommentDbRow): ArticleComment {
   return {
     id: row.id,
@@ -76,9 +73,8 @@ export async function getArticleCommentsAction(articleSlug: string): Promise<Art
     console.error("getArticleCommentsAction exception:", err);
   }
 
-  // Graceful fallback to server memory cache
-  const cached = fallbackCommentsStore.get(articleSlug) || [];
-  return assembleCommentTree(cached);
+  // Do not substitute transient memory records for durable database comments.
+  return [];
 }
 
 /**
@@ -154,29 +150,18 @@ export async function addArticleCommentAction(
       created_at: newComment.createdAt,
       updated_at: newComment.updatedAt,
     });
-
     if (error) {
-      console.warn("Supabase insert comment notice:", error.message);
-      // Fallback in-memory persistence
-      const currentList = fallbackCommentsStore.get(params.articleSlug) || [];
-      currentList.push(newComment);
-      fallbackCommentsStore.set(params.articleSlug, currentList);
+      console.error("Comment persistence failed:", error.code);
+      return { success: false, error: "Comment was not saved. Please retry." };
     }
   } catch (err) {
-    console.error("addArticleCommentAction exception:", err);
-    // Fallback in-memory persistence
-    const currentList = fallbackCommentsStore.get(params.articleSlug) || [];
-    currentList.push(newComment);
-    fallbackCommentsStore.set(params.articleSlug, currentList);
+    console.error("addArticleCommentAction exception:", err instanceof Error ? err.message : "unknown");
+    return { success: false, error: "Comment was not saved. Please retry." };
   }
 
   revalidatePath(`/blog/${params.articleSlug}`);
   revalidatePath(`/projects/${params.articleSlug}`);
-
-  return {
-    success: true,
-    comment: newComment,
-  };
+  return { success: true, comment: newComment };
 }
 
 /**
@@ -200,33 +185,23 @@ export async function deleteArticleCommentAction(
 
   try {
     const supabase = await createClient();
-    let query = supabase.from("article_comments").delete().eq("id", commentId);
-
-    if (!isAdmin) {
-      query = query.eq("user_id", userId);
-    }
-
-    const { error } = await query;
-    if (error) {
-      console.warn("Supabase delete comment notice:", error.message);
+    let query = supabase.from("article_comments").delete({ count: "exact" }).eq("id", commentId);
+    if (articleSlug) query = query.eq("article_slug", articleSlug);
+    if (!isAdmin) query = query.eq("user_id", userId);
+    const { error, count } = await query;
+    if (error || count !== 1) {
+      console.error("Comment deletion failed:", error?.code || "not_found_or_forbidden");
+      return { success: false, error: "Comment could not be deleted." };
     }
   } catch (err) {
-    console.error("deleteArticleCommentAction exception:", err);
+    console.error("deleteArticleCommentAction exception:", err instanceof Error ? err.message : "unknown");
+    return { success: false, error: "Comment could not be deleted." };
   }
-
-  // Update fallback store if present
-  const currentList = fallbackCommentsStore.get(articleSlug) || [];
-  fallbackCommentsStore.set(
-    articleSlug,
-    currentList.filter((c) => c.id !== commentId && c.parentId !== commentId)
-  );
 
   revalidatePath(`/blog/${articleSlug}`);
   revalidatePath(`/projects/${articleSlug}`);
-
-  return {
-    success: true,
-  };
+  revalidatePath("/admin/comments");
+  return { success: true };
 }
 
 export interface AdminCommentFilters {
@@ -281,21 +256,6 @@ export async function getAllCommentsAdminAction(
     console.error("getAllCommentsAdminAction exception:", err);
   }
 
-  // Merge with fallback in-memory store if DB is empty or table pending
-  if (comments.length === 0) {
-    for (const [slug, list] of fallbackCommentsStore.entries()) {
-      if (filters?.articleSlug && filters.articleSlug !== "all" && slug !== filters.articleSlug) {
-        continue;
-      }
-      for (const item of list) {
-        if (!filters?.status || filters.status === "all" || item.status === filters.status) {
-          comments.push(item);
-        }
-      }
-    }
-    comments.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-  }
-
   // Apply search query filter if provided
   if (filters?.search && filters.search.trim()) {
     const q = filters.search.trim().toLowerCase();
@@ -325,34 +285,29 @@ export async function updateCommentStatusAction(
     return { success: false, error: "unauthorized" };
   }
 
-  try {
-    const supabase = await createClient();
-    const { error } = await supabase
-      .from("article_comments")
-      .update({ status, updated_at: new Date().toISOString() })
-      .eq("id", commentId);
-
-    if (error) {
-      console.warn("Supabase updateCommentStatusAction notice:", error.message);
-    }
-  } catch (err) {
-    console.error("updateCommentStatusAction exception:", err);
+  if (!["approved", "flagged", "pending"].includes(status)) {
+    return { success: false, error: "invalid_comment_status" };
   }
 
-  // Update in fallback store
-  for (const [, list] of fallbackCommentsStore.entries()) {
-    const target = list.find((c) => c.id === commentId);
-    if (target) {
-      target.status = status;
-      target.updatedAt = new Date().toISOString();
-      break;
+  try {
+    const supabase = await createClient();
+    const { error, count } = await supabase
+      .from("article_comments")
+      .update({ status, updated_at: new Date().toISOString() }, { count: "exact" })
+      .eq("id", commentId);
+
+    if (error || count !== 1) {
+      console.error("Comment moderation failed:", error?.code || "not_found");
+      return { success: false, error: "Comment moderation was not saved." };
     }
+  } catch (err) {
+    console.error("updateCommentStatusAction exception:", err instanceof Error ? err.message : "unknown");
+    return { success: false, error: "Comment moderation was not saved." };
   }
 
   revalidatePath("/admin/comments");
   revalidatePath("/blog");
   revalidatePath("/projects");
-
   return { success: true };
 }
 
@@ -385,20 +340,6 @@ export async function getCommentsStatsAdminAction(): Promise<AdminCommentsStats>
     console.error("getCommentsStatsAdminAction exception:", err);
   }
 
-  // Fallback stats
-  let total = 0;
-  let approved = 0;
-  let pending = 0;
-  let flagged = 0;
-
-  for (const [, list] of fallbackCommentsStore.entries()) {
-    for (const item of list) {
-      total++;
-      if (item.status === "approved") approved++;
-      else if (item.status === "pending") pending++;
-      else if (item.status === "flagged") flagged++;
-    }
-  }
-
-  return { total, approved, pending, flagged };
+  // An unavailable database is not a valid statistical result.
+  throw new Error("Unable to load comment statistics from Supabase.");
 }

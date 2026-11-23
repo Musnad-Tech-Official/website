@@ -1,0 +1,175 @@
+import { test, expect, assertApplicationResponse } from "./fixtures";
+import { signInWithClerkTesting } from "./clerk-test-auth";
+import { requireIsolatedAdminCrd, openAdminDeleteConfirmation } from "./admin-content-helpers";
+
+const cardAncestor = "xpath=ancestor::div[contains(@class,'flex-col') and contains(@class,'justify-between')][1]";
+
+test.describe("isolated marketing CMS write and visibility checks", () => {
+  test.use({ storageState: { cookies: [], origins: [] } });
+
+  test("trusted company is saved, updated, hidden, and deleted locally", async ({ page }, info) => {
+    test.setTimeout(105_000);
+    const email = process.env.E2E_ADMIN_EMAIL;
+    requireIsolatedAdminCrd(email);
+    const suffix = [process.env.GITHUB_RUN_ID, info.project.name, info.retry].join("-").replace(/[^a-zA-Z0-9-]/g, "");
+    const name = "CI Company " + suffix;
+    const revised = "CI Revised Company " + suffix;
+    await signInWithClerkTesting(page, email, "admin");
+    const r = await page.goto("/en/admin/companies", { waitUntil: "domcontentloaded" });
+    assertApplicationResponse(page.url());
+    expect(r?.status()).toBe(200);
+    await expect(page.locator('[data-admin-hydrated="true"]')).toBeVisible();
+    await page.getByRole("button", { name: "Add Company" }).first().click();
+    let dialog = page.getByRole("dialog");
+    await expect(dialog).toBeVisible();
+    await dialog.getByPlaceholder("e.g. Yemen Mobile").fill(name);
+    await dialog.getByPlaceholder("مثال: يمن موبايل").fill("شركة تجريبية معزولة");
+    // Existing public local favicon avoids fabricated partner logos.
+    await dialog.getByPlaceholder(/Or enter logo path/).fill("/favicon.ico");
+    await dialog.getByRole("switch").uncheck({ force: true });
+    await dialog.getByRole("button", { name: "Add Company" }).click();
+    await expect(dialog).toBeHidden({ timeout: 22_000 });
+    await page.reload({ waitUntil: "domcontentloaded" });
+    let card = page.getByRole("heading", { name, exact: true }).locator(cardAncestor);
+    await expect(card).toBeVisible({ timeout: 15_000 });
+    await expect(card).toContainText("Hidden");
+    await expect(page.locator('[data-admin-hydrated="true"]')).toBeVisible();
+    await card.getByRole("button", { name: "Edit" }).click();
+    dialog = page.getByRole("dialog");
+    await expect(dialog).toBeVisible();
+    await dialog.getByPlaceholder("e.g. Yemen Mobile").fill(revised);
+    await dialog.getByRole("button", { name: "Save Changes" }).click();
+    await expect(dialog).toBeHidden({ timeout: 22_000 });
+    await page.reload({ waitUntil: "domcontentloaded" });
+    card = page.getByRole("heading", { name: revised, exact: true }).locator(cardAncestor);
+    await expect(card).toContainText("Hidden");
+    const confirmation = await openAdminDeleteConfirmation(page, card.getByRole("button").last(), 'Delete "' + revised + '"?');
+    await confirmation.getByRole("button", { name: "Delete Permanently" }).click();
+    await expect(confirmation).toBeHidden({ timeout: 22_000 });
+    await page.reload({ waitUntil: "domcontentloaded" });
+    await expect(page.getByRole("heading", { name: revised, exact: true })).toHaveCount(0);
+  });
+
+  test("testimonial bilingual quote can be updated, hidden, and deleted", async ({ page }, info) => {
+    test.setTimeout(105_000);
+    const email = process.env.E2E_ADMIN_EMAIL;
+    requireIsolatedAdminCrd(email);
+    const suffix = [process.env.GITHUB_RUN_ID, info.project.name, info.retry].join("-").replace(/[^a-zA-Z0-9-]/g, "");
+    const author = "CI Testimonial " + suffix;
+    const quote = "Testimonial created by the isolated CI suite.";
+    const revisedQuote = "Updated testimonial persisted after page reload.";
+    await signInWithClerkTesting(page, email, "admin");
+    const r = await page.goto("/en/admin/testimonials", { waitUntil: "domcontentloaded" });
+    assertApplicationResponse(page.url());
+    expect(r?.status()).toBe(200);
+    await expect(page.locator('[data-admin-hydrated="true"]')).toBeVisible();
+    await page.getByRole("button", { name: "Add Testimonial" }).first().click();
+    let dialog = page.getByRole("dialog");
+    await expect(dialog).toBeVisible();
+    await dialog.getByPlaceholder("e.g. Rashid Al-Dosari").fill(author);
+    await dialog.getByPlaceholder("مثال: راشد الدوسري").fill("توصية اختبارية معزولة");
+    await dialog.getByPlaceholder("Write the quote in English...").fill(quote);
+    await dialog.getByPlaceholder("اكتب التوصية باللغة العربية...").fill("نص تجربة غير حقيقي في القاعدة المحلية.");
+    await dialog.getByRole("switch").uncheck({ force: true });
+    await dialog.getByRole("button", { name: "Add Testimonial" }).click();
+    await expect(dialog).toBeHidden({ timeout: 22_000 });
+    await page.reload({ waitUntil: "domcontentloaded" });
+    let card = page.getByText(author, { exact: true }).locator(cardAncestor);
+    await expect(card).toContainText(quote, { timeout: 15_000 });
+    await expect(card).toContainText("Hidden");
+    await expect(page.locator('[data-admin-hydrated="true"]')).toBeVisible();
+    await card.getByRole("button", { name: "Edit" }).click();
+    dialog = page.getByRole("dialog");
+    await expect(dialog).toBeVisible();
+    await dialog.getByPlaceholder("Write the quote in English...").fill(revisedQuote);
+    await dialog.getByRole("button", { name: "Save Changes" }).click();
+    await expect(dialog).toBeHidden({ timeout: 22_000 });
+    await page.reload({ waitUntil: "domcontentloaded" });
+    card = page.getByText(author, { exact: true }).locator(cardAncestor);
+    await expect(card).toContainText(revisedQuote);
+    const confirmation = await openAdminDeleteConfirmation(page, card.getByRole("button").last(), "Delete Testimonial");
+    await confirmation.getByRole("button", { name: "Delete" }).click();
+    // The modal closes even when deletion fails. Require server-confirmed
+    // success and the updated UI before reloading to verify durability.
+    await expect(page.getByText("Testimonial deleted successfully.", { exact: true }))
+      .toBeVisible({ timeout: 22_000 });
+    await expect(confirmation).toBeHidden({ timeout: 22_000 });
+    await expect(page.getByText(author, { exact: true })).toHaveCount(0);
+    await page.reload({ waitUntil: "domcontentloaded" });
+    await expect(page.getByText(author, { exact: true })).toHaveCount(0);
+  });
+
+  test("announcement banner activates/deactivates for anonymous visitors without persistence leaks", async ({ page, browser }, info) => {
+    test.setTimeout(135_000);
+    const email = process.env.E2E_ADMIN_EMAIL;
+    requireIsolatedAdminCrd(email);
+    const suffix = [process.env.GITHUB_RUN_ID, info.project.name, info.retry].join("-").replace(/[^a-zA-Z0-9-]/g, "");
+    const bannerText = "CI Isolated Announcement " + suffix;
+    const revised = "CI Revised Announcement " + suffix;
+    await signInWithClerkTesting(page, email, "admin");
+    const r = await page.goto("/en/admin/announcements", { waitUntil: "domcontentloaded" });
+    assertApplicationResponse(page.url());
+    expect(r?.status()).toBe(200);
+    await expect(page.locator('[data-admin-hydrated="true"]')).toBeVisible();
+    await page.getByRole("button", { name: "Push New Banner" }).first().click();
+    let dialog = page.getByRole("dialog");
+    await expect(dialog).toBeVisible();
+    await dialog.getByPlaceholder("e.g. Musnad UI Design System & Component Library is officially live!").fill(bannerText);
+    await dialog.getByPlaceholder("مثال: تم إطلاق مكتبة مكونات ونظام تصميم مسند للتقنية للجيل القادم!").fill("إعلان اختباري محلي لا يظهر على الموقع الحقيقي.");
+    await dialog.getByRole("switch").first().uncheck({ force: true });
+    await dialog.getByRole("button", { name: "Push Banner" }).click();
+    await expect(dialog).toBeHidden({ timeout: 22_000 });
+    await page.reload({ waitUntil: "domcontentloaded" });
+    let card = page.getByText(bannerText, { exact: true }).locator(cardAncestor);
+    await expect(card).toContainText("Off", { timeout: 15_000 });
+
+    await expect(page.locator('[data-admin-hydrated="true"]')).toBeVisible();
+    await card.getByRole("button", { name: "Edit" }).click();
+    dialog = page.getByRole("dialog");
+    await expect(dialog).toBeVisible();
+    await dialog.getByPlaceholder("e.g. Musnad UI Design System & Component Library is officially live!").fill(revised);
+    await dialog.getByRole("button", { name: "Save Banner" }).click();
+    await expect(dialog).toBeHidden({ timeout: 22_000 });
+    await page.reload({ waitUntil: "domcontentloaded" });
+    card = page.getByText(revised, { exact: true }).last().locator(cardAncestor);
+    await expect(card).toContainText("Off");
+    const anon = await browser.newContext({ baseURL: "http://localhost:3000" });
+    try {
+      // Next.js RSC may serialize inactive records into raw HTML. Verify real DOM visibility.
+      const visitor = await anon.newPage();
+      const publicBanner = visitor.getByRole("region", { name: "Announcement" });
+      await visitor.goto("/en", { waitUntil: "domcontentloaded" });
+      // A failed previous attempt may leave a different announcement active.
+      // Assert only that this newly created, inactive announcement is absent.
+      await expect(publicBanner.filter({ hasText: revised })).toHaveCount(0);
+      await expect(page.locator('[data-admin-hydrated="true"]')).toBeVisible();
+      await card.getByRole("switch").check({ force: true });
+      // "Active" is an optimistic UI state; the success notice comes only
+      // after the Supabase update finishes.
+      await expect(page.getByText("Banner is now broadcasting live on website.", { exact: true }))
+        .toBeVisible({ timeout: 20_000 });
+      await expect(card).toContainText("Active", { timeout: 15_000 });
+      await page.reload({ waitUntil: "domcontentloaded" });
+      await visitor.reload({ waitUntil: "domcontentloaded" });
+      await expect(publicBanner).toContainText(revised, { timeout: 15_000 });
+      card = page.getByText(revised, { exact: true }).last().locator(cardAncestor);
+      await expect(page.locator('[data-admin-hydrated="true"]')).toBeVisible();
+      await card.getByRole("switch").uncheck({ force: true });
+      await expect(page.getByText("Banner broadcast turned off.", { exact: true }))
+        .toBeVisible({ timeout: 20_000 });
+      await expect(card).toContainText("Off", { timeout: 15_000 });
+      await page.reload({ waitUntil: "domcontentloaded" });
+      await visitor.reload({ waitUntil: "domcontentloaded" });
+      await expect(publicBanner.filter({ hasText: revised })).toHaveCount(0);
+    } finally {
+      await anon.close();
+    }
+    await page.reload({ waitUntil: "domcontentloaded" });
+    card = page.getByText(revised, { exact: true }).last().locator(cardAncestor);
+    const confirm = await openAdminDeleteConfirmation(page, card.getByRole("button").last(), "Delete Announcement Banner");
+    await confirm.getByRole("button", { name: "Delete" }).click();
+    await expect(confirm).toBeHidden({ timeout: 22_000 });
+    await page.reload({ waitUntil: "domcontentloaded" });
+    await expect(page.getByText(revised, { exact: true })).toHaveCount(0);
+  });
+});

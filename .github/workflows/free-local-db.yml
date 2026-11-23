@@ -1,0 +1,50 @@
+name: Free local PostgreSQL RLS checks
+
+on:
+  push:
+    branches: [chore/staging-playwright-20261115]
+  pull_request:
+    branches: [test/integration-security-admin-20261115]
+
+permissions:
+  contents: read
+
+jobs:
+  local-rls:
+    name: Free local-only RLS policy smoke
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: local_ci_only
+          POSTGRES_DB: musnad_local_ci
+        ports: [5432:5432]
+        options: >-
+          --health-cmd "pg_isready -U postgres -d musnad_local_ci"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 8
+    env:
+      PGHOST: 127.0.0.1
+      PGPORT: 5432
+      PGDATABASE: musnad_local_ci
+      PGUSER: postgres
+      PGPASSWORD: local_ci_only
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Install local PostgreSQL client only if needed
+        run: |
+          if ! command -v psql >/dev/null 2>&1; then
+            sudo apt-get update -qq
+            sudo DEBIAN_FRONTEND=noninteractive apt-get install -y postgresql-client
+          fi
+
+      - name: Check source RLS policies against synthetic roles
+        run: bash scripts/test-free-local-rls.sh

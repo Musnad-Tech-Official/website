@@ -85,19 +85,16 @@ export function useToggleArticleStatusMutation() {
     },
     onMutate: async ({ id, newStatus }) => {
       await queryClient.cancelQueries({ queryKey: articleKeys.all });
-      const previous = queryClient.getQueryData<Article[]>(articleKeys.lists());
-
-      if (previous) {
-        queryClient.setQueryData<Article[]>(
-          articleKeys.lists(),
-          previous.map((a) => (a.id === id ? { ...a, status: newStatus } : a))
-        );
-      }
+      const previous = queryClient.getQueriesData<Article[]>({ queryKey: articleKeys.lists() });
+      queryClient.setQueriesData<Article[]>(
+        { queryKey: articleKeys.lists() },
+        (items) => items?.map((a) => (a.id === id ? { ...a, status: newStatus } : a))
+      );
       return { previous };
     },
     onError: (_err, _vars, context) => {
-      if (context?.previous) {
-        queryClient.setQueryData(articleKeys.lists(), context.previous);
+      for (const [key, data] of context?.previous ?? []) {
+        queryClient.setQueryData(key, data);
       }
     },
     onSettled: () => {

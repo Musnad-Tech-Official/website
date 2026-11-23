@@ -1,0 +1,65 @@
+name: Free local Supabase API and schema (Docker CI)
+
+on:
+  push:
+    branches:
+      - chore/staging-playwright-20261115
+
+permissions:
+  contents: read
+
+jobs:
+  local-supabase:
+    name: Local Supabase and API smoke
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Checkout reviewed code only
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Node.js 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Pin standalone local Supabase CLI (no cloud login)
+        uses: supabase/setup-cli@v3
+        with:
+          version: 3.1.0
+
+      - name: Inspect local CLI commands
+        run: |
+          supabase --version
+          supabase init --help
+          supabase migration new --help
+          supabase start --help
+
+      - name: Initialize local-only Supabase configuration
+        run: |
+          supabase init --force
+          test -f supabase/config.toml
+
+      - name: Create local schema migration through CLI
+        run: |
+          supabase migration new local_schema
+          target="$(find supabase/migrations -maxdepth 1 -type f -name '*_local_schema.sql' | head -n 1)"
+          test -n "$target"
+          node scripts/build-local-supabase-schema.mjs "$target"
+          cp tests/staging/seed.sql supabase/seed.sql
+          test -s "$target"
+
+      - name: Start isolated Supabase services
+        run: |
+          supabase start \
+            -x realtime,storage-api,imgproxy,postgres-meta,studio,edge-runtime,logflare,vector,supavisor
+          supabase status -o env > /tmp/musnad-local-status.env
+          chmod 600 /tmp/musnad-local-status.env
+
+      - name: Verify anonymous API and schema, without logging API keys
+        run: node scripts/smoke-local-supabase.mjs /tmp/musnad-local-status.env
+
+      - name: Cleanup local containers
+        if: always()
+        run: supabase stop --no-backup || true
