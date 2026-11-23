@@ -30,7 +30,21 @@ test.describe("authenticated admin module route coverage", () => {
       for (const moduleName of modules) {
         const path = "/" + locale + "/admin/" + moduleName;
         try {
-          const response = await page.goto(path, { waitUntil: "domcontentloaded", timeout: 25000 });
+          // Next.js dev may briefly refuse new sockets while compiling a route
+          // under CI load. Retry only a transient connection refusal; never
+          // mask an HTTP error, wrong redirect, or persistent server outage.
+          let response: Awaited<ReturnType<typeof page.goto>> = null;
+          for (let attempt = 0; attempt < 3; attempt++) {
+            try {
+              response = await page.goto(path, { waitUntil: "domcontentloaded", timeout: 25000 });
+              break;
+            } catch (err) {
+              if (!(err instanceof Error) || !err.message.includes("ERR_CONNECTION_REFUSED") || attempt === 2) {
+                throw err;
+              }
+              await page.waitForTimeout(750 * (attempt + 1));
+            }
+          }
           assertApplicationResponse(page.url());
           const actualPath = new URL(page.url()).pathname.replace(/\/$/, "");
           if (response?.status() !== 200 || actualPath !== path) {
